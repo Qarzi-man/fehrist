@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ДолгКонтроль</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1D9E75;--green-d:#0F6E56;--green-bg:#E1F5EE;--green-t:#085041;
+  --red:#E24B4A;--red-bg:#FCEBEB;--red-t:#501313;
+  --amber:#BA7517;--amber-bg:#FAEEDA;--amber-t:#412402;
+  --g50:#F9F9F8;--g100:#F1EFE8;--g200:#E2E0D8;--g400:#9B9A94;--g600:#5F5E5A;--g900:#1A1A18;
+  --border:rgba(0,0,0,.08);--r:10px;--r-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+body{font-family:'Inter',-apple-system,sans-serif;font-size:14px;color:var(--g900);background:var(--g50);line-height:1.5;-webkit-font-smoothing:antialiased}
+input,select,textarea{width:100%;padding:8px 12px;border:1px solid var(--g200);border-radius:var(--r);font-size:14px;font-family:inherit;color:var(--g900);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,158,117,.12)}
+label{display:block;font-size:12px;font-weight:600;color:var(--g600);margin-bottom:4px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;border:1px solid var(--g200);background:#fff;color:var(--g900);transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--g100)}.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--green);color:#fff;border-color:var(--green)}.btn-primary:hover{background:var(--green-d);border-color:var(--green-d)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-danger{color:var(--red);border-color:rgba(226,75,74,.2);background:var(--red-bg)}
+.btn-full{width:100%}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-title{font-size:15px;font-weight:600}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:10px 20px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 20px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g50)}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px}
+.pill-active{background:var(--green-bg);color:var(--green-t)}
+.pill-due{background:var(--amber-bg);color:var(--amber-t)}
+.pill-overdue{background:var(--red-bg);color:var(--red-t)}
+.pill-paid{background:var(--g100);color:var(--g600)}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow)}
+.stat-label{font-size:12px;color:var(--g400);font-weight:500;margin-bottom:6px}
+.stat-value{font-size:28px;font-weight:700;line-height:1}
+.stat-sub{font-size:12px;color:var(--g400);margin-top:6px}
+.alert{padding:12px 16px;border-radius:var(--r);font-size:13px;margin-top:10px}
+.alert-error{background:var(--red-bg);color:var(--red-t);border:1px solid rgba(226,75,74,.2)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.modal-box{background:#fff;border-radius:var(--r-lg);padding:24px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:2px}
+.modal-sub{font-size:13px;color:var(--g400);margin-bottom:2px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:20px;border-bottom:1px solid var(--border)}
+.logo-mark{width:38px;height:38px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;margin-bottom:8px}
+.logo-name{font-size:16px;font-weight:700}
+.logo-biz{font-size:12px;color:var(--g400);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav{padding:10px 0;flex:1}
+.nav-section{padding:12px 20px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g400)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;font-weight:500;color:var(--g600);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all .12s}
+.nav-item:hover{background:var(--g50);color:var(--g900)}
+.nav-item.active{background:var(--green-bg);color:var(--green-d)}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sidebar-footer{padding:14px 20px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:10px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--green-bg);color:var(--green-t);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-email{font-size:11px;color:var(--g400)}
+.main{flex:1;padding:28px;overflow-y:auto;min-width:0}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:12px}
+.page-title{font-size:22px;font-weight:700}
+.page-sub{font-size:13px;color:var(--g400);margin-top:3px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.spinner{width:32px;height:32px;border:3px solid var(--g200);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-wrap{display:flex;align-items:center;justify-content:center;min-height:200px}
+.empty-state{text-align:center;padding:48px 20px;color:var(--g400)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:600;color:var(--g600);margin-bottom:6px}
+.empty-sub{font-size:13px}
+.filter-bar{display:flex;gap:8px;padding:14px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.filter-bar input{flex:1;min-width:160px}
+.filter-bar select{width:auto;min-width:130px}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:9999;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,.2);color:#fff}
+.toast-success{background:var(--green-d)}
+.toast-error{background:var(--red)}
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--g50);padding:20px}
+.auth-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:36px;width:100%;max-width:400px;box-shadow:var(--shadow)}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.auth-title{font-size:20px;font-weight:700}
+.auth-sub{font-size:13px;color:var(--g400);margin-top:4px;margin-bottom:20px}
+.auth-switch{text-align:center;margin-top:18px;font-size:13px;color:var(--g400)}
+.auth-switch button{background:none;border:none;color:var(--green);cursor:pointer;font-weight:500;padding:0}
+.row-actions{display:flex;gap:4px}
+.info-box{background:var(--g50);border-radius:var(--r);padding:12px 16px;font-size:13px;margin-top:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { createClient } = supabase;
+const sb = createClient(
+  'https://fortxhggcnvbhrapkaul.supabase.co',
+  'sb_publishable_wpL9aGzMTm4GdKyv9TUe5A_UMmkQAqq'
+);
+
+const { useState, useEffect, useMemo, createContext, useContext } = React;
+const AppCtx = createContext(null);
+const useApp = () => useContext(AppCtx);
+
+let _toast = null;
+function toast(msg, type='success') { _toast?.({msg,type,id:Date.now()}); }
+
+function getStatus(d) {
+  if (d.status==='paid') return 'paid';
+  const diff = Math.floor((new Date()-new Date(d.due_date))/86400000);
+  if (diff>0) return 'overdue';
+  if (diff>-7) return 'due';
+  return 'active';
+}
+const statusLabel = s => ({active:'Активный',due:'Скоро срок',overdue:'Просрочен',paid:'Оплачен'}[s]??s);
+const statusClass = s => ({active:'pill-active',due:'pill-due',overdue:'pill-overdue',paid:'pill-paid'}[s]??'');
+const daysOverdue = d => Math.max(0,Math.floor((new Date()-new Date(d.due_date))/86400000));
+const fmt = n => Number(n??0).toLocaleString('ru-RU',{maximumFractionDigits:2});
+const today = () => new Date().toISOString().split('T')[0];
+const addDays = n => { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; };
+
+// ── Logo ──
+const Logo = () => (
+  <div className="auth-logo">
+    <div style={{width:40,height:40,background:'#1D9E75',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:700,fontSize:20}}>Д</div>
+    <div><div style={{fontWeight:700,fontSize:18}}>ДолгКонтроль</div><div style={{fontSize:12,color:'var(--g400)'}}>Учёт задолженностей</div></div>
+  </div>
+);
+
+// ── Auth ──
+function AuthPage() {
+  const [mode,setMode] = useState('login');
+  return mode==='login' ? <Login onSwitch={()=>setMode('register')}/> : <Register onSwitch={()=>setMode('login')}/>;
+}
+
+function Login({onSwitch}) {
+  const [email,setEmail]=useState(''); const [pass,setPass]=useState('');
+  const [error,setError]=useState(''); const [loading,setLoading]=useState(false);
+  async function submit(e) {
+    e.preventDefault(); setError(''); setLoading(true);
+    const {error} = await sb.auth.signInWithPassword({email,password:pass});
+    if(error) setError('Неверный email или пароль');
+    setLoading(false);
+  }
+  return (
+    <div className="auth-page"><div className="auth-card">
+      <Logo/>
+      <div className="auth-title">Добро пожаловать</div>
+      <div className="auth-sub">Войдите в свой аккаунт</div>
+      <form onSubmit={submit}>
+        <label>Email</label>
+        <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required autoFocus/>
+        <label>Пароль</label>
+        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••" required/>
+        {error && <div className="alert alert-error">{error}</div>}
+        <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={loading}>{loading?'Входим...':'Войти'}</button>
+      </form>
+      <div className="auth-switch">Нет аккаунта? <button onClick={onSwitch}>Зарегистрироваться</button></div>
+    </div></div>
+  );
+}
+
+function Register({onSwitch}) {
+  const [bizName,setBizName]=useState(''); const [bizType,setBizType]=useState('Другое');
+  const [email,setEmail]=useState(''); const [pass,setPass]=useState('');
+  const [error,setError]=useState(''); const [loading,setLoading]=useState(false); const [done,setDone]=useState(false);
+  const types=['Аптека','Продуктовый магазин','Строительный магазин','Магазин одежды','Ресторан / кафе','Другое'];
+  async function submit(e) {
+    e.preventDefault(); setError(''); setLoading(true);
+    if(pass.length<6){setError('Пароль минимум 6 символов');setLoading(false);return;}
+    const {error} = await sb.auth.signUp({email,password:pass,options:{data:{biz_name:bizName.trim(),biz_type:bizType}}});
+    if(error) setError(error.message); else setDone(true);
+    setLoading(false);
+  }
+  if(done) return (
+    <div className="auth-page"><div className="auth-card" style={{textAlign:'center'}}>
+      <Logo/><div style={{fontSize:40,margin:'16px 0'}}>✅</div>
+      <div className="auth-title">Аккаунт создан!</div>
+      <div className="auth-sub" style={{marginTop:8}}>Проверьте email <strong>{email}</strong> и подтвердите регистрацию.</div>
+      <button className="btn btn-primary btn-full" style={{marginTop:20}} onClick={onSwitch}>Войти</button>
+    </div></div>
+  );
+  return (
+    <div className="auth-page"><div className="auth-card">
+      <Logo/>
+      <div className="auth-title">Регистрация</div>
+      <div className="auth-sub">Создайте аккаунт для бизнеса</div>
+      <form onSubmit={submit}>
+        <label>Название бизнеса *</label>
+        <input value={bizName} onChange={e=>setBizName(e.target.value)} placeholder="Аптека Шифо / Магазин Азия" required autoFocus/>
+        <label>Тип бизнеса</label>
+        <select value={bizType} onChange={e=>setBizType(e.target.value)}>{types.map(t=><option key={t}>{t}</option>)}</select>
+        <label>Email *</label>
+        <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required/>
+        <label>Пароль *</label>
+        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="Минимум 6 символов" required/>
+        {error && <div className="alert alert-error">{error}</div>}
+        <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={loading}>{loading?'Создаём...':'Создать аккаунт'}</button>
+      </form>
+      <div className="auth-switch">Уже есть аккаунт? <button onClick={onSwitch}>Войти</button></div>
+    </div></div>
+  );
+}
+
+// ── Add Debt Modal ──
+function AddDebtModal({business,onClose,onSaved}) {
+  const CATS=['Лекарства','Продукты','Стройматериалы','Одежда','Другое'];
+  const [f,setF]=useState({name:'',phone:'',amount:'',cat:'Другое',date:today(),days:'30',comment:''});
+  const [error,setError]=useState(''); const [saving,setSaving]=useState(false);
+  const set=(k,v)=>setF(p=>({...p,[k]:v}));
+  async function submit(e) {
+    e.preventDefault(); setError('');
+    if(!f.name.trim()){setError('Введите ФИО клиента');return;}
+    if(!f.phone.trim()){setError('Введите номер телефона');return;}
+    if(!f.amount||+f.amount<=0){setError('Введите корректную сумму');return;}
+    setSaving(true);
+    const {error:err} = await sb.from('debts').insert({
+      business_id:business.id,client_name:f.name.trim(),phone:f.phone.trim(),
+      amount:+f.amount,date_issued:f.date,due_date:addDays(+f.days||30),
+      category:f.cat,comment:f.comment.trim(),status:'active',paid_amount:0
+    });
+    setSaving(false);
+    if(err){setError(err.message);return;}
+    onSaved(); onClose();
+  }
+  return (
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-title">Добавить долг</div>
+        <div className="modal-sub">Заполните данные клиента</div>
+        <form onSubmit={submit}>
+          <label>ФИО клиента *</label><input value={f.name} onChange={e=>set('name',e.target.value)} placeholder="Рустам Алиев" autoFocus/>
+          <label>Номер телефона *</label><input value={f.phone} onChange={e=>set('phone',e.target.value)} placeholder="+992 XX XXX XXXX"/>
+          <label>Сумма долга (сомони) *</label><input type="number" value={f.amount} onChange={e=>set('amount',e.target.value)} placeholder="0" min="1" step="0.01"/>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+            <div><label>Дата долга</label><input type="date" value={f.date} onChange={e=>set('date',e.target.value)}/></div>
+            <div><label>Срок (дней)</label><input type="number" value={f.days} onChange={e=>set('days',e.target.value)} min="1" max="365"/></div>
+          </div>
+          <label>Категория</label>
+          <select value={f.cat} onChange={e=>set('cat',e.target.value)}>{CATS.map(c=><option key={c}>{c}</option>)}</select>
+          <label>Комментарий</label>
+          <textarea value={f.comment} onChange={e=>set('comment',e.target.value)} rows={2} placeholder="Необязательно..."/>
+          {error && <div className="alert alert-error">{error}</div>}
+          <div className="modal-footer">
+            <button type="button" className="btn" onClick={onClose}>Отмена</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving?'Сохраняем...':'Добавить'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Pay Modal ──
+function PayModal({debt,onClose,onSaved}) {
+  const remaining = Number(debt.amount)-Number(debt.paid_amount??0);
+  const [amount,setAmount]=useState(String(remaining));
+  const [paidAt,setPaidAt]=useState(today());
+  const [method,setMethod]=useState('Наличные');
+  const [note,setNote]=useState('');
+  const [error,setError]=useState(''); const [saving,setSaving]=useState(false);
+  async function submit(e) {
+    e.preventDefault(); setError('');
+    const amt=Number(amount);
+    if(!amt||amt<=0){setError('Введите сумму');return;}
+    if(amt>remaining){setError(`Максимум ${fmt(remaining)} сомони`);return;}
+    setSaving(true);
+    await sb.from('payments').insert({debt_id:debt.id,amount:amt,paid_at:paidAt,method,note});
+    const newPaid=Number(debt.paid_amount??0)+amt;
+    const newStatus=newPaid>=Number(debt.amount)?'paid':'partial';
+    await sb.from('debts').update({paid_amount:newPaid,status:newStatus}).eq('id',debt.id);
+    setSaving(false); onSaved();
+  }
+  return (
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-title">Записать оплату</div>
+        <div className="info-box">
+          <div style={{fontWeight:600}}>{debt.client_name}</div>
+          <div style={{color:'var(--g400)',marginTop:2}}>Долг: {fmt(debt.amount)} сомони &nbsp;·&nbsp; Остаток: <strong style={{color:'#E24B4A'}}>{fmt(remaining)} сомони</strong></div>
+        </div>
+        <form onSubmit={submit}>
+          <label>Сумма оплаты *</label>
+          <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} min="1" max={remaining} step="0.01" autoFocus/>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+            <div><label>Дата оплаты</label><input type="date" value={paidAt} onChange={e=>setPaidAt(e.target.value)}/></div>
+            <div><label>Способ</label>
+              <select value={method} onChange={e=>setMethod(e.target.value)}>
+                {['Наличные','Перевод','Карта','Другое'].map(m=><option key={m}>{m}</option>)}
+              </select>
+            </div>
+          </div>
+          <label>Заметка</label>
+          <input value={note} onChange={e=>setNote(e.target.value)} placeholder="Необязательно"/>
+          {error && <div className="alert alert-error">{error}</div>}
+          <div className="modal-footer">
+            <button type="button" className="btn" onClick={onClose}>Отмена</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving?'Сохраняем...':'✓ Подтвердить'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Dashboard ──
+function Dashboard() {
+  const {business,setPage}=useApp();
+  const [debts,setDebts]=useState([]); const [loading,setLoading]=useState(true);
+  const [addOpen,setAddOpen]=useState(false); const [payDebt,setPayDebt]=useState(null);
+  async function load() {
+    if(!business) return; setLoading(true);
+    const {data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});
+    setDebts(data??[]); setLoading(false);
+  }
+  useEffect(()=>{load();},[business]);
+  const active=debts.filter(d=>getStatus(d)!=='paid');
+  const overdue=debts.filter(d=>getStatus(d)==='overdue');
+  const paid=debts.filter(d=>getStatus(d)==='paid');
+  const totalActive=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+  const totalOverdue=overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+  const totalPaid=paid.reduce((s,d)=>s+Number(d.amount),0);
+  const clients=new Set(active.map(d=>d.phone)).size;
+  return (
+    <>
+      <div className="page-header">
+        <div><div className="page-title">Дашборд</div><div className="page-sub">Обзор задолженностей</div></div>
+        <button className="btn btn-primary" onClick={()=>setAddOpen(true)}>+ Добавить долг</button>
+      </div>
+      <div className="stats-grid">
+        <div className="stat-card" style={{borderLeft:'3px solid #1D9E75'}}>
+          <div className="stat-label">Активных долгов</div>
+          <div className="stat-value" style={{color:'#1D9E75'}}>{active.length}</div>
+          <div className="stat-sub">{fmt(totalActive)} сомони</div>
+        </div>
+        <div className="stat-card" style={{borderLeft:'3px solid #E24B4A'}}>
+          <div className="stat-label">Просрочено</div>
+          <div className="stat-value" style={{color:'#E24B4A'}}>{overdue.length}</div>
+          <div className="stat-sub">{fmt(totalOverdue)} сомони</div>
+        </div>
+        <div className="stat-card" style={{borderLeft:'3px solid #9B9A94'}}>
+          <div className="stat-label">Погашено</div>
+          <div className="stat-value" style={{color:'#5F5E5A'}}>{paid.length}</div>
+          <div className="stat-sub">{fmt(totalPaid)} сомони</div>
+        </div>
+        <div className="stat-card" style={{borderLeft:'3px solid #BA7517'}}>
+          <div className="stat-label">Клиентов с долгом</div>
+          <div className="stat-value">{clients}</div>
+          <div className="stat-sub">уникальных</div>
+        </div>
+      </div>
+      <div className="card" style={{marginBottom:20}}>
+        <div className="card-header">
+          <span className="card-title">Последние долги</span>
+          <button className="btn btn-sm" onClick={()=>setPage('debts')}>Все →</button>
+        </div>
+        {loading ? <div className="loading-wrap"><div className="spinner"/></div>
+        : debts.length===0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">📋</div>
+            <div className="empty-title">Долгов пока нет</div>
+            <div className="empty-sub">Нажмите «Добавить долг» чтобы начать</div>
+          </div>
+        ) : (
+          <div className="table-wrap"><table>
+            <thead><tr><th>Клиент</th><th>Сумма</th><th>Остаток</th><th>Срок</th><th>Статус</th><th></th></tr></thead>
+            <tbody>{debts.slice(0,6).map(d=>{
+              const st=getStatus(d); const rem=Number(d.amount)-Number(d.paid_amount??0);
+              return <tr key={d.id}>
+                <td><strong>{d.client_name}</strong><br/><span style={{fontSize:11,color:'var(--g400)'}}>{d.phone}</span></td>
+                <td>{fmt(d.amount)}</td>
+                <td style={{fontWeight:600,color:rem>0?'#E24B4A':'var(--g400)'}}>{fmt(rem)}</td>
+                <td>{d.due_date}{st==='overdue'&&<div style={{fontSize:11,color:'#E24B4A'}}>+{daysOverdue(d)} дн.</div>}</td>
+                <td><span className={`pill ${statusClass(st)}`}>{statusLabel(st)}</span></td>
+                <td><div className="row-actions">{st!=='paid'&&<button className="btn btn-sm" onClick={()=>setPayDebt(d)}>💰</button>}</div></td>
+              </tr>;
+            })}</tbody>
+          </table></div>
+        )}
+      </div>
+      {overdue.length>0 && (
+        <div className="card">
+          <div className="card-header"><span className="card-title">🔴 Просроченные</span><span style={{fontSize:12,color:'#E24B4A',fontWeight:600}}>{overdue.length} шт.</span></div>
+          <div className="table-wrap"><table>
+            <thead><tr><th>Клиент</th><th>Остаток</th><th>Просрочка</th><th>Телефон</th><th></th></tr></thead>
+            <tbody>{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=>(
+              <tr key={d.id}>
+                <td><strong>{d.client_name}</strong></td>
+                <td style={{fontWeight:600}}>{fmt(Number(d.amount)-Number(d.paid_amount??0))} сомони</td>
+                <td><span style={{color:'#E24B4A',fontWeight:700}}>{daysOverdue(d)} дн.</span></td>
+                <td>{d.phone}</td>
+                <td><button className="btn btn-sm" onClick={()=>setPayDebt(d)}>💰 Оплата</button></td>
+              </tr>
+            ))}</tbody>
+          </table></div>
+        </div>
+      )}
+      {addOpen&&<AddDebtModal business={business} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast('Долг добавлен');}}/>}
+      {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast('Оплата записана');}}/>}
+    </>
+  );
+}
+
+// ── Debts Page ──
+function DebtsPage() {
+  const {business}=useApp();
+  const [debts,setDebts]=useState([]); const [loading,setLoading]=useState(true);
+  const [search,setSearch]=useState(''); const [fStatus,setFStatus]=useState(''); const [sort,setSort]=useState('date_desc');
+  const [addOpen,setAddOpen]=useState(false); const [payDebt,setPayDebt]=useState(null);
+  async function load() {
+    if(!business) return; setLoading(true);
+    const {data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});
+    setDebts(data??[]); setLoading(false);
+  }
+  useEffect(()=>{load();},[business]);
+  async function del(d) {
+    if(!confirm(`Удалить долг "${d.client_name}"?`)) return;
+    await sb.from('debts').delete().eq('id',d.id);
+    toast('Удалено','error'); load();
+  }
+  const list=useMemo(()=>{
+    let r=debts.filter(d=>{
+      const q=search.toLowerCase();
+      return (!q||d.client_name.toLowerCase().includes(q)||d.phone.includes(q))&&(!fStatus||getStatus(d)===fStatus);
+    });
+    r.sort((a,b)=>{
+      if(sort==='date_asc') return new Date(a.date_issued)-new Date(b.date_issued);
+      if(sort==='amount_desc') return Number(b.amount)-Number(a.amount);
+      if(sort==='overdue') return daysOverdue(b)-daysOverdue(a);
+      return new Date(b.created_at)-new Date(a.created_at);
+    });
+    return r;
+  },[debts,search,fStatus,sort]);
+  return (
+    <>
+      <div className="page-header">
+        <div><div className="page-title">Все долги</div><div className="page-sub">{list.length} записей</div></div>
+        <button className="btn btn-primary" onClick={()=>setAddOpen(true)}>+ Добавить долг</button>
+      </div>
+      <div className="card">
+        <div className="filter-bar">
+          <input placeholder="Поиск по ФИО или телефону..." value={search} onChange={e=>setSearch(e.target.value)}/>
+          <select value={fStatus} onChange={e=>setFStatus(e.target.value)}>
+            <option value="">Все статусы</option>
+            <option value="active">Активный</option>
+            <option value="due">Скоро срок</option>
+            <option value="overdue">Просрочен</option>
+            <option value="paid">Оплачен</option>
+          </select>
+          <select value={sort} onChange={e=>setSort(e.target.value)}>
+            <option value="date_desc">Сначала новые</option>
+            <option value="date_asc">Сначала старые</option>
+            <option value="amount_desc">По сумме</option>
+            <option value="overdue">По просрочке</option>
+          </select>
+        </div>
+        {loading?<div className="loading-wrap"><div className="spinner"/></div>
+        :list.length===0?<div className="empty-state"><div className="empty-icon">📋</div><div className="empty-title">Долгов не найдено</div></div>
+        :<div className="table-wrap"><table>
+          <thead><tr><th>Клиент</th><th>Телефон</th><th>Сумма</th><th>Оплачено</th><th>Остаток</th><th>Срок</th><th>Статус</th><th></th></tr></thead>
+          <tbody>{list.map(d=>{
+            const st=getStatus(d); const pa=Number(d.paid_amount??0); const rem=Number(d.amount)-pa;
+            return <tr key={d.id}>
+              <td><strong>{d.client_name}</strong>{d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}</td>
+              <td style={{color:'var(--g600)'}}>{d.phone}</td>
+              <td>{fmt(d.amount)}</td>
+              <td style={{color:'var(--g400)'}}>{pa>0?fmt(pa):'—'}</td>
+              <td style={{fontWeight:600,color:rem>0?'#E24B4A':'var(--g400)'}}>{fmt(rem)}</td>
+              <td>{d.due_date}{st==='overdue'&&<div style={{fontSize:11,color:'#E24B4A',fontWeight:600}}>+{daysOverdue(d)} дн.</div>}</td>
+              <td><span className={`pill ${statusClass(st)}`}>{statusLabel(st)}</span></td>
+              <td><div className="row-actions">
+                {st!=='paid'&&<button className="btn btn-sm" onClick={()=>setPayDebt(d)}>💰</button>}
+                <button className="btn btn-sm btn-danger" onClick={()=>del(d)}>✕</button>
+              </div></td>
+            </tr>;
+          })}</tbody>
+        </table></div>}
+      </div>
+      {addOpen&&<AddDebtModal business={business} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast('Долг добавлен');}}/>}
+      {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast('Оплата записана');}}/>}
+    </>
+  );
+}
+
+// ── Clients Page ──
+function ClientsPage() {
+  const {business}=useApp();
+  const [debts,setDebts]=useState([]); const [loading,setLoading]=useState(true); const [search,setSearch]=useState('');
+  useEffect(()=>{
+    if(!business) return; setLoading(true);
+    sb.from('debts').select('*').eq('business_id',business.id).then(({data})=>{setDebts(data??[]);setLoading(false);});
+  },[business]);
+  const clients=useMemo(()=>{
+    const map={};
+    debts.forEach(d=>{if(!map[d.phone])map[d.phone]={name:d.client_name,phone:d.phone,debts:[]};map[d.phone].debts.push(d);});
+    return Object.values(map).filter(c=>{const q=search.toLowerCase();return !q||c.name.toLowerCase().includes(q)||c.phone.includes(q);})
+      .sort((a,b)=>b.debts.some(d=>getStatus(d)==='overdue')-a.debts.some(d=>getStatus(d)==='overdue'));
+  },[debts,search]);
+  return (
+    <>
+      <div className="page-header"><div><div className="page-title">Клиенты</div><div className="page-sub">{clients.length} клиентов</div></div></div>
+      <div className="card">
+        <div className="filter-bar"><input placeholder="Поиск..." value={search} onChange={e=>setSearch(e.target.value)}/></div>
+        {loading?<div className="loading-wrap"><div className="spinner"/></div>
+        :clients.length===0?<div className="empty-state"><div className="empty-icon">👥</div><div className="empty-title">Клиентов нет</div></div>
+        :<div className="table-wrap"><table>
+          <thead><tr><th>Клиент</th><th>Телефон</th><th>Долгов</th><th>Активная сумма</th><th>Оплачено</th><th>Статус</th></tr></thead>
+          <tbody>{clients.map(c=>{
+            const active=c.debts.filter(d=>getStatus(d)!=='paid');
+            const paidD=c.debts.filter(d=>getStatus(d)==='paid');
+            const actSum=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+            const paidSum=paidD.reduce((s,d)=>s+Number(d.amount),0);
+            const hasOv=active.some(d=>getStatus(d)==='overdue');
+            const init=c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            return <tr key={c.phone}>
+              <td><div style={{display:'flex',alignItems:'center',gap:10}}>
+                <div style={{width:34,height:34,borderRadius:'50%',background:'var(--green-bg)',color:'var(--green-t)',fontSize:12,fontWeight:600,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>{init}</div>
+                <strong>{c.name}</strong>
+              </div></td>
+              <td>{c.phone}</td>
+              <td>{c.debts.length}</td>
+              <td style={{fontWeight:600,color:actSum>0?'#E24B4A':'var(--g400)'}}>{fmt(actSum)} сомони</td>
+              <td style={{color:'var(--g400)'}}>{fmt(paidSum)} сомони</td>
+              <td><span className={`pill ${hasOv?'pill-overdue':active.length?'pill-active':'pill-paid'}`}>{hasOv?'Просрочка':active.length?'Активный':'Чистый'}</span></td>
+            </tr>;
+          })}</tbody>
+        </table></div>}
+      </div>
+    </>
+  );
+}
+
+// ── Settings ──
+function SettingsPage() {
+  const {business,setBusiness,session}=useApp();
+  const [name,setName]=useState(''); const [type,setType]=useState(''); const [saving,setSaving]=useState(false);
+  const types=['Аптека','Продуктовый магазин','Строительный магазин','Магазин одежды','Ресторан / кафе','Другое'];
+  useEffect(()=>{if(business){setName(business.name);setType(business.type);};},[business]);
+  async function save(e) {
+    e.preventDefault(); setSaving(true);
+    const {data}=await sb.from('businesses').update({name,type}).eq('id',business.id).select().single();
+    if(data){setBusiness(data);toast('Настройки сохранены');}
+    setSaving(false);
+  }
+  return (
+    <>
+      <div className="page-header"><div><div className="page-title">Настройки</div><div className="page-sub">Данные вашего бизнеса</div></div></div>
+      <div className="card" style={{maxWidth:480}}>
+        <div className="card-header"><span className="card-title">Профиль бизнеса</span></div>
+        <form onSubmit={save} style={{padding:20}}>
+          <label>Email</label><input value={session?.user?.email??''} disabled style={{opacity:.6}}/>
+          <label>Название бизнеса</label><input value={name} onChange={e=>setName(e.target.value)} required/>
+          <label>Тип бизнеса</label>
+          <select value={type} onChange={e=>setType(e.target.value)}>{types.map(t=><option key={t}>{t}</option>)}</select>
+          <button className="btn btn-primary" type="submit" style={{marginTop:20}} disabled={saving}>{saving?'Сохраняем...':'Сохранить'}</button>
+        </form>
+      </div>
+    </>
+  );
+}
+
+// ── Sidebar ──
+function Sidebar({page,setPage}) {
+  const {session,business}=useApp();
+  const email=session?.user?.email??'';
+  const initials=(business?.name??email).slice(0,2).toUpperCase();
+  const nav=[{id:'dashboard',icon:'📊',label:'Дашборд'},{id:'debts',icon:'📋',label:'Долги'},{id:'clients',icon:'👥',label:'Клиенты'},{id:'settings',icon:'⚙️',label:'Настройки'}];
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-logo">
+        <div className="logo-mark">Д</div>
+        <div className="logo-name">ДолгКонтроль</div>
+        <div className="logo-biz">{business?.name??'...'}</div>
+      </div>
+      <nav className="nav">
+        <div className="nav-section">Меню</div>
+        {nav.map(n=><button key={n.id} className={`nav-item${page===n.id?' active':''}`} onClick={()=>setPage(n.id)}><span className="nav-icon">{n.icon}</span>{n.label}</button>)}
+      </nav>
+      <div className="sidebar-footer">
+        <div className="user-row">
+          <div className="user-avatar">{initials}</div>
+          <div style={{flex:1,minWidth:0}}><div className="user-name">{business?.name??'Бизнес'}</div><div className="user-email">{email}</div></div>
+          <button className="btn btn-sm" onClick={()=>sb.auth.signOut()} title="Выйти">↩</button>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+// ── App Root ──
+const PAGES={dashboard:Dashboard,debts:DebtsPage,clients:ClientsPage,settings:SettingsPage};
+function App() {
+  const [session,setSession]=useState(undefined);
+  const [business,setBusiness]=useState(null);
+  const [page,setPage]=useState('dashboard');
+  const [toastState,setToast]=useState(null);
+  _toast=setToast;
+
+  useEffect(()=>{
+    sb.auth.getSession().then(({data:{session}})=>setSession(session));
+    const {data:{subscription}}=sb.auth.onAuthStateChange((_,s)=>setSession(s));
+    return ()=>subscription.unsubscribe();
+  },[]);
+
+  useEffect(()=>{
+    if(!session){setBusiness(null);return;}
+    sb.from('businesses').select('*').eq('owner_id',session.user.id).single().then(({data})=>setBusiness(data));
+  },[session]);
+
+  useEffect(()=>{
+    if(!toastState) return;
+    const t=setTimeout(()=>setToast(null),3000);
+    return ()=>clearTimeout(t);
+  },[toastState]);
+
+  if(session===undefined) return <div className="loading-wrap"><div className="spinner"/></div>;
+  if(!session) return <AuthPage/>;
+  const Page=PAGES[page]??Dashboard;
+  return (
+    <AppCtx.Provider value={{session,business,setBusiness,setPage}}>
+      <div className="layout">
+        <Sidebar page={page} setPage={setPage}/>
+        <main className="main"><Page/></main>
+      </div>
+      {toastState&&<div key={toastState.id} className={`toast toast-${toastState.type}`}>{toastState.msg}</div>}
+    </AppCtx.Provider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
