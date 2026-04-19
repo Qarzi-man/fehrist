@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Қарзи ман</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#2563EB;--primary-d:#1D4ED8;--primary-bg:#EFF6FF;--primary-t:#1E40AF;
+  --green:#059669;--green-bg:#ECFDF5;--green-t:#065F46;
+  --red:#DC2626;--red-bg:#FEF2F2;--red-t:#7F1D1D;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-t:#78350F;
+  --g50:#F8FAFC;--g100:#F1F5F9;--g200:#E2E8F0;--g300:#CBD5E1;--g400:#94A3B8;--g500:#64748B;--g600:#475569;--g700:#334155;--g800:#1E293B;--g900:#0F172A;
+  --border:rgba(0,0,0,.07);--r:10px;--r-lg:14px;--r-xl:20px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.1);
+  --sidebar-w:240px;--bottom-nav:60px;
+}
+body{font-family:'Inter',-apple-system,sans-serif;font-size:14px;color:var(--g800);background:var(--g50);line-height:1.5;-webkit-font-smoothing:antialiased}
+input,select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--g200);border-radius:var(--r);font-size:15px;font-family:inherit;color:var(--g800);background:#fff;outline:none;transition:all .15s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+input:disabled{background:var(--g100);color:var(--g400)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+label{display:block;font-size:12px;font-weight:600;color:var(--g500);margin-bottom:5px;margin-top:14px;text-transform:uppercase;letter-spacing:.04em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--r);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;border:1.5px solid var(--g200);background:#fff;color:var(--g700);transition:all .15s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.btn:hover{background:var(--g100)}.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn-primary:hover{background:var(--primary-d)}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green)}.btn-green:hover{background:#047857}
+.btn-sm{padding:7px 13px;font-size:12px}
+.btn-danger{color:var(--red);border-color:rgba(220,38,38,.2);background:var(--red-bg)}
+.btn-full{width:100%;padding:13px;font-size:15px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.card-title{font-size:15px;font-weight:700;color:var(--g800)}
+.card-sub{font-size:12px;color:var(--g400);margin-top:1px}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th{font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--g50)}
+td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFBFF}
+.debt-cards{display:none;flex-direction:column;gap:10px;padding:12px}
+.debt-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;box-shadow:var(--shadow)}
+.debt-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.debt-card-name{font-weight:700;font-size:15px;color:var(--g900)}
+.debt-card-phone{font-size:12px;color:var(--g400);margin-top:2px}
+.debt-card-amount{text-align:right}
+.debt-card-sum{font-size:18px;font-weight:800;color:var(--red)}
+.debt-card-sum.paid-sum{color:var(--g400)}
+.debt-card-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--g500);margin-top:6px;flex-wrap:wrap;gap:4px}
+.debt-card-actions{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+.debt-card-actions .btn{flex:1;font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px}
+.pill-active{background:var(--green-bg);color:var(--green-t)}
+.pill-due{background:var(--amber-bg);color:var(--amber-t)}
+.pill-overdue{background:var(--red-bg);color:var(--red-t)}
+.pill-paid{background:var(--g100);color:var(--g500)}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.cat-1{background:#FEF9C3;color:#713F12}.cat-2{background:#FFEDD5;color:#7C2D12}
+.cat-3{background:#FEE2E2;color:#7F1D1D}.cat-4{background:#F3E8FF;color:#4C1D95}.cat-5{background:#FCE7F3;color:#831843}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-accent{position:absolute;top:0;left:0;width:4px;height:100%}
+.stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}.stat-icon svg{width:20px;height:20px;stroke:currentColor}
+.stat-label{font-size:11px;color:var(--g400);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.stat-value{font-size:24px;font-weight:800;line-height:1;color:var(--g900)}
+.stat-sub{font-size:11px;color:var(--g400);margin-top:5px;font-weight:500}
+.alert{padding:12px 14px;border-radius:var(--r);font-size:13px;margin-top:10px;font-weight:500}
+.alert-error{background:var(--red-bg);color:var(--red-t);border:1px solid rgba(220,38,38,.15)}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:flex-end;justify-content:center;z-index:1000;padding:0;backdrop-filter:blur(3px)}
+.modal-box{background:#fff;border-radius:var(--r-xl) var(--r-xl) 0 0;padding:20px 20px 32px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 -8px 32px rgba(0,0,0,.2);animation:slideUp .25s ease}
+.modal-handle{width:36px;height:4px;background:var(--g200);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:18px;font-weight:800;color:var(--g900);margin-bottom:2px}
+.modal-footer{display:flex;gap:8px;margin-top:20px}
+.modal-footer .btn{flex:1}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--g900);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100}
+.sidebar-logo{padding:18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#2563EB,#7C3AED);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-name{font-size:15px;font-weight:800;color:#fff;line-height:1.2}
+.logo-tagline{font-size:10px;color:rgba(255,255,255,.3);margin-top:1px}
+.lang-switcher{display:flex;gap:3px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06)}
+.lang-btn{flex:1;padding:5px 3px;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;transition:all .12s;background:rgba(255,255,255,.06);color:rgba(255,255,255,.4)}
+.lang-btn.active{background:var(--primary);color:#fff}
+.nav{padding:8px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:13px;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all .12s}
+.nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.nav-item.active{background:rgba(37,99,235,.3);color:#fff;font-weight:600}
+.nav-item.active .nav-iw{background:var(--primary)}
+.nav-iw{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0}.nav-iw svg{width:16px;height:16px;stroke:currentColor}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:100px;min-width:18px;text-align:center}
+.sidebar-footer{padding:12px 16px;border-top:1px solid rgba(255,255,255,.08)}
+.user-row{display:flex;align-items:center;gap:8px}
+.user-av{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:#fff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-email{font-size:10px;color:rgba(255,255,255,.3)}
+.logout-btn{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.4);cursor:pointer;width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s;flex-shrink:0}
+.logout-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+.main{flex:1;margin-left:var(--sidebar-w);overflow-y:auto;min-width:0}
+.main-inner{padding:24px;max-width:1100px}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:10px;flex-wrap:wrap}
+.page-title{font-size:20px;font-weight:800;color:var(--g900);letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--g400);margin-top:2px}
+.page-actions{display:flex;gap:8px;flex-wrap:wrap}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.spinner{width:32px;height:32px;border:3px solid var(--g200);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-wrap{display:flex;align-items:center;justify-content:center;min-height:160px;flex-direction:column;gap:10px;color:var(--g400);font-size:13px}
+.empty-state{text-align:center;padding:40px 20px;color:var(--g400)}
+.empty-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;opacity:.35}.empty-icon svg{width:40px;height:40px;stroke:var(--g400)}
+.empty-title{font-size:15px;font-weight:700;color:var(--g500);margin-bottom:4px}
+.filter-bar{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--g50)}
+.filter-bar input{flex:1;min-width:140px;font-size:14px}
+.filter-bar select{width:auto;min-width:120px;font-size:14px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:var(--r-lg);font-size:13px;font-weight:600;z-index:9999;max-width:320px;width:calc(100% - 32px);box-shadow:var(--shadow-lg);color:#fff;display:flex;align-items:center;gap:10px;animation:slideUp .2s ease;justify-content:center}
+.toast-success{background:#065F46}.toast-error{background:var(--red)}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;padding:0 12px calc(12px + env(safe-area-inset-bottom)) 12px}
+.mobile-nav-glass{
+  display:flex;align-items:center;
+  background:rgba(255,255,255,0.72);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,0.5);
+  border-radius:28px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.8);
+  height:64px;
+  padding:0 4px;
+  overflow:hidden;
+}
+.mobile-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--g400);font-size:8.5px;font-weight:600;transition:all .2s cubic-bezier(.34,1.56,.64,1);-webkit-tap-highlight-color:transparent;position:relative;padding:8px 2px 6px;min-width:0;border-radius:22px}
+.mobile-nav-item:active{transform:scale(.92)}
+.mobile-nav-item.active{color:var(--primary)}
+.mobile-nav-icon-wrap{display:flex;align-items:center;justify-content:center;width:42px;height:30px;border-radius:14px;transition:all .2s cubic-bezier(.34,1.56,.64,1);position:relative}
+.mobile-nav-item.active .mobile-nav-icon-wrap{background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(124,58,237,.1));box-shadow:0 2px 8px rgba(37,99,235,.2)}
+.mobile-nav-item.nav-center-item .mobile-nav-icon-wrap{background:linear-gradient(135deg,#2563EB,#7C3AED);border-radius:18px;width:50px;height:36px;margin-top:-14px;box-shadow:0 6px 20px rgba(37,99,235,.45),0 2px 8px rgba(37,99,235,.3),inset 0 1px 0 rgba(255,255,255,.3)}
+.mobile-nav-item.nav-center-item{color:var(--primary)}
+.mobile-nav-item.nav-center-item .mobile-nav-icon svg{width:22px;height:22px;stroke:#fff}
+.mobile-nav-item.nav-center-item.active .mobile-nav-icon-wrap{box-shadow:0 8px 24px rgba(37,99,235,.55),0 2px 8px rgba(37,99,235,.3),inset 0 1px 0 rgba(255,255,255,.3)}
+.mobile-nav-icon{display:flex;align-items:center;justify-content:center;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.mobile-nav-item.active .mobile-nav-icon{transform:scale(1.1)}.mobile-nav-item.active .mobile-nav-icon svg{stroke:var(--primary)}
+.mobile-nav-label{font-size:8.5px;font-weight:600;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:54px;transition:all .2s}
+.mobile-nav-item.active .mobile-nav-label{color:var(--primary);font-weight:700}
+.mobile-nav-badge{position:absolute;top:2px;right:2px;background:var(--red);color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:100px;min-width:14px;text-align:center;line-height:1.4;box-shadow:0 1px 4px rgba(220,38,38,.4)}
+.mobile-header{display:none;position:sticky;top:0;z-index:99;background:#fff;border-bottom:1px solid var(--border);padding:11px 14px;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}
+.mobile-header-title{font-size:16px;font-weight:800;color:var(--g900)}
+.mobile-lang{display:flex;gap:3px}
+.mobile-lang-btn{padding:4px 7px;border:1.5px solid var(--g200);border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;background:#fff;color:var(--g400)}
+.mobile-lang-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.auth-page{min-height:100vh;display:flex;background:var(--g900)}
+.auth-left{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:40px 40px 32px;position:relative;overflow-y:auto}
+.auth-left::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(37,99,235,.15),rgba(124,58,237,.1),rgba(0,0,0,.3))}
+.auth-brand{position:relative;z-index:1;text-align:center;max-width:420px;width:100%}
+.auth-brand-icon{width:76px;height:76px;background:linear-gradient(135deg,#2563EB,#7C3AED);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 20px 40px rgba(37,99,235,.35)}
+.auth-brand-name{font-size:26px;font-weight:800;color:#fff}
+.auth-brand-sub{font-size:13px;color:rgba(255,255,255,.4);margin-top:6px}
+.auth-features{margin-top:24px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.auth-value-prop{margin-top:32px;text-align:left;position:relative;z-index:1;max-width:420px;width:100%}
+.auth-about{margin-top:24px;text-align:left;position:relative;z-index:1;max-width:420px;width:100%;border-top:1px solid rgba(255,255,255,.1);padding-top:24px}
+.mobile-value-prop{display:none}
+.auth-feature{display:flex;align-items:center;gap:11px;color:rgba(255,255,255,.6);font-size:13px}
+.auth-feature-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.auth-right{width:420px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px}
+.auth-card{width:100%;max-width:340px}
+.auth-lang-row{display:flex;gap:5px;margin-bottom:20px;background:var(--g100);padding:4px;border-radius:var(--r)}
+.auth-lang-btn{flex:1;padding:6px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;background:transparent;color:var(--g400)}
+.auth-lang-btn.active{background:#fff;color:var(--g800);box-shadow:var(--shadow)}
+.auth-title{font-size:22px;font-weight:800;color:var(--g900);margin-bottom:3px}
+.auth-subtitle{font-size:13px;color:var(--g400);margin-bottom:18px}
+.auth-switch{text-align:center;margin-top:14px;font-size:13px;color:var(--g400)}
+.auth-switch button{background:none;border:none;color:var(--primary);cursor:pointer;font-weight:600;padding:0}
+.info-box{background:var(--g50);border-radius:var(--r);padding:12px 14px;font-size:13px;margin-top:12px;border:1px solid var(--border)}
+.row-actions{display:flex;gap:4px}
+.chart-wrap{padding:14px 16px}
+.chart-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.chart-bar-label{font-size:12px;color:var(--g500);font-weight:600;width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart-bar-track{flex:1;height:8px;background:var(--g100);border-radius:100px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:100px;transition:width .6s ease}
+.chart-bar-val{font-size:11px;color:var(--g700);font-weight:600;width:72px;text-align:right;flex-shrink:0}
+.overdue-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px 16px}
+.overdue-card{border-radius:var(--r);padding:12px 8px;text-align:center}
+.overdue-num{font-size:22px;font-weight:800;line-height:1}
+.overdue-lbl{font-size:10px;font-weight:700;margin-top:3px;opacity:.75;line-height:1.3}
+.overdue-sum{font-size:10px;margin-top:4px;opacity:.6}
+.admin-biz-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.admin-biz-row:hover{background:var(--g50)}
+.admin-biz-row:last-child{border-bottom:none}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+
+.fab-wrap{display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:150;align-items:center;flex-direction:column}
+.fab-actions{position:absolute;bottom:76px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:12px;animation:fabUp .22s cubic-bezier(.34,1.56,.64,1)}
+.fab-action-btn{display:flex;align-items:center;gap:12px;border:none;cursor:pointer;border-radius:24px;padding:0;-webkit-tap-highlight-color:transparent;transition:transform .15s;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+.fab-action-btn:active{transform:scale(.94)}
+.fab-action-inner{display:flex;align-items:center;gap:12px;padding:13px 22px 13px 16px;border-radius:24px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.fab-action-btn.add .fab-action-inner{background:linear-gradient(135deg,#2563EB,#4F46E5);color:#fff}
+.fab-action-btn.pay .fab-action-inner{background:linear-gradient(135deg,#059669,#0D9488);color:#fff}
+.fab-action-icon{width:38px;height:38px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fab-action-icon svg{stroke:#fff;width:20px;height:20px}
+.fab-action-label{font-size:15px;font-weight:700;color:#fff;white-space:nowrap}
+.fab-action-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px}
+.fab-btn{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#7C3AED);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(37,99,235,.5),0 3px 10px rgba(37,99,235,.35),inset 0 1px 0 rgba(255,255,255,.25);transition:all .22s cubic-bezier(.34,1.56,.64,1);-webkit-tap-highlight-color:transparent;position:relative}
+.fab-btn::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(37,99,235,.25);animation:fabPulse 2.5s ease-in-out infinite}
+.fab-btn:active{transform:scale(.9);box-shadow:0 4px 16px rgba(37,99,235,.4)}
+.fab-btn-icon{display:flex;align-items:center;justify-content:center;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.fab-btn-icon svg{stroke:#fff;width:26px;height:26px;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.fab-btn.open .fab-btn-icon svg{transform:rotate(45deg)}
+.fab-btn.open{box-shadow:0 4px 16px rgba(37,99,235,.4)}
+.fab-btn.open::after{animation:none;opacity:0}
+.fab-backdrop{position:fixed;inset:0;z-index:149;background:rgba(15,23,42,.35);backdrop-filter:blur(3px);animation:fadeIn .2s ease}
+@keyframes fabUp{from{opacity:0;transform:translateX(-50%) translateY(16px) scale(.92)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}} @keyframes fabPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:.2;transform:scale(1.15)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media(max-width:768px){.fab-wrap{display:flex}}
+@media(max-width:768px){
+  :root{--sidebar-w:0px}
+  .sidebar{display:none}
+  .main{margin-left:0;padding-bottom:90px}
+  .main-inner{padding:10px}
+  .page-header{gap:8px}
+  .page-actions{gap:6px}
+  .btn-sm{padding:6px 10px;font-size:11px}
+  .dash-bottom-grid{grid-template-columns:1fr!important}
+  .dash-bottom-grid .card-title{font-size:13px}
+  .dash-bottom-grid div[style*="fontWeight:600,fontSize:13"]{font-size:12px!important}
+  .dash-bottom-grid div[style*="fontSize:11"]{font-size:10px!important}
+  .mobile-nav{display:block}
+  .mobile-header{display:flex}
+  .page-header{margin-bottom:12px}
+  .page-title{font-size:18px}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .stat-card{padding:12px}
+  .stat-value{font-size:20px}
+  .stat-icon{width:34px;height:34px;font-size:16px;margin-bottom:8px}
+  .overdue-grid{grid-template-columns:repeat(2,1fr)}
+  .table-wrap{display:none!important}
+  .debt-cards{display:flex!important}
+  .toast{bottom:72px}
+  .auth-left{display:none}
+  .mobile-value-prop{display:block}
+  .auth-right{width:100%;padding:20px 18px;padding-top:36px}
+  .card-header{padding:11px 13px}
+  .filter-bar{padding:9px 11px}
+}
+@media(min-width:769px){
+  .mobile-nav,.mobile-header{display:none!important}
+  .table-wrap{display:block!important}
+  .debt-cards{display:none!important}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {createClient}=supabase;
+const sb=createClient('https://fortxhggcnvbhrapkaul.supabase.co','sb_publishable_wpL9aGzMTm4GdKyv9TUe5A_UMmkQAqq');
+const {useState,useEffect,useMemo,createContext,useContext}=React;
+const AppCtx=createContext(null);
+const useApp=()=>useContext(AppCtx);
+let _toast=null;
+function toast(msg,type='success'){_toast?.({msg,type,id:Date.now()});}
+
+const T={
+  tg:{
+    appName:'Қарзи ман',appSub:'Ҳисобдории қарз',
+    login:'Даромадан',register:'Бақайдгирӣ',logout:'Баромадан',
+    email:'Почтаи электронӣ',password:'Рамз',
+    bizName:'Номи тиҷорат',bizType:'Намуди тиҷорат',
+    loginTitle:'Хуш омадед',loginSub:'Ба ҳисоби худ ворид шавед',
+    registerTitle:'Бақайдгирӣ',registerSub:'Ҳисоби бепул созед',
+    dashboard:'Дашборд',debts:'Қарзҳо',clients:'Мизоҷон',settings:'Танзимот',admin:'Маъмур',
+    addDebt:'+ Илова',exportExcel:'📥 Excel',
+    clientName:'Номи мизоҷ',phone:'Рақами телефон',amount:'Маблағ (сомонӣ)',
+    dateIssued:'Санаи қарз',dueDate:'Мӯҳлати пардохт',
+    expectedDate:'Санаи интизории пардохт',actualDate:'Санаи воқеии пардохт',
+    category:'Категория',comment:'Шарҳ',
+    add:'Илова кардан',cancel:'Бекор кардан',save:'Нигоҳ доштан',
+    paid:'Пардохташуда',active:'Фаъол',overdue:'Мӯҳлат гузашт',dueSoon:'Наздик аст',partial:'Қисман',
+    totalDebt:'Қарзи умумӣ',remaining:'Боқимонда',
+    payTitle:'Пардохт қайд кардан',payAmount:'Маблағи пардохт',payDate:'Санаи пардохт',
+    payMethod:'Усули пардохт',payNote:'Шарҳ',confirmPay:'✓ Тасдиқ',
+    cash:'Нақд',transfer:'Интиқол',card:'Корт',other:'Дигар',
+    cat1:'То 30 рӯз',cat2:'30–90 рӯз',cat3:'90–180 рӯз',cat4:'180–365 рӯз',cat5:'Зиёда аз 365',
+    activeDebts:'Қарзҳои фаъол',expectedSum:'Маблағи интизорӣ',overdueDebts:'Мӯҳлат гузашт',paidDebts:'Пардохташуда',clientsCount:'Мизоҷон',
+    overdueClass:'Таснифи қарзҳои мӯҳлатгузошта',sum:'сомонӣ',days:'рӯз',
+    noDebts:'Қарз нест',addFirst:'Қарзи аввалро илова кунед',noClients:'Мизоҷ нест',
+    search:'Ҷустуҷӯ...',allStatus:'Ҳама статусҳо',
+    newest:'Аввал нав',oldest:'Аввал кӯҳна',byAmount:'Аз рӯи маблағ',byOverdue:'Аз рӯи мӯҳлат',
+    delete:'Нест кардан',deleteConfirm:'Нест кардан?',
+    savedOk:'Нигоҳ дошта шуд ✓',addedOk:'Илова шуд ✓',paidOk:'Пардохт қайд шуд ✓',deletedOk:'Нест шуд',
+    settingsTitle:'Танзимот',profileTitle:'Профили тиҷорат',myShops:'Мағозаҳои ман',addShop:'+ Мағоза илова',switchShop:'Иваз кардан',premiumOnly:'Функсияи Premium',premiumHint:'Барои илова кардани мағозаи дигар ба Premium гузаред',currentShop:'Мағозаи ҷорӣ',shopName:'Номи мағоза',createShop:'Сохтан',freeLimit:'1 мағоза ройгон',premiumIncludes:'Premium дар бар мегирад:',premiumFeature1:'Якчанд мағоза',premiumFeature2:'Содироти Excel',premiumFeature3:'Огоҳнома тавассути SMS',premiumFeature4:'Дастгирии афзалиятнок',
+    recentDebts:'Қарзҳои охирин',seeAll:'Ҳама →',
+    maxPay:'Аз ҳад зиёд',minPay:'Ҳадди ақал 0.01',
+    emailConfirmHint:'Барои тасдиқи почта ба inbox нигаред ва пайвандро клик кунед, сипас дубора ворид шавед.',payHistory:'Таърихи пардохт',clientHistory:'Таърихи мизоҷ',offerTitle:'Шартнома-оферта',offerAccept:'Қабул мекунам',offerBack:'Бозгашт',offerMust:'Шумо бояд бо оферта розӣ шавед',debtorClients:'Бадҳисоб',dupPhone:'Ин рақами телефон аллакай мавҷуд аст',dupPhoneClient:'Мизоҷ:',dupPhoneAdd:'Барои мизоҷи мавҷуд қарз илова кардан?',dupPhoneConfirm:'Ҳа, илова кун',dupPhoneCancel:'Бекор кун',offerConfirmed:'Оферта тасдиқшуд',offerNotConfirmed:'Оферта тасдиқ нашудааст',overdueHistory:'Таърихи мизоҷони мушкилситон',forgotPass:'Рамзро фаромӯш кардед?',forgotTitle:'Барқарор кардани рамз',forgotSub:'Почтаи электрониро ворид кунед',
+    forgotSent:'Хат фиристода шуд!',forgotCheck:'Хатро тафтиш кунед',forgotSend:'Фиристодан',forgotBack:'← Бозгашт',forgotLogin:'← Даромадан',
+    adminPanel:'Панели маъмур',allShops:'Ҳама мағозаҳо',shopDebts:'Қарзҳои мағоза',back:'← Бозгашт',
+    types:['Дорухона','Мағозаи хӯрокворӣ','Мағозаи сохтмон','Мағозаи либос','Мағозаи мебел','Ресторан/Кафе','Мағозаи электроника','Дигар'],
+    cats:['Дору','Хӯрокворӣ','Маводи сохтмон','Либос','Мебел','Электроника','Дигар'],
+  },
+  ru:{
+    appName:'Мой долг',appSub:'Учёт задолженностей',
+    login:'Войти',register:'Регистрация',logout:'Выйти',
+    email:'Email',password:'Пароль',
+    bizName:'Название бизнеса',bizType:'Тип бизнеса',
+    loginTitle:'Добро пожаловать',loginSub:'Войдите в аккаунт',
+    registerTitle:'Регистрация',registerSub:'Создайте аккаунт бесплатно',
+    dashboard:'Дашборд',debts:'Долги',clients:'Клиенты',settings:'Настройки',admin:'Админ',
+    addDebt:'+ Добавить',exportExcel:'📥 Excel',
+    clientName:'ФИО клиента',phone:'Номер телефона',amount:'Сумма (сомони)',
+    dateIssued:'Дата долга',dueDate:'Срок оплаты',
+    expectedDate:'Ожидаемая дата оплаты',actualDate:'Фактическая дата оплаты',
+    category:'Категория',comment:'Комментарий',
+    add:'Добавить',cancel:'Отмена',save:'Сохранить',
+    paid:'Оплачен',active:'Активный',overdue:'Просрочен',dueSoon:'Скоро срок',partial:'Частично',
+    totalDebt:'Общий долг',remaining:'Остаток',
+    payTitle:'Записать оплату',payAmount:'Сумма оплаты',payDate:'Дата оплаты',
+    payMethod:'Способ оплаты',payNote:'Заметка',confirmPay:'✓ Подтвердить',
+    cash:'Наличные',transfer:'Перевод',card:'Карта',other:'Другое',
+    cat1:'До 30 дней',cat2:'30–90 дней',cat3:'90–180 дней',cat4:'180–365 дней',cat5:'Более 365 дней',
+    activeDebts:'Активных долгов',expectedSum:'Ожидаемая сумма',overdueDebts:'Просрочено',paidDebts:'Погашено',clientsCount:'Клиентов',
+    overdueClass:'Классификация просроченных долгов',sum:'сомони',days:'дн.',
+    noDebts:'Долгов нет',addFirst:'Добавьте первый долг',noClients:'Клиентов нет',
+    search:'Поиск...',allStatus:'Все статусы',
+    newest:'Сначала новые',oldest:'Сначала старые',byAmount:'По сумме',byOverdue:'По просрочке',
+    delete:'Удалить',deleteConfirm:'Удалить этот долг?',
+    savedOk:'Сохранено ✓',addedOk:'Долг добавлен ✓',paidOk:'Оплата записана ✓',deletedOk:'Удалено',
+    settingsTitle:'Настройки',profileTitle:'Профиль бизнеса',myShops:'Мои магазины',addShop:'+ Добавить магазин',switchShop:'Переключить',premiumOnly:'Premium функция',premiumHint:'Для добавления нескольких магазинов перейдите на Premium',currentShop:'Текущий магазин',shopName:'Название магазина',createShop:'Создать',freeLimit:'1 магазин бесплатно',premiumIncludes:'Premium включает:',premiumFeature1:'Несколько магазинов',premiumFeature2:'Экспорт в Excel',premiumFeature3:'SMS уведомления',premiumFeature4:'Приоритетная поддержка',
+    recentDebts:'Последние долги',seeAll:'Все →',
+    maxPay:'Превышает остаток',minPay:'Минимум 0.01',
+    emailConfirmHint:'Проверьте входящие письма, нажмите ссылку подтверждения и войдите снова.',payHistory:'История оплат',clientHistory:'История клиента',offerTitle:'Договор-оферта',offerAccept:'Принимаю',offerBack:'Назад',offerMust:'Необходимо принять оферту',debtorClients:'Должников',dupPhone:'Этот номер уже существует',dupPhoneClient:'Клиент:',dupPhoneAdd:'Добавить долг существующему клиенту?',dupPhoneConfirm:'Да, добавить',dupPhoneCancel:'Отмена',offerConfirmed:'Оферта принята',offerNotConfirmed:'Оферта не принята',overdueHistory:'История должников',forgotPass:'Забыли пароль?',forgotTitle:'Сброс пароля',forgotSub:'Введите email — пришлём ссылку',
+    forgotSent:'Письмо отправлено!',forgotCheck:'Проверьте почту и нажмите ссылку',forgotSend:'Отправить ссылку',forgotBack:'← Назад',forgotLogin:'← Войти',
+    adminPanel:'Админ-панель',allShops:'Все магазины',shopDebts:'Долги магазина',back:'← Назад',
+    types:['Аптека','Продуктовый магазин','Строительный магазин','Магазин одежды','Магазин мебели','Ресторан/Кафе','Магазин электроники','Другое'],
+    cats:['Лекарства','Продукты','Стройматериалы','Одежда','Мебель','Электроника','Другое'],
+  },
+  uz:{
+    appName:'Mening qarzim',appSub:'Qarz hisobi',
+    login:'Kirish',register:"Ro'yxatdan o'tish",logout:'Chiqish',
+    email:'Email',password:'Parol',
+    bizName:'Biznes nomi',bizType:'Biznes turi',
+    loginTitle:'Xush kelibsiz',loginSub:"Hisobingizga kiring",
+    registerTitle:"Ro'yxatdan o'tish",registerSub:"Bepul hisob yarating",
+    dashboard:'Bosh sahifa',debts:'Qarzlar',clients:'Mijozlar',settings:'Sozlamalar',admin:'Admin',
+    addDebt:"+ Qo'shish",exportExcel:'📥 Excel',
+    clientName:'Mijoz FISh',phone:'Telefon raqami',amount:'Miqdor (somoniy)',
+    dateIssued:'Qarz sanasi',dueDate:"To'lov muddati",
+    expectedDate:"Kutilgan to'lov sanasi",actualDate:"Haqiqiy to'lov sanasi",
+    category:'Kategoriya',comment:'Izoh',
+    add:"Qo'shish",cancel:'Bekor qilish',save:'Saqlash',
+    paid:"To'langan",active:'Faol',overdue:"Muddati o'tgan",dueSoon:'Yaqin muddat',partial:'Qisman',
+    totalDebt:'Umumiy qarz',remaining:'Qoldiq',
+    payTitle:"To'lovni qayd qilish",payAmount:"To'lov miqdori",payDate:"To'lov sanasi",
+    payMethod:"To'lov usuli",payNote:'Izoh',confirmPay:'✓ Tasdiqlash',
+    cash:'Naqd',transfer:"O'tkazma",card:'Karta',other:'Boshqa',
+    cat1:'30 kungacha',cat2:'30–90 kun',cat3:'90–180 kun',cat4:'180–365 kun',cat5:"365 kundan ko'p",
+    activeDebts:'Faol qarzlar',expectedSum:'Kutilgan summa',overdueDebts:"Muddati o'tgan",paidDebts:"To'langan",clientsCount:'Mijozlar',
+    overdueClass:'Muddati o\'tgan qarzlar tasnifi',sum:'somoniy',days:'kun',
+    noDebts:"Qarz yo'q",addFirst:"Birinchi qarzni qo'shing",noClients:"Mijoz yo'q",
+    search:'Qidirish...',allStatus:'Barcha statuslar',
+    newest:'Avval yangi',oldest:'Avval eski',byAmount:"Miqdor bo'yicha",byOverdue:"Kechikish bo'yicha",
+    delete:"O'chirish",deleteConfirm:"Bu qarzni o'chirish?",
+    savedOk:'Saqlandi ✓',addedOk:"Qarz qo'shildi ✓",paidOk:"To'lov qayd qilindi ✓",deletedOk:"O'chirildi",
+    settingsTitle:'Sozlamalar',profileTitle:'Biznes profili',myShops:"Do'konlarim",addShop:"+ Do'kon qo'shish",switchShop:'Almashtirish',premiumOnly:'Premium funksiya',premiumHint:"Bir nechta do'kon qo'shish uchun Premiumga o'ting",currentShop:"Joriy do'kon",shopName:"Do'kon nomi",createShop:'Yaratish',freeLimit:"1 ta do'kon bepul",premiumIncludes:"Premium o'z ichiga oladi:",premiumFeature1:"Bir nechta do'kon",premiumFeature2:"Excel eksporti",premiumFeature3:"SMS xabarnomalar",premiumFeature4:"Ustuvor qo'llab-quvvatlash",
+    recentDebts:'Oxirgi qarzlar',seeAll:'Barchasi →',
+    maxPay:'Qoldiqdan oshdi',minPay:'Minimum 0.01',
+    emailConfirmHint:'Kiruvchi xatlarga qarang, tasdiqlash havolasini bosing va qayta kiring.',payHistory:"To'lovlar tarixi",clientHistory:'Mijoz tarixi',offerTitle:'Oferta shartnomasi',offerAccept:'Qabul qilaman',offerBack:'Orqaga',offerMust:'Ofertani qabul qilish shart',debtorClients:'Qarzdorlar',dupPhone:'Bu raqam allaqachon mavjud',dupPhoneClient:'Mijoz:',dupPhoneAdd:'Mavjud mijozga qarz qo\'shish?',dupPhoneConfirm:'Ha, qo\'shish',dupPhoneCancel:'Bekor qilish',offerConfirmed:'Oferta qabul qilindi',offerNotConfirmed:'Oferta qabul qilinmagan',overdueHistory:'Qarzdorlar tarixi',forgotPass:'Parolni unutdingizmi?',forgotTitle:'Parolni tiklash',forgotSub:'Email kiriting — havola yuboramiz',
+    forgotSent:'Xat yuborildi!',forgotCheck:'Pochtangizni tekshiring',forgotSend:'Havola yuborish',forgotBack:'← Orqaga',forgotLogin:'← Kirish',
+    adminPanel:'Admin paneli',allShops:"Barcha do'konlar",shopDebts:"Do'kon qarzlari",back:'← Orqaga',
+    types:["Dorixona","Oziq-ovqat do'koni","Qurilish do'koni","Kiyim do'koni","Mebel do'koni","Restoran/Kafe","Elektronika do'koni","Boshqa"],
+    cats:["Dori","Oziq-ovqat","Qurilish materiallari","Kiyim","Mebel","Elektronika","Boshqa"],
+  },
+  en:{
+    appName:'My Debt',appSub:'Debt management',
+    login:'Sign In',register:'Sign Up',logout:'Sign Out',
+    email:'Email',password:'Password',
+    bizName:'Business name',bizType:'Business type',
+    loginTitle:'Welcome back',loginSub:'Sign in to your account',
+    registerTitle:'Create account',registerSub:'Start tracking debts for free',
+    dashboard:'Dashboard',debts:'Debts',clients:'Clients',settings:'Settings',admin:'Admin',
+    addDebt:'+ Add debt',exportExcel:'📥 Excel',
+    clientName:'Client name',phone:'Phone number',amount:'Amount (somoni)',
+    dateIssued:'Issue date',dueDate:'Due date',
+    expectedDate:'Expected payment date',actualDate:'Actual payment date',
+    category:'Category',comment:'Comment',
+    add:'Add',cancel:'Cancel',save:'Save',
+    paid:'Paid',active:'Active',overdue:'Overdue',dueSoon:'Due soon',partial:'Partial',
+    totalDebt:'Total debt',remaining:'Remaining',
+    payTitle:'Record payment',payAmount:'Payment amount',payDate:'Payment date',
+    payMethod:'Payment method',payNote:'Note',confirmPay:'✓ Confirm',
+    cash:'Cash',transfer:'Transfer',card:'Card',other:'Other',
+    cat1:'Up to 30 days',cat2:'30–90 days',cat3:'90–180 days',cat4:'180–365 days',cat5:'Over 365 days',
+    activeDebts:'Active debts',expectedSum:'Expected total',overdueDebts:'Overdue',paidDebts:'Paid',clientsCount:'Clients',
+    overdueClass:'Overdue debt classification',sum:'somoni',days:'d.',
+    noDebts:'No debts',addFirst:'Add your first debt',noClients:'No clients yet',
+    search:'Search...',allStatus:'All statuses',
+    newest:'Newest first',oldest:'Oldest first',byAmount:'By amount',byOverdue:'By overdue',
+    delete:'Delete',deleteConfirm:'Delete this debt?',
+    savedOk:'Saved ✓',addedOk:'Debt added ✓',paidOk:'Payment recorded ✓',deletedOk:'Deleted',
+    settingsTitle:'Settings',profileTitle:'Business profile',myShops:'My shops',addShop:'+ Add shop',switchShop:'Switch',premiumOnly:'Premium feature',premiumHint:'Upgrade to Premium to add multiple shops',currentShop:'Current shop',shopName:'Shop name',createShop:'Create',freeLimit:'1 shop free',premiumIncludes:'Premium includes:',premiumFeature1:'Multiple shops',premiumFeature2:'Excel export',premiumFeature3:'SMS notifications',premiumFeature4:'Priority support',
+    recentDebts:'Recent debts',seeAll:'All →',
+    maxPay:'Exceeds remaining',minPay:'Minimum 0.01',
+    emailConfirmHint:'Check your inbox for a confirmation email, click the link, then sign in again.',payHistory:'Payment history',clientHistory:'Client history',offerTitle:'Public offer agreement',offerAccept:'I accept',offerBack:'Back',offerMust:'You must accept the offer',debtorClients:'Debtors',dupPhone:'This phone number already exists',dupPhoneClient:'Client:',dupPhoneAdd:'Add debt to existing client?',dupPhoneConfirm:'Yes, add',dupPhoneCancel:'Cancel',offerConfirmed:'Offer accepted',offerNotConfirmed:'Offer not accepted',overdueHistory:'Overdue history',forgotPass:'Forgot password?',forgotTitle:'Reset password',forgotSub:'Enter your email — we will send a link',
+    forgotSent:'Email sent!',forgotCheck:'Check your inbox and click the link',forgotSend:'Send link',forgotBack:'← Back',forgotLogin:'← Sign in',
+    adminPanel:'Admin panel',allShops:'All shops',shopDebts:'Shop debts',back:'← Back',
+    types:['Pharmacy','Grocery store','Hardware store','Clothing store','Furniture store','Restaurant/Cafe','Electronics store','Other'],
+    cats:['Medicine','Groceries','Construction','Clothing','Furniture','Electronics','Other'],
+  }
+};
+
+function getStatus(d){
+  if(d.status==='paid')return 'paid';
+  const diff=Math.floor((new Date()-new Date(d.due_date))/86400000);
+  if(diff>0)return 'overdue';
+  if(diff>-7)return 'due';
+  return 'active';
+}
+const statusClass=s=>({active:'pill-active',due:'pill-due',overdue:'pill-overdue',paid:'pill-paid',partial:'pill-due'}[s]??'');
+const daysOverdue=d=>Math.max(0,Math.floor((new Date()-new Date(d.due_date))/86400000));
+const fmt=n=>Number(n??0).toLocaleString('ru-RU',{maximumFractionDigits:2});
+const todayStr=()=>new Date().toISOString().split('T')[0];
+function getOverdueCat(days,t){
+  if(days<=0)return null;
+  if(days<=30)return{label:t.cat1,cls:'cat-1'};
+  if(days<=90)return{label:t.cat2,cls:'cat-2'};
+  if(days<=180)return{label:t.cat3,cls:'cat-3'};
+  if(days<=365)return{label:t.cat4,cls:'cat-4'};
+  return{label:t.cat5,cls:'cat-5'};
+}
+function translateCat(cat,t){
+  // Map all possible category names across languages to current language
+  const allCats={
+    0:['Дору','Лекарства','Dori','Medicine'],
+    1:['Хӯрокворӣ','Продукты','Oziq-ovqat','Groceries'],
+    2:['Маводи сохтмон','Стройматериалы','Qurilish materiallari','Construction'],
+    3:['Либос','Одежда','Kiyim','Clothing'],
+    4:['Мебел','Мебель','Mebel','Furniture'],
+    5:['Электроника','Электроника','Elektronika','Electronics'],
+    6:['Дигар','Другое','Boshqa','Other'],
+  };
+  for(const [idx,variants] of Object.entries(allCats)){
+    if(variants.some(v=>v.toLowerCase()===cat?.toLowerCase())){
+      return t.cats[Number(idx)]||cat;
+    }
+  }
+  return cat;
+}
+function stLabel(st,t){return{active:t.active,due:t.dueSoon,overdue:t.overdue,paid:t.paid,partial:t.partial}[st]??st;}
+function formatPhone(v){return v.replace(/\D/g,'').slice(0,15);}
+function exportToExcel(debts,bizName,t){
+  const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  const headers=[t.clientName,t.phone,t.amount,t.paid,t.remaining,t.dateIssued,t.dueDate,t.category,t.comment];
+  const rows=debts.map(d=>[
+    d.client_name,d.phone,Number(d.amount),Number(d.paid_amount??0),
+    Number(d.amount)-Number(d.paid_amount??0),
+    d.date_issued,d.due_date,d.category||'',d.comment||''
+  ]);
+  if(isMobile){
+    // Mobile: CSV download - works on ALL mobile browsers (iOS Safari, Android Chrome)
+    const esc=v=>{const s=String(v??'');return(s.includes(',')||s.includes('"')||s.includes('\n'))?'"'+s.replace(/"/g,'""')+'"':s;};
+    const csv='\uFEFF'+[headers,...rows].map(r=>r.map(esc).join(',')).join('\r\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=(bizName||'export').replace(/[^\w\u0400-\u04FF]/g,'_')+'_'+todayStr()+'.csv';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{try{URL.revokeObjectURL(url);document.body.removeChild(a);}catch{}},500);
+  } else {
+    // Desktop: proper Excel xlsx
+    const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,t.debts||'Debts');
+    const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+    const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=(bizName||'export')+'_'+todayStr()+'.xlsx';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{try{URL.revokeObjectURL(url);document.body.removeChild(a);}catch{}},1000);
+  }
+}
+
+
+function AuthPage({lang,setLang}){
+  const [mode,setMode]=useState('login');
+  const t=T[lang];
+  const langs=[{k:'tg',l:'Тоҷ'},{k:'ru',l:'Рус'},{k:'uz',l:'Ўзб'},{k:'en',l:'Eng'}];
+
+  const features=[
+    {icon:IC.dashboard,text:{tg:'Дашборди ҳамаҷониба',ru:'Полный дашборд',uz:"To'liq boshqaruv paneli",en:'Full analytics dashboard'}},
+    {icon:IC.warning,text:{tg:'Тасниф аз рӯи мӯҳлат',ru:'Классификация просрочки',uz:'Kechikish tasnifi',en:'Overdue classification'}},
+    {icon:IC.excel,text:{tg:'Содироти Excel ва HTML',ru:'Экспорт в Excel',uz:"Excel eksporti",en:'Excel export'}},
+    {icon:IC.store,text:{tg:'Якчанд мағоза (Premium)',ru:'Несколько магазинов (Premium)',uz:"Bir nechta do'kon (Premium)",en:'Multiple shops (Premium)'}},
+  ];
+
+  const valueProp={
+    tg:{
+      headline:"Дигар дафтари коғазӣ не!",
+      sub:"Ҳисобдории қарзи мизоҷонро ба воситаи телефон осон кунед",
+      points:[
+        {icon:"debts",title:"Тезу осон",desc:"Дар чанд сония қарз илова кунед"},
+        {icon:"history",title:"Таърихи пурра",desc:"Ҳамаи пардохтҳо бо сана ва маблағ"},
+        {icon:"clients",title:"Ҳамаи мизоҷон",desc:"Рӯйхати мизоҷон ва ҳолати қарзашон"},
+        {icon:"warning",title:"Огоҳкунӣ",desc:"Мӯҳлати пардохти наздик ва гузашта"},
+      ]
+    },
+    ru:{
+      headline:"Забудьте про бумажный журнал!",
+      sub:"Ведите учёт долгов клиентов прямо с телефона — быстро, удобно, надёжно",
+      points:[
+        {icon:"debts",title:"Быстро и просто",desc:"Добавляйте долги за секунды"},
+        {icon:"history",title:"Полная история",desc:"Все платежи с датами и суммами"},
+        {icon:"clients",title:"Все клиенты",desc:"Список клиентов и статус их долгов"},
+        {icon:"warning",title:"Контроль просрочки",desc:"Видите кто задержал оплату и насколько"},
+      ]
+    },
+    uz:{
+      headline:"Qog'oz daftarni unutin!",
+      sub:"Mijozlar qarzini telefoningizdan boshqaring — tez, qulay, ishonchli",
+      points:[
+        {icon:"debts",title:"Tez va oson",desc:"Soniyalar ichida qarz qoshing"},
+        {icon:"history",title:"Tolik tarix",desc:"Barcha tolovlar sana va miqdor bilan"},
+        {icon:"clients",title:"Barcha mijozlar",desc:"Mijozlar royxati va qarz holati"},
+        {icon:"warning",title:"Kechikish nazorati",desc:"Kim qachon kechiktirganini koring"},
+      ]
+    },
+    en:{
+      headline:"Ditch the paper notebook!",
+      sub:"Manage client debts from your phone — fast, simple, reliable",
+      points:[
+        {icon:"debts",title:"Fast & simple",desc:"Add debts in seconds"},
+        {icon:"history",title:"Full history",desc:"All payments with dates and amounts"},
+        {icon:"clients",title:"All clients",desc:"Client list with debt status"},
+        {icon:"warning",title:"Overdue control",desc:"See who is late and by how much"},
+      ]
+    },
+  };
+
+  const vp=valueProp[lang]||valueProp.ru;
+
+  return(
+    <div className="auth-page">
+      <div className="auth-left">
+        {/* Brand */}
+        <div style={{width:'100%',maxWidth:420}}>
+          <div className="auth-brand">
+            <div className="auth-brand-icon"><LogoSVG size={44}/></div>
+            <div className="auth-brand-name">{t.appName}</div>
+            <div className="auth-brand-sub">{t.appSub}</div>
+          </div>
+
+          {/* Value Proposition */}
+          <div className="auth-value-prop">
+            <div style={{fontSize:22,fontWeight:800,color:'#fff',lineHeight:1.25,marginBottom:8}}>{vp.headline}</div>
+            <div style={{fontSize:13,color:'rgba(255,255,255,.55)',marginBottom:20,lineHeight:1.6}}>{vp.sub}</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+              {vp.points.map((p,i)=>(
+                <div key={i} style={{background:'rgba(255,255,255,.07)',backdropFilter:'blur(10px)',border:'1px solid rgba(255,255,255,.1)',borderRadius:12,padding:'12px 14px'}}>
+                  <div style={{color:'rgba(255,255,255,.6)',marginBottom:6}}>{IC[p.icon]}</div>
+                  <div style={{fontSize:13,fontWeight:700,color:'#fff',marginBottom:2}}>{p.title}</div>
+                  <div style={{fontSize:11,color:'rgba(255,255,255,.4)',lineHeight:1.5}}>{p.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* About / О нас */}
+          <div className="auth-about">
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
+              <div style={{width:36,height:36,borderRadius:10,background:'rgba(255,255,255,.08)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                {IC.store}
+              </div>
+              <div>
+                <div style={{fontSize:13,fontWeight:800,color:'rgba(255,255,255,.9)',letterSpacing:'.02em'}}>GAMMA GROUP</div>
+                <div style={{fontSize:11,color:'rgba(255,255,255,.35)'}}>Консалтинг · Финансы · Бизнес</div>
+              </div>
+            </div>
+            <div style={{fontSize:12,color:'rgba(255,255,255,.45)',lineHeight:1.7,marginBottom:12}}>
+              Консалтинговая компания в сфере бизнеса и финансов. Финансовое планирование, стратегирование, корпоративная культура, создание ценностей и миссии, тренинги для сотрудников. Действуем на основании Свидетельства о государственной регистрации ИП.
+            </div>
+            <a href="mailto:niyatorzuzoda@gmail.com" style={{display:'inline-flex',alignItems:'center',gap:6,fontSize:11,color:'rgba(255,255,255,.4)',textDecoration:'none',borderBottom:'1px solid rgba(255,255,255,.15)',paddingBottom:2}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+              niyatorzuzoda@gmail.com
+            </a>
+          </div>
+
+          {/* Features mini */}
+          <div className="auth-features" style={{marginTop:20}}>
+            {features.map((f,i)=>(
+              <div key={i} className="auth-feature">
+                <div className="auth-feature-icon">{f.icon}</div>
+                <span style={{fontSize:12,color:'rgba(255,255,255,.55)'}}>{f.text[lang]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="auth-right">
+        <div className="auth-card">
+          <div className="auth-lang-row">{langs.map(l=><button key={l.k} className={`auth-lang-btn${lang===l.k?' active':''}`} onClick={()=>setLang(l.k)}>{l.l}</button>)}</div>
+          {/* Mobile value prop - only shown on mobile (auth-left is hidden) */}
+          <div className="mobile-value-prop">
+            <div style={{textAlign:'center',marginBottom:14}}>
+              <div style={{fontSize:17,fontWeight:800,color:'var(--g900)',marginBottom:4}}>{vp.headline}</div>
+              <div style={{fontSize:12,color:'var(--g400)',lineHeight:1.6}}>{vp.sub}</div>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:16}}>
+              {vp.points.map((p,i)=>(
+                <div key={i} style={{background:'var(--g50)',border:'1px solid var(--border)',borderRadius:10,padding:'10px 12px'}}>
+                  <div style={{color:'var(--primary)',marginBottom:4}}>{IC[p.icon]}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:'var(--g800)',marginBottom:2}}>{p.title}</div>
+                  <div style={{fontSize:11,color:'var(--g400)',lineHeight:1.4}}>{p.desc}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{fontSize:11,color:'var(--g400)',textAlign:'center',marginBottom:16,paddingBottom:16,borderBottom:'1px solid var(--border)'}}>
+              <strong style={{color:'var(--g600)'}}>GAMMA GROUP</strong> · niyatorzuzoda@gmail.com
+            </div>
+          </div>
+          {mode==='login'?<LoginForm t={t} onSwitch={()=>setMode('register')}/>:<RegisterForm t={t} onSwitch={()=>setMode('login')}/>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LoginForm({t,onSwitch}){
+  const [email,setEmail]=useState('');const [pass,setPass]=useState('');
+  const [error,setError]=useState('');const [loading,setLoading]=useState(false);
+  const [forgotMode,setForgotMode]=useState(false);
+  const [fEmail,setFEmail]=useState('');const [fSent,setFSent]=useState(false);const [fLoad,setFLoad]=useState(false);
+  async function submit(e){e.preventDefault();setError('');setLoading(true);const{error}=await sb.auth.signInWithPassword({email,password:pass});if(error)setError('⚠️ '+t.email+'?');setLoading(false);}
+  async function sendReset(e){e.preventDefault();setFLoad(true);await sb.auth.resetPasswordForEmail(fEmail,{redirectTo:window.location.origin});setFSent(true);setFLoad(false);}
+  if(forgotMode)return(
+    <>
+      <div className="auth-title">🔑 {t.forgotTitle}</div>
+      <div className="auth-subtitle">{t.forgotSub}</div>
+      {fSent?(
+        <>
+          <div style={{textAlign:'center',fontSize:48,margin:'14px 0'}}>📧</div>
+          <div style={{textAlign:'center',color:'var(--green)',fontWeight:700,marginBottom:6}}>{t.forgotSent}</div>
+          <div style={{textAlign:'center',fontSize:13,color:'var(--g400)',marginBottom:18}}>{t.forgotCheck}: <strong>{fEmail}</strong></div>
+          <button className="btn btn-primary btn-full" onClick={()=>{setForgotMode(false);setFSent(false);}}>{t.forgotLogin}</button>
+        </>
+      ):(
+        <form onSubmit={sendReset}>
+          <label>{t.email}</label>
+          <input type="email" value={fEmail} onChange={e=>setFEmail(e.target.value)} placeholder="you@example.com" required autoFocus/>
+          <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={fLoad}>{fLoad?'...':t.forgotSend}</button>
+          <button type="button" className="btn btn-full" style={{marginTop:8}} onClick={()=>setForgotMode(false)}>{t.forgotBack}</button>
+        </form>
+      )}
+    </>
+  );
+  return(
+    <>
+      <div className="auth-title">{t.loginTitle}</div>
+      <div className="auth-subtitle">{t.loginSub}</div>
+      <form onSubmit={submit}>
+        <label>{t.email}</label>
+        <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required autoFocus/>
+        <label>{t.password}</label>
+        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••" required/>
+        {error&&<div className="alert alert-error">{error}</div>}
+        <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={loading}>{loading?'...':t.login}</button>
+      </form>
+      <div style={{textAlign:'center',marginTop:10}}>
+        <button style={{background:'none',border:'none',color:'var(--g400)',cursor:'pointer',fontSize:13,padding:'4px 8px'}} onClick={()=>{setForgotMode(true);setFEmail(email);}}>{t.forgotPass}</button>
+      </div>
+      <div className="auth-switch">{t.register}? <button onClick={onSwitch}>{t.register}</button></div>
+    </>
+  );
+}
+
+
+// ── Оферта Modal ──
+function OfferModal({t,onAccept,onClose,initialLang}){
+  const [scrolled,setScrolled]=useState(false);
+  function onScroll(e){const el=e.target;if(el.scrollTop+el.clientHeight>=el.scrollHeight-20)setScrolled(true);}
+  const offerTexts={
+    tg:[
+      {n:'1. Мавзӯи шартнома',t:'Оферта-шартномаи мазкур тартиби истифодаи хидмати «Қарзи ман»-ро барои ҳисобдории қарзи дебиторӣ муайян мекунад. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) дастрасиро ба хидмат мувофиқи шартҳои шартномаи мазкур таъмин мекунад.'},
+      {n:'2. Шартҳои истифода',t:'Корбар ӯҳдадор аст хидматро танҳо барои мақсадҳои қонунӣ истифода барад. Додани дастрасӣ ба шахсони сеюм, бор кардани маълумоти нодуруст ва кӯшишҳои дастрасии ғайриқонунӣ манъ аст.'},
+      {n:'3. Махфият',t:'Ҳамаи маълумоте, ки корбар ворид мекунад, махфӣ мебошанд. Оператор маълумоти шахсиро бидуни розигии корбар ба шахсони сеюм намедиҳад.'},
+      {n:'4. Масъулият',t:'Оператор барои зарарҳое, ки дар натиҷаи истифодаи нодурусти хидмат ба вуҷуд меоянд, ҷавобгар нест. Корбар барои дурустии маълумоти ворид кардааш масъул аст.'},
+      {n:'5. Пардохт',t:'Дар айни ҳол хидмат бепул пешниҳод карда мешавад. Оператор ҳуқуқ дорад тарифҳои пулакиро бо огоҳидиҳии на камтар аз 14 рӯз ҷорӣ кунад.'},
+      {n:'6. Тағйири шартҳо',t:'Оператор ҳуқуқ дорад шартҳои офертаро тағйир диҳад. Идомаи истифодаи хидмат маънои қабули шартҳои нав дорад.'},
+      {n:'7. Реквизитҳо',t:'ИП Исмонов Ғафурҷон Фарҳодҷонович · ЕИН: 0331564805 · Ҷумҳурии Тоҷикистон'},
+    ],
+    ru:[
+      {n:'1. Предмет договора',t:'Настоящая публичная оферта регулирует использование веб-сервиса «Қарзи ман» для учёта дебиторской задолженности. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) предоставляет доступ к сервису на условиях настоящего Договора.'},
+      {n:'2. Условия использования',t:'Пользователь обязуется использовать сервис только в законных целях. Запрещается передача доступа третьим лицам, загрузка недостоверных данных, попытки взлома системы.'},
+      {n:'3. Конфиденциальность',t:'Все данные пользователя конфиденциальны. Оператор не передаёт персональные данные третьим лицам без согласия пользователя.'},
+      {n:'4. Ответственность',t:'Оператор не несёт ответственности за убытки от некорректного использования. Пользователь отвечает за достоверность вводимых данных.'},
+      {n:'5. Оплата',t:'Сервис предоставляется бесплатно. Оператор вправе ввести платные тарифы с уведомлением за 14 дней.'},
+      {n:'6. Изменение условий',t:'Оператор вправе изменять условия оферты. Продолжение использования означает согласие с новыми условиями.'},
+      {n:'7. Реквизиты',t:'ИП Исмонов Ғафурҷон Фарҳодҷонович · ЕИН: 0331564805 · Республика Таджикистан'},
+    ],
+    uz:[
+      {n:"1. Shartnoma mavzusi",t:"Ushbu ommaviy oferta Mening qarzim veb-xizmatidan foydalanish tartibini belgilaydi. YaT Ismonov Gafurjon Farhodjonovich (EIN: 0331564805) xizmatga kirishni ushbu shartnoma shartlari asosida taminlaydi."},
+      {n:"2. Foydalanish shartlari",t:"Foydalanuvchi xizmatdan faqat qonuniy maqsadlarda foydalanishga majburdir. Uchinchi shaxslarga kirish huquqini berish, noto'g'ri malumot yuklash taqiqlanadi."},
+      {n:"3. Maxfiylik",t:"Foydalanuvchi kiritgan barcha malumotlar maxfiy hisoblanadi. Operator shaxsiy malumotlarni foydalanuvchi roziligisiz uchinchi shaxslarga bermaydi."},
+      {n:"4. Masuliyat",t:"Operator xizmatdan noto'g'ri foydalanish natijasida yetkazilgan zararlar uchun javobgar emas. Foydalanuvchi kiritilgan malumotlarning to'g'riligi uchun o'zi javob beradi."},
+      {n:"5. To'lov",t:"Hozirda xizmat bepul taqdim etiladi. Operator kamida 14 kun oldin xabar bergan holda pullik tariflarni joriy qilish huquqiga ega."},
+      {n:"6. Shartlarni o'zgartirish",t:"Operator oferta shartlarini o'zgartirish huquqiga ega. Xizmatdan foydalanishni davom ettirish yangi shartlarni qabul qilish degan manoni anglatadi."},
+      {n:"7. Rekvizitlar",t:"YaT Ismonov Gafurjon Farhodjonovich · EIN: 0331564805 · Tojikiston Respublikasi"},
+    ],
+    en:[
+      {n:'1. Subject of Agreement',t:'This public offer governs the use of the «My Debt» web service for accounts receivable management. IE Ismonov Ghafurjon Farhodjonovich (EIN: 0331564805) provides access to the service under these terms.'},
+      {n:'2. Terms of Use',t:'The user agrees to use the service only for lawful purposes. Transferring access to third parties, uploading false data, and unauthorized access attempts are prohibited.'},
+      {n:'3. Confidentiality',t:'All user data is confidential. The operator does not share personal data with third parties without user consent.'},
+      {n:'4. Liability',t:'The operator is not liable for losses caused by improper use of the service. The user is responsible for the accuracy of the data entered.'},
+      {n:'5. Payment',t:'The service is currently provided free of charge. The operator may introduce paid plans with at least 14 days notice.'},
+      {n:'6. Changes',t:'The operator may modify the offer terms. Continued use of the service constitutes acceptance of the new terms.'},
+      {n:'7. Details',t:'IE Ismonov Ghafurjon Farhodjonovich · EIN: 0331564805 · Republic of Tajikistan'},
+    ],
+  };
+  const [offerLang,setOfferLang]=useState(initialLang||'ru');
+  const paragraphs=offerTexts[offerLang]||offerTexts.ru;
+  return(
+    <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,.75)',display:'flex',alignItems:'flex-end',justifyContent:'center',zIndex:2000,padding:0,backdropFilter:'blur(4px)'}}>
+      <div style={{background:'#fff',borderRadius:'20px 20px 0 0',width:'100%',maxWidth:560,maxHeight:'90vh',display:'flex',flexDirection:'column',boxShadow:'0 -8px 40px rgba(0,0,0,.25)'}}>
+        <div style={{padding:'14px 16px 10px',borderBottom:'1px solid var(--border)',flexShrink:0}}>
+          <div style={{width:36,height:4,background:'var(--g200)',borderRadius:2,margin:'0 auto 12px'}}/>
+          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:8}}>
+            <div>
+              <div style={{fontSize:16,fontWeight:800,color:'var(--g900)'}}>{(T[offerLang]||T.ru).offerTitle}</div>
+              <div style={{fontSize:11,color:'var(--g400)',marginTop:1}}>ИП Исмонов Ғафурҷон Фарҳодҷонович · ЕИН: 0331564805</div>
+            </div>
+            <div style={{display:'flex',gap:3,flexShrink:0}}>
+              {['tg','ru','uz','en'].map(l=><button key={l} onClick={()=>setOfferLang(l)} style={{padding:'3px 7px',border:'1.5px solid',borderColor:offerLang===l?'var(--primary)':'var(--g200)',borderRadius:6,fontSize:10,fontWeight:700,cursor:'pointer',background:offerLang===l?'var(--primary)':'#fff',color:offerLang===l?'#fff':'var(--g400)'}}>{l==='tg'?'Тоҷ':l==='ru'?'Рус':l==='uz'?'Ўзб':'Eng'}</button>)}
+            </div>
+          </div>
+        </div>
+        <div onScroll={onScroll} style={{flex:1,overflowY:'auto',padding:'14px 16px',fontSize:13,lineHeight:1.7,color:'var(--g700)'}}>
+          {paragraphs.map((p,i)=><div key={i} style={{marginBottom:14}}><div style={{fontWeight:700,color:'var(--g800)',marginBottom:4}}>{p.n}</div><div style={{color:'var(--g600)'}}>{p.t}</div></div>)}
+          {!scrolled&&<div style={{textAlign:'center',color:'var(--g400)',fontSize:12,marginTop:8,padding:'8px',background:'var(--g50)',borderRadius:8}}>⬇️</div>}
+        </div>
+        <div style={{padding:'12px 16px 28px',borderTop:'1px solid var(--border)',flexShrink:0,display:'flex',gap:8}}>
+          <button className="btn" style={{flex:1,padding:'12px'}} onClick={onClose}>{(T[offerLang]||T.ru).offerBack}</button>
+          <button className="btn btn-primary" style={{flex:2,padding:'12px',opacity:scrolled?1:.45}} onClick={()=>{if(scrolled)onAccept();}} disabled={!scrolled}>{(T[offerLang]||T.ru).offerAccept} ✓</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RegisterForm({t,onSwitch}){
+  const [bizName,setBizName]=useState('');const [bizType,setBizType]=useState(t.types[0]);
+  const [email,setEmail]=useState('');const [pass,setPass]=useState('');
+  const [error,setError]=useState('');const [loading,setLoading]=useState(false);const [done,setDone]=useState(false);
+  const [showOffer,setShowOffer]=useState(false);const [offerAccepted,setOfferAccepted]=useState(false);
+  async function submit(e){e.preventDefault();setError('');if(!offerAccepted){setError(t.offerMust);return;}setLoading(true);if(pass.length<6){setError('Min 6');setLoading(false);return;}const offerTime=new Date().toISOString();
+    const{data:signUpData,error}=await sb.auth.signUp({email,password:pass,options:{data:{biz_name:bizName.trim(),biz_type:bizType,offer_accepted_at:offerTime}}});
+    if(error){setError(error.message);}
+    else{
+      // Save offer acceptance time to businesses table (retry a few times since trigger may delay)
+      setTimeout(async()=>{
+        await sb.from('businesses').update({offer_accepted_at:offerTime,offer_accepted:true}).eq('owner_id',signUpData?.user?.id);
+      },2000);
+      setDone(true);
+    }
+    setLoading(false);}
+  if(done)return(<><div style={{textAlign:'center',fontSize:48,margin:'0 0 12px'}}>✅</div><div className="auth-title" style={{textAlign:'center'}}>{t.registerTitle}!</div><div className="auth-subtitle" style={{textAlign:'center'}}>Email: <strong>{email}</strong></div><div style={{background:'var(--amber-bg)',border:'1px solid rgba(217,119,6,.2)',borderRadius:'var(--r)',padding:'12px 14px',fontSize:13,color:'var(--amber-t)',margin:'12px 0 18px',lineHeight:1.6}}>✉️ {t.emailConfirmHint}</div><button className="btn btn-primary btn-full" onClick={onSwitch}>{t.login}</button></>);
+  return(
+    <>
+      <div className="auth-title">{t.registerTitle}</div>
+      <div className="auth-subtitle">{t.registerSub}</div>
+      <form onSubmit={submit}>
+        <label>{t.bizName} *</label><input value={bizName} onChange={e=>setBizName(e.target.value)} required autoFocus/>
+        <label>{t.bizType}</label><select value={bizType} onChange={e=>setBizType(e.target.value)}>{t.types.map(tp=><option key={tp}>{tp}</option>)}</select>
+        <label>{t.email} *</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required/>
+        <label>{t.password} *</label><input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="min 6" required/>
+        {error&&<div className="alert alert-error">⚠️ {error}</div>}
+        <div onClick={()=>setShowOffer(true)} style={{display:'flex',alignItems:'center',gap:10,marginTop:14,padding:'12px 14px',background:offerAccepted?'var(--green-bg)':'var(--g50)',borderRadius:'var(--r)',border:`1.5px solid ${offerAccepted?'var(--green)':'var(--g200)'}`,cursor:'pointer',transition:'all .15s'}}>
+          <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${offerAccepted?'var(--green)':'var(--g300)'}`,background:offerAccepted?'var(--green)':'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all .15s'}}>
+            {offerAccepted&&<span style={{color:'#fff',fontSize:14,lineHeight:1}}>✓</span>}
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:12,fontWeight:600,color:offerAccepted?'var(--green-t)':'var(--g700)',lineHeight:1.4}}>{offerAccepted?'✅ '+t.offerAccept:<span>{t.offerTitle} <span style={{color:'var(--primary)',textDecoration:'underline'}}>→</span></span>}</div>
+            {!offerAccepted&&<div style={{fontSize:11,color:'var(--g400)',marginTop:2}}>{t.offerMust}</div>}
+          </div>
+        </div>
+        <input type="checkbox" checked={offerAccepted} onChange={()=>{}} style={{display:'none'}}/>
+        {showOffer&&<OfferModal t={t} onAccept={()=>{setOfferAccepted(true);setShowOffer(false);}} onClose={()=>setShowOffer(false)} initialLang={typeof window!=='undefined'?localStorage.getItem('appLang')||'ru':'ru'}/>}
+        <button className="btn btn-primary btn-full" type="submit" style={{marginTop:10}} disabled={loading}>{loading?'...':t.register}</button>
+      </form>
+      <div className="auth-switch">{t.login}? <button onClick={onSwitch}>{t.login}</button></div>
+    </>
+  );
+}
+
+
+// ── Voice Input Architecture (ready for future implementation) ──
+function useVoiceInput(onResult){
+  const [listening,setListening]=useState(false);
+  const [supported]=useState(()=>{
+    try{return typeof window!=='undefined'&&('SpeechRecognition' in window||'webkitSpeechRecognition' in window);}
+    catch{return false;}
+  });
+  const recRef=React.useRef(null);
+
+  function start(){
+    if(!supported)return;
+    try{
+      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      const rec=new SR();
+      rec.continuous=false;
+      rec.interimResults=false;
+      rec.lang='ru-RU'; // ru-RU works best in CIS region; tg-TJ not widely supported yet
+      rec.onstart=()=>setListening(true);
+      rec.onend=()=>setListening(false);
+      rec.onerror=(e)=>{console.log('Voice error:',e.error);setListening(false);}
+      rec.onresult=(e)=>{
+        const transcript=e.results[0][0].transcript;
+        if(onResult)onResult(transcript);
+      };
+      rec.start();
+      recRef.current=rec;
+    }catch(e){setListening(false);}
+  }
+  function stop(){
+    try{recRef.current?.stop();}catch{}
+    setListening(false);
+  }
+  return{listening,supported,start,stop};
+}
+
+// ── Mic Button Component ──
+function MicButton({onTranscript,lang,style={}}){
+  const {listening,supported,start,stop}=useVoiceInput(onTranscript);
+  // Show button always - if not supported show disabled state
+  return(
+    <button
+      type="button"
+      onClick={()=>{if(supported){listening?stop():start();}else{alert('Браузер не поддерживает голосовой ввод. Используйте Chrome.');}}}
+      title={listening?"Stop":"Voice input"}
+      style={{
+        display:'flex',alignItems:'center',justifyContent:'center',
+        width:40,height:40,borderRadius:10,border:'1.5px solid',flexShrink:0,
+        borderColor:listening?'var(--red)':supported?'var(--primary)':'var(--g200)',
+        background:listening?'var(--red-bg)':supported?'var(--primary-bg)':'var(--g50)',
+        color:listening?'var(--red)':supported?'var(--primary)':'var(--g300)',
+        cursor:'pointer',transition:'all .15s',
+        animation:listening?'micPulse 1s ease-in-out infinite':'none',
+        ...style
+      }}
+    >
+      {IC.mic}
+    </button>
+  );
+}
+
+function AddDebtModal({business,onClose,onSaved,t}){
+  const [f,setF]=useState({name:'',phone:'',amount:'',cat:t.cats[0],dateIssued:todayStr(),dueDate:'',comment:''});
+  const [error,setError]=useState('');const [saving,setSaving]=useState(false);
+  const [dupClient,setDupClient]=useState(null); // existing client with same phone
+  const set=(k,v)=>setF(p=>({...p,[k]:v}));
+
+  // Check duplicate phone when user finishes typing
+  async function checkPhone(phone){
+    set('phone',phone);
+    if(phone.length<7)return;
+    const{data}=await sb.from('debts').select('client_name,phone').eq('business_id',business.id).eq('phone',phone.trim()).limit(1);
+    if(data&&data.length>0){
+      setDupClient(data[0]);
+    } else {
+      setDupClient(null);
+    }
+  }
+
+  async function doInsert(nameOverride){
+    const clientName=nameOverride||f.name.trim();
+    setSaving(true);
+    const{error:err}=await sb.from('debts').insert({
+      business_id:business.id,client_name:clientName,
+      phone:f.phone.trim(),amount:+f.amount,
+      date_issued:f.dateIssued,due_date:f.dueDate,
+      category:f.cat,comment:f.comment.trim(),
+      status:'active',paid_amount:0
+    });
+    setSaving(false);
+    if(err){setError(err.message);return;}
+    onSaved();onClose();
+  }
+
+  async function submit(e){
+    e.preventDefault();setError('');
+    if(!f.name.trim()){setError(t.clientName+'!');return;}
+    if(!f.phone||f.phone.length<7){setError(t.phone+'!');return;}
+    if(!f.amount||+f.amount<=0){setError(t.amount+'!');return;}
+    if(!f.dateIssued){setError(t.dateIssued+'!');return;}
+    if(!f.dueDate){setError(t.dueDate+'!');return;}
+    await doInsert();
+  }
+  return(
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-handle"/>
+        <div className="modal-title">{t.addDebt.replace(/\+\s*/,'')}</div>
+        <form onSubmit={submit}>
+          <label>{t.clientName} *</label><input value={f.name} onChange={e=>set('name',e.target.value)} autoFocus style={{fontSize:16}}/>
+          <label>{t.phone} *</label><input type="tel" value={f.phone} onChange={e=>checkPhone(formatPhone(e.target.value))} placeholder="+992XXXXXXXXX" inputMode="numeric" maxLength={15} style={{fontSize:16}}/>
+          {dupClient&&(
+            <div style={{background:'var(--amber-bg)',border:'1px solid #FDE68A',borderRadius:'var(--r)',padding:'10px 12px',marginTop:8,fontSize:13}}>
+              <div style={{fontWeight:700,color:'var(--amber-t)',marginBottom:4}}>⚠️ {t.dupPhone}</div>
+              <div style={{color:'var(--amber-t)',marginBottom:8}}>{t.dupPhoneClient} <strong>{dupClient.client_name}</strong></div>
+              <div style={{color:'var(--g600)',fontSize:12,marginBottom:8}}>{t.dupPhoneAdd}</div>
+              <div style={{display:'flex',gap:6}}>
+                <button type="button" className="btn btn-sm" style={{flex:1,background:'var(--amber)',color:'#fff',border:'none'}}
+                  onClick={()=>{
+                    if(!f.amount||+f.amount<=0){setError(t.amount+'!');return;}
+                    if(!f.dateIssued){setError(t.dateIssued+'!');return;}
+                    if(!f.dueDate){setError(t.dueDate+'!');return;}
+                    doInsert(dupClient.client_name);
+                  }}>
+                  {t.dupPhoneConfirm}
+                </button>
+                <button type="button" className="btn btn-sm" style={{flex:1}}
+                  onClick={()=>{setDupClient(null);set('phone','');}}>
+                  {t.dupPhoneCancel}
+                </button>
+              </div>
+            </div>
+          )}
+          <label>{t.amount} *</label><input type="number" value={f.amount} onChange={e=>set('amount',e.target.value)} placeholder="0" min="0.01" step="0.01" inputMode="decimal" style={{fontSize:16}}/>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div><label>{t.dateIssued} *</label><input type="date" value={f.dateIssued} onChange={e=>set('dateIssued',e.target.value)}/></div>
+            <div><label>{t.dueDate} *</label><input type="date" value={f.dueDate} onChange={e=>set('dueDate',e.target.value)}/></div>
+          </div>
+          <label>{t.category}</label><select value={f.cat} onChange={e=>set('cat',e.target.value)}>{t.cats.map(c=><option key={c}>{c}</option>)}</select>
+          <label>{t.comment}</label><textarea value={f.comment} onChange={e=>set('comment',e.target.value)} rows={2}/>
+          {error&&<div className="alert alert-error">{error}</div>}
+          <div className="modal-footer">
+            <button type="button" className="btn" onClick={onClose}>{t.cancel}</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving?'...':t.add}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function PayModal({debt,onClose,onSaved,t}){
+  const remaining=Number(debt.amount)-Number(debt.paid_amount??0);
+  const [amount,setAmount]=useState(String(Math.round(remaining*100)/100));
+  const [expectedDate,setExpectedDate]=useState(debt.due_date||todayStr());
+  const [actualDate,setActualDate]=useState(todayStr());
+  const [method,setMethod]=useState(t.cash);
+  const [note,setNote]=useState('');
+  const [error,setError]=useState('');const [saving,setSaving]=useState(false);
+  async function submit(e){
+    e.preventDefault();setError('');
+    const amt=Number(amount);
+    if(!amt||amt<=0){setError(t.minPay);return;}
+    if(amt>remaining+0.01){setError(t.maxPay+': '+fmt(remaining)+' '+t.sum);return;}
+    setSaving(true);
+    await sb.from('payments').insert({debt_id:debt.id,amount:amt,paid_at:actualDate,expected_date:expectedDate,method,note});
+    const newPaid=Number(debt.paid_amount??0)+amt;
+    const newStatus=newPaid>=Number(debt.amount)-0.01?'paid':'partial';
+    await sb.from('debts').update({paid_amount:newPaid,status:newStatus}).eq('id',debt.id);
+    setSaving(false);onSaved();
+  }
+  return(
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-handle"/>
+        <div style={{display:"flex",alignItems:"center",gap:9}}><span style={{color:"var(--green)"}}>{IC.pay}</span><div className="modal-title">{t.payTitle}</div></div>
+        <div className="info-box" style={{marginTop:12}}>
+          <div style={{fontWeight:700,fontSize:15}}>{debt.client_name}</div>
+          <div style={{color:'var(--g500)',marginTop:4,fontSize:13}}>{t.totalDebt}: <strong>{fmt(debt.amount)}</strong> {t.sum} &nbsp;·&nbsp; {t.remaining}: <strong style={{color:'var(--red)'}}>{fmt(remaining)}</strong> {t.sum}</div>
+        </div>
+        <form onSubmit={submit}>
+          <label>{t.payAmount} *</label><input type="number" value={amount} onChange={e=>setAmount(e.target.value)} min="0.01" step="0.01" inputMode="decimal" autoFocus style={{fontSize:16}}/>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div><label>{t.expectedDate}</label><input type="date" value={expectedDate} onChange={e=>setExpectedDate(e.target.value)}/></div>
+            <div><label>{t.actualDate}</label><input type="date" value={actualDate} onChange={e=>setActualDate(e.target.value)}/></div>
+          </div>
+          <label>{t.payMethod}</label>
+          <select value={method} onChange={e=>setMethod(e.target.value)}>{[t.cash,t.transfer,t.card,t.other].map(m=><option key={m}>{m}</option>)}</select>
+          <label>{t.payNote}</label><input value={note} onChange={e=>setNote(e.target.value)}/>
+          {error&&<div className="alert alert-error">{error}</div>}
+          <div className="modal-footer">
+            <button type="button" className="btn" onClick={onClose}>{t.cancel}</button>
+            <button type="submit" className="btn btn-green" disabled={saving}>{saving?'...':t.confirmPay}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+
+// ── Pay History Modal ──
+function PayHistoryModal({debt,onClose,t}){
+  const [payments,setPayments]=useState([]);const [loading,setLoading]=useState(true);
+  useEffect(()=>{
+    sb.from('payments').select('*').eq('debt_id',debt.id).order('paid_at',{ascending:true})
+      .then(({data})=>{setPayments(data??[]);setLoading(false);});
+  },[debt.id]);
+  const totalAmount=Number(debt.amount);
+  const remaining=Number(debt.paid_amount??0);
+  const paidPct=Math.min(100,Math.round(remaining/totalAmount*100));
+  const st=getStatus(debt);
+  // Calculate running balance
+  let runningBalance=totalAmount;
+  const paymentsWithBalance=payments.map(p=>{
+    runningBalance=runningBalance-Number(p.amount);
+    return{...p,balanceAfter:Math.max(0,runningBalance)};
+  });
+  return(
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-handle"/>
+        <div style={{display:'flex',alignItems:'center',gap:9}}>
+          <span style={{color:'var(--primary)'}}>{IC.history}</span>
+          <div className="modal-title">{t.payHistory}</div>
+        </div>
+        {/* Client info */}
+        <div style={{background:'var(--g50)',borderRadius:'var(--r)',padding:'12px 14px',marginTop:12,border:'1px solid var(--border)'}}>
+          <div style={{fontWeight:700,fontSize:15,color:'var(--g900)'}}>{debt.client_name}</div>
+          <div style={{fontSize:12,color:'var(--g500)',marginTop:2}}>{debt.phone} · {t.dueDate}: {debt.due_date}</div>
+        </div>
+        {/* Progress bar */}
+        <div style={{marginTop:14}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12,color:'var(--g500)'}}>
+            <span>{t.paid}: <strong style={{color:'var(--green)'}}>{fmt(remaining)} {t.sum}</strong></span>
+            <span>{paidPct}%</span>
+          </div>
+          <div style={{height:10,background:'var(--g200)',borderRadius:100,overflow:'hidden'}}>
+            <div style={{height:'100%',width:`${paidPct}%`,background:paidPct===100?'var(--green)':'linear-gradient(90deg,var(--green),#10B981)',borderRadius:100,transition:'width .6s ease'}}/>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:12,color:'var(--g500)'}}>
+            <span>{t.totalDebt}: <strong>{fmt(totalAmount)} {t.sum}</strong></span>
+            <span style={{color:remaining<totalAmount?'var(--red)':'var(--green)',fontWeight:600}}>
+              {t.remaining}: {fmt(totalAmount-remaining)} {t.sum}
+            </span>
+          </div>
+        </div>
+        {/* Payment timeline */}
+        <div style={{marginTop:16,fontSize:13,fontWeight:700,color:'var(--g600)',marginBottom:8}}>{t.payHistory} ({payments.length})</div>
+        {loading?<div className="loading-wrap"><div className="spinner"/></div>
+        :payments.length===0?
+          <div style={{textAlign:'center',padding:'20px',color:'var(--g400)',background:'var(--g50)',borderRadius:'var(--r)'}}>
+            <div style={{fontSize:28,marginBottom:6}}>📭</div>
+            <div style={{fontSize:13}}>{t.noDebts}</div>
+          </div>
+        :<div style={{position:'relative'}}>
+          {/* Timeline line */}
+          <div style={{position:'absolute',left:17,top:0,bottom:0,width:2,background:'var(--g200)',zIndex:0}}/>
+          {paymentsWithBalance.map((p,i)=>(
+            <div key={p.id} style={{display:'flex',gap:12,marginBottom:12,position:'relative',zIndex:1}}>
+              {/* Circle */}
+              <div style={{width:36,height:36,borderRadius:'50%',background:i===paymentsWithBalance.length-1&&paidPct===100?'var(--green)':'var(--green-bg)',border:`2px solid ${i===paymentsWithBalance.length-1&&paidPct===100?'var(--green)':'#D1FAE5'}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'var(--green)'}}>
+                {IC.pay}
+              </div>
+              {/* Content */}
+              <div style={{flex:1,background:'#fff',border:'1px solid var(--border)',borderRadius:'var(--r)',padding:'10px 12px',boxShadow:'var(--shadow)'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8}}>
+                  <div>
+                    <div style={{fontWeight:800,color:'var(--green)',fontSize:16}}>+{fmt(p.amount)} {t.sum}</div>
+                    <div style={{fontSize:11,color:'var(--g400)',marginTop:2,display:'flex',gap:6,flexWrap:'wrap'}}>
+                      <span>{p.method||t.cash}</span>
+                      {p.expected_date&&p.expected_date!==p.paid_at&&<span>{t.expectedDate}: {p.expected_date}</span>}
+                    </div>
+                  </div>
+                  <div style={{textAlign:'right',flexShrink:0}}>
+                    <div style={{fontSize:13,fontWeight:700,color:'var(--g700)'}}>{p.paid_at}</div>
+                    <div style={{fontSize:11,color:'var(--g400)',marginTop:2}}>
+                      {t.remaining}: <strong style={{color:p.balanceAfter>0?'var(--amber)':'var(--green)'}}>{fmt(p.balanceAfter)}</strong>
+                    </div>
+                  </div>
+                </div>
+                {p.note&&<div style={{fontSize:11,color:'var(--g500)',marginTop:6,padding:'5px 8px',background:'var(--g50)',borderRadius:6,fontStyle:'italic'}}>"{p.note}"</div>}
+              </div>
+            </div>
+          ))}
+          {/* Summary */}
+          <div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',background:paidPct===100?'var(--green-bg)':'var(--amber-bg)',borderRadius:'var(--r)',border:`1px solid ${paidPct===100?'#A7F3D0':'#FDE68A'}`,marginTop:4}}>
+            <span style={{color:paidPct===100?'var(--green)':'var(--amber)'}}>{paidPct===100?IC.check:IC.warning}</span>
+            <div>
+              <div style={{fontWeight:700,fontSize:13,color:paidPct===100?'var(--green-t)':'var(--amber-t)'}}>
+                {paidPct===100?t.paid:t.active}: {payments.length}x → {fmt(remaining)} {t.sum}
+              </div>
+              {paidPct<100&&<div style={{fontSize:11,color:'var(--amber-t)',opacity:.8}}>{t.remaining}: {fmt(totalAmount-remaining)} {t.sum}</div>}
+            </div>
+          </div>
+        </div>}
+        <div style={{marginTop:16}}><button className="btn btn-full" onClick={onClose}>{t.cancel}</button></div>
+      </div>
+    </div>
+  );
+}
+
+function DebtCard({d,t,onPay,onDelete,onHistory}){
+  const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
+  return(
+    <div className="debt-card">
+      <div className="debt-card-top">
+        <div><div className="debt-card-name">{d.client_name}</div><div className="debt-card-phone">{d.phone}</div></div>
+        <div className="debt-card-amount">
+          <div className={`debt-card-sum${st==='paid'?' paid-sum':''}`}>{fmt(rem)}</div>
+          <div style={{fontSize:11,color:'var(--g400)'}}>{t.sum}</div>
+        </div>
+      </div>
+      <div className="debt-card-row">
+        <span className={`pill ${statusClass(st)}`}><span className="pill-dot"/>{stLabel(st,t)}</span>
+        {st==='overdue'&&cat&&<span className={`pill ${cat.cls}`}>{ov} {t.days}</span>}
+      </div>
+      <div className="debt-card-row" style={{marginTop:4}}>
+        <span>{t.dueDate}: <strong>{d.due_date}</strong></span>
+        <span>{d.category}</span>
+      </div>
+      {d.comment&&<div style={{fontSize:12,color:'var(--g400)',marginTop:4,fontStyle:'italic'}}>{d.comment}</div>}
+      <div className="debt-card-actions">
+        {st!=='paid'&&<button className="btn btn-green" onClick={()=>onPay(d)}>💳 {t.confirmPay.replace('✓ ','')}</button>}
+        <button className="btn btn-sm" onClick={()=>onHistory(d)}>📋</button>
+        <button className="btn btn-danger btn-sm" onClick={()=>onDelete(d)}>✕</button>
+      </div>
+    </div>
+  );
+}
+
+
+
+// ── Quick Pay Modal (from FAB) ──
+function QuickPayModal({debts,onClose,onPaid,t}){
+  const [selected,setSelected]=useState(null);
+  const [search,setSearch]=useState('');
+  const active=debts.filter(d=>{
+    if(!search)return true;
+    const q=search.toLowerCase();
+    return d.client_name.toLowerCase().includes(q)||d.phone.includes(q);
+  });
+  if(selected)return<PayModal debt={selected} onClose={()=>setSelected(null)} onSaved={()=>onPaid(selected)} t={t}/>;
+  return(
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-handle"/>
+        <div className="modal-title">💳 {t.confirmPay.replace('✓ ','')}</div>
+        <div style={{marginTop:12}}>
+          <input placeholder={'🔍 '+t.search} value={search} onChange={e=>setSearch(e.target.value)} autoFocus style={{fontSize:15}}/>
+        </div>
+        {active.length===0?<div style={{textAlign:'center',padding:'24px',color:'var(--g400)'}}>{t.noDebts}</div>
+        :<div style={{marginTop:10,maxHeight:'55vh',overflowY:'auto'}}>
+          {active.map(d=>{
+            const rem=Number(d.amount)-Number(d.paid_amount??0);
+            const st=getStatus(d);
+            return<div key={d.id} onClick={()=>setSelected(d)} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 4px',borderBottom:'1px solid var(--border)',cursor:'pointer'}}>
+              <div>
+                <div style={{fontWeight:700,fontSize:14}}>{d.client_name}</div>
+                <div style={{fontSize:12,color:'var(--g400)'}}>{d.phone}</div>
+              </div>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontWeight:800,color:'var(--red)',fontSize:15}}>{fmt(rem)} {t.sum}</div>
+                <span className={`pill ${statusClass(st)}`} style={{fontSize:10}}><span className="pill-dot"/>{stLabel(st,t)}</span>
+              </div>
+            </div>;
+          })}
+        </div>}
+        <div style={{marginTop:14}}><button className="btn btn-full" onClick={onClose}>{t.cancel}</button></div>
+      </div>
+    </div>
+  );
+}
+
+// ── Floating Action Button ──
+function FAB({t,onAddDebt,onPayDebt}){
+  const [open,setOpen]=useState(false);
+  function close(){setOpen(false);}
+  function handleAdd(){close();setTimeout(onAddDebt,120);}
+  function handlePay(){close();setTimeout(onPayDebt,120);}
+  return(
+    <>
+      {open&&<div className="fab-backdrop" onClick={close}/>}
+      <div className="fab-wrap">
+        {open&&(
+          <div className="fab-actions">
+            <button className="fab-action-btn add" onClick={handleAdd}>
+              <div className="fab-action-inner">
+                <div className="fab-action-icon">{IC.debts}</div>
+                <div>
+                  <div className="fab-action-label">{t.addDebt.replace(/\+\s*/,'')}</div>
+                  <div className="fab-action-sub">{t.clientName}</div>
+                </div>
+              </div>
+            </button>
+            <button className="fab-action-btn pay" onClick={handlePay}>
+              <div className="fab-action-inner">
+                <div className="fab-action-icon">{IC.pay}</div>
+                <div>
+                  <div className="fab-action-label">{t.payTitle}</div>
+                  <div className="fab-action-sub">{t.remaining}</div>
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
+        <button className={`fab-btn${open?' open':''}`} onClick={()=>setOpen(o=>!o)} aria-label="Actions">
+          <span className="fab-btn-icon">{IC.plus}</span>
+        </button>
+      </div>
+    </>
+  );
+}
+
+function Dashboard({t}){
+  const {business,setPage}=useApp();
+  const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
+  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);
+  async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
+  useEffect(()=>{load();},[business]);
+  const active=debts.filter(d=>getStatus(d)!=='paid');
+  const overdue=debts.filter(d=>getStatus(d)==='overdue');
+  const paid=debts.filter(d=>getStatus(d)==='paid');
+  const totalActive=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+  const totalOverdue=overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+  const totalPaid=paid.reduce((s,d)=>s+Number(d.amount),0);
+  const clients=new Set(active.map(d=>d.phone)).size;
+  const debtorClients=new Set(overdue.map(d=>d.phone)).size;
+  const ovCats=[{label:t.cat1,days:[1,30],cls:'cat-1'},{label:t.cat2,days:[31,90],cls:'cat-2'},{label:t.cat3,days:[91,180],cls:'cat-3'},{label:t.cat4,days:[181,365],cls:'cat-4'},{label:t.cat5,days:[366,99999],cls:'cat-5'}]
+    .map(cat=>{const items=overdue.filter(d=>{const ov=daysOverdue(d);return ov>=cat.days[0]&&ov<=cat.days[1];});return{...cat,count:items.length,sum:items.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0)};});
+
+  return(
+    <>
+      <div className="page-header">
+        <div><div className="page-title">{t.dashboard}</div><div className="page-sub">{business?.name}</div></div>
+        <div className="page-actions">
+          <button className="btn btn-sm" onClick={()=>exportToExcel(debts,business?.name||'',t)} style={{display:'flex',alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button>
+          <button className="btn btn-primary" onClick={()=>setAddOpen(true)}>{t.addDebt}</button>
+        </div>
+      </div>
+      <div className="stats-grid">
+        {[
+          {label:t.activeDebts,val:active.length,sub:fmt(totalActive)+' '+t.sum,color:'var(--primary)',bg:'var(--primary-bg)',icon:IC.debts},
+          {label:t.expectedSum,val:fmt(totalActive)+' '+t.sum,sub:active.length+' '+t.clientsCount.toLowerCase(),color:'var(--g700)',bg:'var(--g100)',icon:IC.pay,sm:true},
+          {label:t.overdueDebts,val:overdue.length,sub:fmt(totalOverdue)+' '+t.sum,color:'var(--red)',bg:'var(--red-bg)',icon:IC.warning},
+          {label:t.paidDebts,val:paid.length,sub:fmt(totalPaid)+' '+t.sum,color:'var(--green)',bg:'var(--green-bg)',icon:IC.check},
+        ].map((s,i)=>(
+          <div key={i} className="stat-card">
+            <div className="stat-accent" style={{background:s.color}}/>
+            <div className="stat-icon" style={{background:s.bg,color:s.color}}>{s.icon}</div>
+            <div className="stat-label">{s.label}</div>
+            <div className="stat-value" style={{color:s.color,fontSize:s.sm?'18px':undefined}}>{s.val}</div>
+            {s.sub&&<div className="stat-sub">{s.sub}</div>}
+          </div>
+        ))}
+      </div>
+      {overdue.length>0&&(
+        <div className="card" style={{marginBottom:14}}>
+          <div className="card-header"><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{color:"var(--amber)"}}>{IC.warning}</span><div className="card-title">{t.overdueClass}</div></div></div>
+          <div className="overdue-grid">{ovCats.map(cat=>(
+            <div key={cat.label} className={`overdue-card ${cat.cls}`}>
+              <div className="overdue-num">{cat.count}</div>
+              <div className="overdue-lbl">{cat.label}</div>
+              <div className="overdue-sum">{fmt(cat.sum)} {t.sum}</div>
+            </div>
+          ))}</div>
+        </div>
+      )}
+      <div style={{marginBottom:14}}>
+        <div className="card">
+          <div className="card-header">
+            <div style={{display:"flex",alignItems:"center",gap:8}}><span style={{color:"var(--g400)"}}>{IC.history}</span><div className="card-title">{t.recentDebts}</div></div>
+            <button className="btn btn-sm" onClick={()=>setPage('debts')}>{t.seeAll}</button>
+          </div>
+          {loading?<div className="loading-wrap"><div className="spinner"/></div>
+          :debts.length===0?<div className="empty-state" style={{padding:'20px'}}><div className="empty-icon">{IC.debts}</div><div className="empty-title">{t.noDebts}</div></div>
+          :<div>{debts.slice(0,6).map(d=>{const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);
+            return<div key={d.id} style={{display:'flex',alignItems:'center',padding:'11px 16px',borderBottom:'1px solid var(--border)',gap:12}}>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.client_name}</div>
+                <div style={{fontSize:11,color:'var(--g400)',marginTop:1}}>{d.phone} · {d.due_date}</div>
+              </div>
+              <div style={{textAlign:'right',flexShrink:0}}>
+                <div style={{fontWeight:800,fontSize:15,color:rem>0?'var(--red)':'var(--green)'}}>{fmt(rem)}</div>
+                <div style={{fontSize:10,color:'var(--g400)'}}>{t.sum}</div>
+              </div>
+              <div style={{display:'flex',flexDirection:'column',gap:4,alignItems:'flex-end',flexShrink:0}}>
+                <span className={`pill ${statusClass(st)}`} style={{fontSize:10}}><span className="pill-dot"/>{stLabel(st,t)}</span>
+                {st!=='paid'&&<button className="btn btn-sm btn-green" style={{padding:'3px 9px',fontSize:11}} onClick={()=>setPayDebt(d)}>{IC.pay}</button>}
+              </div>
+            </div>;
+          })}</div>}
+        </div>
+      </div>
+      {overdue.length>0&&(
+        <div className="card">
+          <div className="card-header"><div><div style={{display:"flex",alignItems:"center",gap:7}}><span style={{color:"var(--red)"}}>{IC.warning}</span><div className="card-title">{t.overdueDebts}</div></div><div className="card-sub">{overdue.length}</div></div><button className="btn btn-sm" onClick={()=>exportToExcel(overdue,business?.name+'_ov',t)} style={{display:'flex',alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button></div>
+          <div className="table-wrap"><table>
+            <thead><tr><th>{t.clientName}</th><th>{t.remaining}</th><th>{t.days}</th><th>{t.overdueClass}</th><th>{t.phone}</th><th></th></tr></thead>
+            <tbody>{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=>{const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);const rem=Number(d.amount)-Number(d.paid_amount??0);
+              return<tr key={d.id}>
+                <td><div style={{fontWeight:600}}>{d.client_name}</div><div style={{fontSize:11,color:'var(--g400)'}}>{d.category}</div></td>
+                <td style={{fontWeight:700,color:'var(--red)'}}>{fmt(rem)} {t.sum}</td>
+                <td><strong style={{color:'var(--red)'}}>{ov} {t.days}</strong></td>
+                <td>{cat&&<span className={`pill ${cat.cls}`}>{cat.label}</span>}</td>
+                <td style={{color:'var(--g500)'}}>{d.phone}</td>
+                <td><button className="btn btn-sm btn-green" onClick={()=>setPayDebt(d)}>💳</button></td>
+              </tr>;})}
+            </tbody>
+          </table></div>
+          <div className="debt-cards">{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onDelete={async dd=>{if(!confirm(t.deleteConfirm))return;await sb.from('debts').delete().eq('id',dd.id);load();}} onHistory={setHistDebt}/>)}</div>
+        </div>
+      )}
+      {addOpen&&<AddDebtModal business={business} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast(t.addedOk);}} t={t}/>}
+      {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast(t.paidOk);}} t={t}/>}
+      {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
+    </>
+  );
+}
+
+function DebtsPage({t}){
+  const {business}=useApp();
+  const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
+  const [search,setSearch]=useState('');const [fStatus,setFStatus]=useState('');const [sort,setSort]=useState('date_desc');
+  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);
+  async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
+  useEffect(()=>{load();},[business]);
+  async function del(d){if(!confirm(t.deleteConfirm))return;await sb.from('debts').delete().eq('id',d.id);toast(t.deletedOk,'error');load();}
+  const list=useMemo(()=>{
+    let r=debts.filter(d=>{const q=search.toLowerCase();return(!q||d.client_name.toLowerCase().includes(q)||d.phone.includes(q))&&(!fStatus||getStatus(d)===fStatus);});
+    r.sort((a,b)=>{if(sort==='date_asc')return new Date(a.date_issued)-new Date(b.date_issued);if(sort==='amount_desc')return Number(b.amount)-Number(a.amount);if(sort==='overdue')return daysOverdue(b)-daysOverdue(a);return new Date(b.created_at)-new Date(a.created_at);});
+    return r;
+  },[debts,search,fStatus,sort]);
+  return(
+    <>
+      <div className="page-header">
+        <div><div className="page-title">{t.debts}</div><div className="page-sub">{list.length}</div></div>
+        <div className="page-actions"><button className="btn btn-sm" onClick={()=>exportToExcel(list,business?.name||'',t)} style={{display:'flex',alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button><button className="btn btn-primary" onClick={()=>setAddOpen(true)}>{t.addDebt}</button></div>
+      </div>
+      <div className="card">
+        <div className="filter-bar">
+          <input placeholder={'🔍 '+t.search} value={search} onChange={e=>setSearch(e.target.value)}/>
+          <select value={fStatus} onChange={e=>setFStatus(e.target.value)}><option value="">{t.allStatus}</option><option value="active">{t.active}</option><option value="due">{t.dueSoon}</option><option value="overdue">{t.overdue}</option><option value="paid">{t.paid}</option></select>
+          <select value={sort} onChange={e=>setSort(e.target.value)}><option value="date_desc">{t.newest}</option><option value="date_asc">{t.oldest}</option><option value="amount_desc">{t.byAmount}</option><option value="overdue">{t.byOverdue}</option></select>
+        </div>
+        {loading?<div className="loading-wrap"><div className="spinner"/></div>
+        :list.length===0?<div className="empty-state"><div className="empty-icon">{IC.debts}</div><div className="empty-title">{t.noDebts}</div><div style={{fontSize:13}}>{t.addFirst}</div></div>
+        :<>
+          <div className="table-wrap"><table>
+            <thead><tr><th>{t.clientName}</th><th>{t.phone}</th><th>{t.amount}</th><th>{t.paid}</th><th>{t.remaining}</th><th>{t.dueDate}</th><th>{t.overdueClass}</th><th></th></tr></thead>
+            <tbody>{list.map(d=>{const st=getStatus(d);const pa=Number(d.paid_amount??0);const rem=Number(d.amount)-pa;const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
+              return<tr key={d.id}>
+                <td><div style={{fontWeight:600}}>{d.client_name}</div>{d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}</td>
+                <td style={{color:'var(--g500)'}}>{d.phone}</td>
+                <td style={{fontWeight:600}}>{fmt(d.amount)}</td>
+                <td style={{color:'var(--g400)'}}>{pa>0?fmt(pa):'—'}</td>
+                <td style={{fontWeight:700,color:rem>0?'var(--red)':'var(--g400)'}}>{fmt(rem)}</td>
+                <td style={{fontSize:12,color:'var(--g500)'}}>{d.due_date}</td>
+                <td>{st==='overdue'&&cat?<span className={`pill ${cat.cls}`}>{cat.label}</span>:<span className={`pill ${statusClass(st)}`}><span className="pill-dot"/>{stLabel(st,t)}</span>}</td>
+                <td><div className="row-actions">{st!=='paid'&&<button className="btn btn-sm btn-green" onClick={()=>setPayDebt(d)} title={t.payTitle}>{IC.pay}</button>}<button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button><button className="btn btn-sm btn-danger" onClick={()=>del(d)} title={t.delete}>{IC.trash}</button></div></td>
+              </tr>;})}
+            </tbody>
+          </table></div>
+          <div className="debt-cards">{list.map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onDelete={del} onHistory={setHistDebt}/>)}</div>
+        </>}
+      </div>
+      {addOpen&&<AddDebtModal business={business} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast(t.addedOk);}} t={t}/>}
+      {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast(t.paidOk);}} t={t}/>}
+      {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
+    </>
+  );
+}
+
+
+// ── Client History Modal ──
+function ClientHistoryModal({client,debts,onClose,t}){
+  const [payments,setPayments]=useState([]);const [loading,setLoading]=useState(true);
+  useEffect(()=>{
+    const ids=debts.map(d=>d.id);
+    if(!ids.length){setLoading(false);return;}
+    sb.from('payments').select('*').in('debt_id',ids).order('paid_at',{ascending:false}).then(({data})=>{setPayments(data??[]);setLoading(false);});
+  },[]);
+  const totalDebt=debts.reduce((s,d)=>s+Number(d.amount),0);
+  const totalPaid=debts.reduce((s,d)=>s+Number(d.paid_amount??0),0);
+  const totalRem=totalDebt-totalPaid;
+  const overdueD=debts.filter(d=>getStatus(d)==='overdue');
+  const maxOv=Math.max(0,...overdueD.map(d=>daysOverdue(d)));
+  return(
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-handle"/>
+        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}>
+          <div style={{width:44,height:44,borderRadius:12,background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)',color:'var(--primary)',fontSize:16,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid var(--border)'}}>
+            {client.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()}
+          </div>
+          <div>
+            <div style={{fontWeight:800,fontSize:16,color:'var(--g900)'}}>{client.name}</div>
+            <div style={{fontSize:13,color:'var(--g500)'}}>{client.phone}</div>
+          </div>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:14}}>
+          {[
+            {label:t.totalDebt,val:fmt(totalDebt),color:'var(--g700)'},
+            {label:t.paid,val:fmt(totalPaid),color:'var(--green)'},
+            {label:t.remaining,val:fmt(totalRem),color:totalRem>0?'var(--red)':'var(--green)'},
+          ].map((s,i)=>(
+            <div key={i} style={{background:'var(--g50)',borderRadius:'var(--r)',padding:'10px 8px',textAlign:'center',border:'1px solid var(--border)'}}>
+              <div style={{fontSize:10,color:'var(--g400)',fontWeight:700,textTransform:'uppercase',marginBottom:3}}>{s.label}</div>
+              <div style={{fontSize:14,fontWeight:800,color:s.color}}>{s.val}</div>
+              <div style={{fontSize:10,color:'var(--g400)'}}>{t.sum}</div>
+            </div>
+          ))}
+        </div>
+        {maxOv>0&&<div style={{background:'var(--red-bg)',border:'1px solid rgba(220,38,38,.15)',borderRadius:'var(--r)',padding:'9px 12px',fontSize:12,color:'var(--red-t)',fontWeight:600,marginBottom:12}}>⚠️ {t.overdue}: {maxOv} {t.days} · {overdueD.length} {t.debts}</div>}
+        <div style={{fontWeight:700,fontSize:13,color:'var(--g700)',marginBottom:8}}>📋 {t.debts} ({debts.length})</div>
+        {debts.map(d=>{
+          const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
+          const dPay=payments.filter(p=>p.debt_id===d.id);
+          return<div key={d.id} style={{border:'1px solid var(--border)',borderRadius:'var(--r)',marginBottom:10,overflow:'hidden'}}>
+            <div style={{padding:'10px 12px',background:'var(--g50)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <div style={{fontSize:12,color:'var(--g500)'}}>{d.date_issued} → {d.due_date}</div>
+                <div style={{fontSize:12,color:'var(--g500)'}}>{d.category}</div>
+              </div>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontWeight:800,fontSize:15,color:rem>0?'var(--red)':'var(--green)'}}>{fmt(rem)} {t.sum}</div>
+                <span className={`pill ${statusClass(st)}`} style={{fontSize:10}}><span className="pill-dot"/>{stLabel(st,t)}</span>
+                {st==='overdue'&&cat&&<span className={`pill ${cat.cls}`} style={{fontSize:10,marginLeft:4}}>{ov} {t.days}</span>}
+              </div>
+            </div>
+            {dPay.length>0&&<div style={{padding:'8px 12px'}}>
+              {dPay.map(p=><div key={p.id} style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--g500)',padding:'3px 0',borderBottom:'1px solid var(--border)'}}>
+                <span>💳 {p.paid_at} · {p.method||t.cash}</span>
+                <span style={{fontWeight:700,color:'var(--green)'}}>+{fmt(p.amount)} {t.sum}</span>
+              </div>)}
+            </div>}
+          </div>;
+        })}
+        <button className="btn btn-full" style={{marginTop:4}} onClick={onClose}>{t.cancel}</button>
+      </div>
+    </div>
+  );
+}
+
+function ClientsPage({t}){
+  const {business}=useApp();
+  const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);const [search,setSearch]=useState('');const [histClient,setHistClient]=useState(null);
+  useEffect(()=>{if(!business)return;setLoading(true);sb.from('debts').select('*').eq('business_id',business.id).then(({data})=>{setDebts(data??[]);setLoading(false);});},[business]);
+  const clients=useMemo(()=>{
+    const map={};debts.forEach(d=>{if(!map[d.phone])map[d.phone]={name:d.client_name,phone:d.phone,debts:[]};map[d.phone].debts.push(d);});
+    return Object.values(map).filter(c=>{const q=search.toLowerCase();return!q||c.name.toLowerCase().includes(q)||c.phone.includes(q);}).sort((a,b)=>b.debts.some(d=>getStatus(d)==='overdue')-a.debts.some(d=>getStatus(d)==='overdue'));
+  },[debts,search]);
+  return(
+    <>
+      <div className="page-header"><div><div className="page-title">{t.clients}</div><div className="page-sub">{clients.length}</div></div></div>
+      <div className="card">
+        <div className="filter-bar"><input placeholder={'🔍 '+t.search} value={search} onChange={e=>setSearch(e.target.value)}/></div>
+        {loading?<div className="loading-wrap"><div className="spinner"/></div>
+        :clients.length===0?<div className="empty-state"><div className="empty-icon">{IC.clients}</div><div className="empty-title">{t.noClients}</div></div>
+        :<>
+          <div className="table-wrap"><table>
+            <thead><tr><th>{t.clientName}</th><th>{t.phone}</th><th>{t.debts}</th><th>{t.activeDebts}</th><th>{t.paidDebts}</th><th>{t.overdueClass}</th><th></th></tr></thead>
+            <tbody>{clients.map(c=>{
+              const active=c.debts.filter(d=>getStatus(d)!=='paid');const paidD=c.debts.filter(d=>getStatus(d)==='paid');
+              const actSum=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);const paidSum=paidD.reduce((s,d)=>s+Number(d.amount),0);
+              const hasOv=active.some(d=>getStatus(d)==='overdue');const maxOv=Math.max(0,...active.filter(d=>getStatus(d)==='overdue').map(d=>daysOverdue(d)));
+              const cat=getOverdueCat(maxOv,t);const init=c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+              return<tr key={c.phone}>
+                <td><div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <div style={{width:34,height:34,borderRadius:9,background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)',color:'var(--primary)',fontSize:13,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid var(--border)'}}>{init}</div>
+                  <strong>{c.name}</strong>
+                </div></td>
+                <td style={{color:'var(--g500)'}}>{c.phone}</td>
+                <td>{c.debts.length}</td>
+                <td style={{fontWeight:700,color:actSum>0?'var(--red)':'var(--g400)'}}>{fmt(actSum)} {t.sum}</td>
+                <td style={{color:'var(--green)',fontWeight:600}}>{fmt(paidSum)} {t.sum}</td>
+                <td>{maxOv>0&&cat?<span className={`pill ${cat.cls}`}>{maxOv} {t.days}</span>:<span style={{color:'var(--g300)'}}>—</span>}</td>
+                <td><div style={{display:'flex',gap:6,alignItems:'center'}}><span className={`pill ${hasOv?'pill-overdue':active.length?'pill-active':'pill-paid'}`}><span className="pill-dot"/>{hasOv?t.overdue:active.length?t.active:t.paid}</span><button className="btn btn-sm" onClick={()=>setHistClient({name:c.name,phone:c.phone,debts:c.debts})} style={{marginLeft:4}}>📋</button></div></td>
+              </tr>;})}
+            </tbody>
+          </table></div>
+          <div className="debt-cards">{clients.map(c=>{
+            const active=c.debts.filter(d=>getStatus(d)!=='paid');const actSum=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);const hasOv=active.some(d=>getStatus(d)==='overdue');const init=c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            return<div key={c.phone} className="debt-card">
+              <div className="debt-card-top">
+                <div style={{display:'flex',alignItems:'center',gap:10}}>
+                  <div style={{width:40,height:40,borderRadius:10,background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)',color:'var(--primary)',fontSize:14,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid var(--border)'}}>{init}</div>
+                  <div><div className="debt-card-name">{c.name}</div><div className="debt-card-phone">{c.phone}</div></div>
+                </div>
+                <span className={`pill ${hasOv?'pill-overdue':active.length?'pill-active':'pill-paid'}`}><span className="pill-dot"/>{hasOv?t.overdue:active.length?t.active:t.paid}</span>
+              </div>
+              <div className="debt-card-row"><span>{t.debts}: <strong>{c.debts.length}</strong></span><span style={{fontWeight:700,color:actSum>0?'var(--red)':'var(--g400)'}}>{fmt(actSum)} {t.sum}</span></div>
+              <div style={{marginTop:10,paddingTop:10,borderTop:'1px solid var(--border)'}}><button className="btn btn-sm btn-full" onClick={()=>setHistClient({name:c.name,phone:c.phone,debts:c.debts})}>📋 {t.clientHistory}</button></div>
+            </div>;})}
+          </div>
+        </>}
+      </div>
+      {histClient&&<ClientHistoryModal client={histClient} debts={histClient.debts} onClose={()=>setHistClient(null)} t={t}/>}
+    </>
+  );
+}
+
+
+// ── Overdue History Page ──
+function OverdueHistoryPage({t}){
+  const {business}=useApp();
+  const [debts,setDebts]=useState([]);const [payments,setPayments]=useState([]);const [loading,setLoading]=useState(true);
+  const [search,setSearch]=useState('');const [sort,setSort]=useState('overdue');const [histDebt,setHistDebt]=useState(null);
+  useEffect(()=>{
+    if(!business)return;setLoading(true);
+    Promise.all([
+      sb.from('debts').select('*').eq('business_id',business.id).neq('status','paid'),
+      sb.from('payments').select('*'),
+    ]).then(([{data:d},{data:p}])=>{
+      setDebts(d??[]);setPayments(p??[]);setLoading(false);
+    });
+  },[business]);
+  const overdue=useMemo(()=>{
+    let r=debts.filter(d=>getStatus(d)==='overdue');
+    if(search){const q=search.toLowerCase();r=r.filter(d=>d.client_name.toLowerCase().includes(q)||d.phone.includes(q));}
+    r.sort((a,b)=>sort==='overdue'?daysOverdue(b)-daysOverdue(a):Number(b.amount)-Number(b.paid_amount??0)-(Number(a.amount)-Number(a.paid_amount??0)));
+    return r;
+  },[debts,search,sort]);
+  const totalRem=overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+  return(
+    <>
+      <div className="page-header">
+        <div><div style={{display:"flex",alignItems:"center",gap:10}}><span style={{color:"var(--red)"}}>{IC.warning}</span><div className="page-title">{t.overdueHistory}</div></div><div className="page-sub">{overdue.length} · {fmt(totalRem)} {t.sum}</div></div>
+      </div>
+      <div className="card">
+        <div className="filter-bar">
+          <input placeholder={'🔍 '+t.search} value={search} onChange={e=>setSearch(e.target.value)}/>
+          <select value={sort} onChange={e=>setSort(e.target.value)}>
+            <option value="overdue">{t.byOverdue}</option>
+            <option value="amount">{t.byAmount}</option>
+          </select>
+        </div>
+        {loading?<div className="loading-wrap"><div className="spinner"/></div>
+        :overdue.length===0?<div className="empty-state"><div className="empty-icon">{IC.check}</div><div className="empty-title">{t.noDebts}</div></div>
+        :<>
+          <div className="table-wrap"><table>
+            <thead><tr><th>{t.clientName}</th><th>{t.phone}</th><th>{t.remaining}</th><th>{t.days}</th><th>{t.overdueClass}</th><th>{t.dueDate}</th><th></th></tr></thead>
+            <tbody>{overdue.map(d=>{
+              const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
+              const dPay=payments.filter(p=>p.debt_id===d.id);
+              return<tr key={d.id}>
+                <td><div style={{fontWeight:700}}>{d.client_name}</div>{d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}</td>
+                <td style={{color:'var(--g500)'}}>{d.phone}</td>
+                <td style={{fontWeight:800,color:'var(--red)',fontSize:15}}>{fmt(rem)} {t.sum}</td>
+                <td><strong style={{color:'var(--red)',fontSize:14}}>{ov} {t.days}</strong></td>
+                <td>{cat&&<span className={`pill ${cat.cls}`}>{cat.label}</span>}</td>
+                <td style={{fontSize:12,color:'var(--g500)'}}>{d.due_date}</td>
+                <td><button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button></td>
+              </tr>;
+            })}</tbody>
+          </table></div>
+          <div className="debt-cards">
+            {overdue.map(d=>{
+              const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
+              const dPay=payments.filter(p=>p.debt_id===d.id);
+              return<div key={d.id} className="debt-card" style={{borderLeft:'3px solid var(--red)'}}>
+                <div className="debt-card-top">
+                  <div><div className="debt-card-name">{d.client_name}</div><div className="debt-card-phone">{d.phone}</div></div>
+                  <div className="debt-card-amount">
+                    <div className="debt-card-sum">{fmt(rem)}</div>
+                    <div style={{fontSize:11,color:'var(--g400)'}}>{t.sum}</div>
+                    <div style={{fontSize:11,fontWeight:700,color:'var(--red)',marginTop:2}}>{ov} {t.days}</div>
+                  </div>
+                </div>
+                <div className="debt-card-row">
+                  {cat&&<span className={`pill ${cat.cls}`}>{cat.label}</span>}
+                  <span style={{fontSize:12,color:'var(--g500)'}}>{t.dueDate}: {d.due_date}</span>
+                </div>
+                {dPay.length>0&&<div style={{marginTop:8,fontSize:12,color:'var(--g500)',paddingTop:8,borderTop:'1px solid var(--border)'}}>
+                  {t.paid}: {dPay.length}x · {fmt(dPay.reduce((s,p)=>s+Number(p.amount),0))} {t.sum}
+                </div>}
+                {d.comment&&<div style={{fontSize:12,color:'var(--g400)',marginTop:4,fontStyle:'italic'}}>{d.comment}</div>}
+                <div className="debt-card-actions">
+                  <button className="btn btn-sm btn-full" onClick={()=>setHistDebt(d)}>📋 {t.payHistory}</button>
+                </div>
+              </div>;
+            })}
+          </div>
+        </>}
+      </div>
+      {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
+    </>
+  );
+}
+
+function SettingsPage({t}){
+  const {business,setBusiness,session,allBusinesses,switchBusiness,refreshBusinesses}=useApp();
+  const [name,setName]=useState('');const [type,setType]=useState('');const [saving,setSaving]=useState(false);
+  const [showAdd,setShowAdd]=useState(false);
+  const isPremium=allBusinesses.some(b=>b.is_premium)||business?.is_premium;
+  useEffect(()=>{if(business){setName(business.name);setType(business.type);};},[business]);
+  async function save(e){e.preventDefault();setSaving(true);const{data}=await sb.from('businesses').update({name,type}).eq('id',business.id).select().single();if(data){setBusiness(data);toast(t.savedOk);}setSaving(false);}
+  return(
+    <>
+      <div className="page-header"><div><div className="page-title">{t.settingsTitle}</div></div></div>
+      <div className="card" style={{maxWidth:460,marginBottom:16}}>
+        <div className="card-header"><span className="card-title">{t.profileTitle}</span></div>
+        <form onSubmit={save} style={{padding:18}}>
+          <label>{t.email}</label><input value={session?.user?.email??''} disabled/>
+          <label>{t.bizName}</label><input value={name} onChange={e=>setName(e.target.value)} required/>
+          <label>{t.bizType}</label><select value={type} onChange={e=>setType(e.target.value)}>{t.types.map(tp=><option key={tp}>{tp}</option>)}</select>
+          <button className="btn btn-primary" type="submit" style={{marginTop:18}} disabled={saving}>{saving?'...':t.save}</button>
+        </form>
+      </div>
+      <div className="card" style={{maxWidth:460}}>
+        <div className="card-header">
+          <div style={{display:'flex',alignItems:'center',gap:8}}><span style={{color:'var(--primary)'}}>{IC.store}</span><span className="card-title">{t.myShops}</span><span className="card-sub" style={{marginLeft:4}}>({allBusinesses.length})</span></div>
+          <button className="btn btn-sm btn-primary" onClick={()=>setShowAdd(true)}>{t.addShop}</button>
+        </div>
+        <div>
+          {allBusinesses.map(biz=>(
+            <div key={biz.id} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderBottom:'1px solid var(--border)',background:biz.id===business?.id?'var(--primary-bg)':'#fff'}}>
+              <div style={{width:36,height:36,borderRadius:10,background:biz.id===business?.id?'var(--primary)':'var(--g100)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:biz.id===business?.id?'#fff':'var(--g400)'}}>
+                {IC.store}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:700,fontSize:14,color:biz.id===business?.id?'var(--primary)':'var(--g900)'}}>{biz.name}</div>
+                <div style={{fontSize:11,color:'var(--g400)',marginTop:1}}>{biz.type}</div>
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                {biz.is_premium&&<span style={{background:'#F59E0B',color:'#fff',fontSize:9,fontWeight:700,padding:'2px 8px',borderRadius:100}}>PRO</span>}
+                {biz.id===business?.id
+                  ?<span style={{fontSize:11,color:'var(--primary)',fontWeight:700}}>✓ {t.currentShop}</span>
+                  :<button className="btn btn-sm" onClick={()=>switchBusiness(biz)}>{t.switchShop}</button>}
+              </div>
+            </div>
+          ))}
+        </div>
+        {!isPremium&&(
+          <div style={{padding:'14px 16px',background:'linear-gradient(135deg,#FEF9C3,#FFFBEB)',borderTop:'1px solid #FDE68A'}}>
+            <div style={{display:'flex',gap:10,alignItems:'flex-start',marginBottom:10}}>
+              <span style={{fontSize:22,flexShrink:0}}>⭐</span>
+              <div>
+                <div style={{fontWeight:800,fontSize:13,color:'#92400E'}}>{t.premiumOnly}</div>
+                <div style={{fontSize:12,color:'#B45309',marginTop:2}}>{t.premiumHint}</div>
+              </div>
+            </div>
+            <div style={{fontSize:11,color:'#78350F',background:'rgba(255,255,255,.6)',borderRadius:8,padding:'8px 10px',lineHeight:1.6}}>
+              🚀 <strong>{t.premiumIncludes||"Premium включает:"}</strong><br/>
+              • {t.premiumFeature1||"Несколько магазинов"}<br/>
+              • {t.premiumFeature2||"Экспорт в Excel"}<br/>
+              • {t.premiumFeature3||"SMS уведомления клиентам"}<br/>
+              • {t.premiumFeature4||"Приоритетная поддержка"}<br/>
+              <br/>
+              📩 <a href="mailto:niyatorzuzoda@gmail.com" style={{color:'#92400E',fontWeight:700}}>niyatorzuzoda@gmail.com</a>
+            </div>
+          </div>
+        )}
+      </div>
+      {showAdd&&<AddShopModal t={t} session={session} isPremium={isPremium||allBusinesses.length===0} onClose={()=>setShowAdd(false)} onCreated={(biz)=>{refreshBusinesses();switchBusiness(biz);setShowAdd(false);toast(t.savedOk);}}/>}
+    </>
+  );
+}
+
+function AdminPage({t}){
+  const [stats,setStats]=useState(null);const [businesses,setBusinesses]=useState([]);const [loading,setLoading]=useState(true);
+  const [selectedBiz,setSelectedBiz]=useState(null);const [bizDebts,setBizDebts]=useState([]);const [debtsLoading,setDebtsLoading]=useState(false);
+  useEffect(()=>{
+    async function load(){
+      setLoading(true);
+      const [{data:biz},{data:debts}]=await Promise.all([sb.from('businesses').select('*').order('created_at',{ascending:false}),sb.from('debts').select('*')]);
+      const bizList=biz??[];const debtList=debts??[];
+      const totalDebt=debtList.reduce((s,d)=>s+Number(d.amount),0);const totalPaid=debtList.reduce((s,d)=>s+Number(d.paid_amount??0),0);
+      const overdue=debtList.filter(d=>getStatus(d)==='overdue');
+      setStats({bizCount:bizList.length,debtCount:debtList.length,totalDebt,totalPaid,overdueCount:overdue.length,totalOverdue:overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0)});
+      setBusinesses(bizList.map(b=>{const bd=debtList.filter(d=>d.business_id===b.id);const active=bd.filter(d=>getStatus(d)!=='paid');const ov=bd.filter(d=>getStatus(d)==='overdue');return{...b,debtCount:bd.length,activeSum:active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),overdueCount:ov.length,overdueSum:ov.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),owner_offer_at:b.offer_accepted_at};}));
+      setLoading(false);
+    }
+    load();
+  },[]);
+  async function openBiz(biz){setSelectedBiz(biz);setDebtsLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',biz.id).order('created_at',{ascending:false});setBizDebts(data??[]);setDebtsLoading(false);}
+  if(loading)return<div className="loading-wrap"><div className="spinner"/></div>;
+  if(selectedBiz)return(
+    <>
+      <div className="page-header">
+        <div><button className="btn btn-sm" style={{marginBottom:8}} onClick={()=>setSelectedBiz(null)}>{t.back}</button><div className="page-title">🏪 {selectedBiz.name}</div><div className="page-sub">{selectedBiz.type} · {selectedBiz.created_at?.slice(0,10)}</div></div>
+        <button className="btn btn-sm" onClick={()=>exportToExcel(bizDebts,selectedBiz.name,t)} style={{display:'flex',alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button>
+      </div>
+      <div className="stats-grid" style={{gridTemplateColumns:'repeat(3,1fr)',marginBottom:14}}>
+        {[{label:t.activeDebts,val:bizDebts.filter(d=>getStatus(d)!=='paid').length,color:'var(--primary)',bg:'var(--primary-bg)',icon:'📋'},{label:t.overdueDebts,val:bizDebts.filter(d=>getStatus(d)==='overdue').length,color:'var(--red)',bg:'var(--red-bg)',icon:'⚠️'},{label:t.paidDebts,val:bizDebts.filter(d=>getStatus(d)==='paid').length,color:'var(--green)',bg:'var(--green-bg)',icon:'✅'}].map((s,i)=>(
+          <div key={i} className="stat-card"><div className="stat-accent" style={{background:s.color}}/><div className="stat-icon" style={{background:s.bg,color:s.color}}>{s.icon}</div><div className="stat-label">{s.label}</div><div className="stat-value" style={{color:s.color}}>{s.val}</div></div>
+        ))}
+      </div>
+      <div className="card">
+        <div className="card-header"><div className="card-title">{t.shopDebts}</div><div className="card-sub">{bizDebts.length}</div></div>
+        {debtsLoading?<div className="loading-wrap"><div className="spinner"/></div>
+        :bizDebts.length===0?<div className="empty-state"><div className="empty-icon">{IC.debts}</div><div className="empty-title">{t.noDebts}</div></div>
+        :<>
+          <div className="table-wrap"><table>
+            <thead><tr><th>{t.clientName}</th><th>{t.phone}</th><th>{t.amount}</th><th>{t.remaining}</th><th>{t.dueDate}</th><th>{t.overdueClass}</th></tr></thead>
+            <tbody>{bizDebts.map(d=>{const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
+              return<tr key={d.id}><td><strong>{d.client_name}</strong>{d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}</td><td style={{color:'var(--g500)'}}>{d.phone}</td><td style={{fontWeight:600}}>{fmt(d.amount)} {t.sum}</td><td style={{fontWeight:700,color:rem>0?'var(--red)':'var(--g400)'}}>{fmt(rem)} {t.sum}</td><td style={{fontSize:12}}>{d.due_date}</td><td>{st==='overdue'&&cat?<span className={`pill ${cat.cls}`}>{cat.label}</span>:<span className={`pill ${statusClass(st)}`}><span className="pill-dot"/>{stLabel(st,t)}</span>}</td></tr>;})}
+            </tbody>
+          </table></div>
+          <div className="debt-cards">{bizDebts.map(d=><DebtCard key={d.id} d={d} t={t} onPay={()=>{}} onDelete={()=>{}}/>)}</div>
+        </>}
+      </div>
+    </>
+  );
+  return(
+    <>
+      <div className="page-header"><div><div style={{display:"flex",alignItems:"center",gap:10}}><span style={{color:"var(--amber)"}}>{IC.admin}</span><div className="page-title">{t.adminPanel}</div></div></div></div>
+      <div className="stats-grid">
+        {[{label:t.clientsCount,val:stats.bizCount,color:'var(--primary)',bg:'var(--primary-bg)',icon:'🏪'},{label:t.activeDebts,val:stats.debtCount,color:'var(--g700)',bg:'var(--g100)',icon:'📋'},{label:t.overdueDebts,val:stats.overdueCount,color:'var(--red)',bg:'var(--red-bg)',icon:'⚠️'},{label:t.paidDebts,val:fmt(stats.totalPaid)+' '+t.sum,color:'var(--green)',bg:'var(--green-bg)',icon:'✅',sm:true}].map((s,i)=>(
+          <div key={i} className="stat-card"><div className="stat-accent" style={{background:s.color}}/><div className="stat-icon" style={{background:s.bg,color:s.color}}>{s.icon}</div><div className="stat-label">{s.label}</div><div className="stat-value" style={{color:s.color,fontSize:s.sm?16:24}}>{s.val}</div></div>
+        ))}
+      </div>
+      <div className="card">
+        <div className="card-header"><div><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{color:"var(--primary)"}}>{IC.store}</span><div className="card-title">{t.allShops}</div></div><div className="card-sub">{businesses.length}</div></div></div>
+        {businesses.map(b=>{
+          const offerAt=b.owner_offer_at;
+          return(
+          <div key={b.id} className="admin-biz-row" onClick={()=>openBiz(b)}>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:14}}>{b.name}</div>
+              <div style={{fontSize:12,color:'var(--g400)',marginTop:2}}>{b.type} · {b.created_at?.slice(0,10)}</div>
+              {offerAt
+                ?<div style={{fontSize:11,color:'var(--green-t)',marginTop:2,fontWeight:600}}>✅ {t.offerConfirmed}: {offerAt.slice(0,16).replace('T',' ')}</div>
+                :<div style={{fontSize:11,color:'var(--amber)',marginTop:2}}>⚠️ {t.offerNotConfirmed}</div>}
+            </div>
+            <div style={{display:'flex',gap:12,alignItems:'center',flexShrink:0}}>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontSize:12,color:'var(--g500)'}}>{t.debts}: <strong>{b.debtCount}</strong></div>
+                {b.overdueCount>0&&<div style={{fontSize:11,color:'var(--red)',fontWeight:600}}>{t.overdueDebts}: {b.overdueCount}</div>}
+              </div>
+              <div style={{color:'var(--g300)'}}>{IC.chevron}</div>
+            </div>
+          </div>
+        );})}
+      </div>
+    </>
+  );
+}
+
+
+// ── Add Shop Modal ──
+function AddShopModal({t,session,onClose,onCreated,isPremium}){
+  const [name,setName]=useState('');
+  const [type,setType]=useState(t.types[0]);
+  const [saving,setSaving]=useState(false);
+  const [error,setError]=useState('');
+  async function submit(e){
+    e.preventDefault();
+    if(!name.trim()){setError(t.bizName+'!');return;}
+    setSaving(true);
+    const{data,error:err}=await sb.from('businesses').insert({
+      owner_id:session.user.id,name:name.trim(),type,
+      is_premium:false,is_active:true,
+      offer_accepted:true,offer_accepted_at:new Date().toISOString()
+    }).select().single();
+    setSaving(false);
+    if(err){setError(err.message);return;}
+    onCreated(data);
+  }
+  return(
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-handle"/>
+        <div style={{display:'flex',alignItems:'center',gap:9}}>
+          <span style={{color:'var(--primary)'}}>{IC.store}</span>
+          <div className="modal-title">{t.addShop}</div>
+        </div>
+        {!isPremium&&(
+          <div style={{background:'linear-gradient(135deg,#FEF9C3,#FEF3C7)',border:'1px solid #FDE68A',borderRadius:'var(--r)',padding:'12px 14px',marginTop:14,display:'flex',gap:10,alignItems:'flex-start'}}>
+            <span style={{fontSize:18,flexShrink:0}}>⭐</span>
+            <div>
+              <div style={{fontWeight:700,fontSize:13,color:'#92400E'}}>{t.premiumOnly}</div>
+              <div style={{fontSize:12,color:'#B45309',marginTop:2}}>{t.premiumHint}</div>
+              <div style={{fontSize:11,color:'#78350F',marginTop:6,opacity:.7}}>{t.freeLimit}</div>
+            </div>
+          </div>
+        )}
+        {isPremium&&(
+          <form onSubmit={submit} style={{marginTop:4}}>
+            <label>{t.shopName} *</label>
+            <input value={name} onChange={e=>setName(e.target.value)} autoFocus style={{fontSize:16}}/>
+            <label>{t.bizType}</label>
+            <select value={type} onChange={e=>setType(e.target.value)}>{t.types.map(tp=><option key={tp}>{tp}</option>)}</select>
+            {error&&<div className="alert alert-error">{error}</div>}
+            <div className="modal-footer">
+              <button type="button" className="btn" onClick={onClose}>{t.cancel}</button>
+              <button type="submit" className="btn btn-primary" disabled={saving}>{saving?'...':t.createShop}</button>
+            </div>
+          </form>
+        )}
+        {!isPremium&&(
+          <div className="modal-footer">
+            <button className="btn btn-full" onClick={onClose}>{t.cancel}</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Shop Switcher (in Sidebar + Settings) ──
+function ShopSwitcher({t,collapsed}){
+  const {business,allBusinesses,switchBusiness,session,refreshBusinesses}=useApp();
+  const [open,setOpen]=useState(false);
+  const [showAdd,setShowAdd]=useState(false);
+  const isPremium=business?.is_premium||allBusinesses.some(b=>b.is_premium);
+  const canAddMore=isPremium||allBusinesses.length<1;
+  if(!business||allBusinesses.length===0)return null;
+  return(
+    <>
+      <div style={{padding:'8px 12px',borderBottom:'1px solid rgba(255,255,255,.06)'}}>
+        <div
+          onClick={()=>setOpen(o=>!o)}
+          style={{display:'flex',alignItems:'center',gap:8,padding:'8px 10px',background:'rgba(255,255,255,.06)',borderRadius:10,cursor:'pointer',transition:'all .12s'}}
+        >
+          <div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,#2563EB,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            {IC.store}
+          </div>
+          {!collapsed&&<>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:11,color:'rgba(255,255,255,.35)',fontWeight:600,textTransform:'uppercase',letterSpacing:'.04em'}}>{t.currentShop}</div>
+              <div style={{fontSize:13,fontWeight:700,color:'#fff',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{business.name}</div>
+            </div>
+            <div style={{color:'rgba(255,255,255,.3)',fontSize:12,transform:open?'rotate(180deg)':'rotate(0)',transition:'transform .2s'}}>▼</div>
+          </>}
+        </div>
+        {open&&!collapsed&&(
+          <div style={{marginTop:6,background:'rgba(0,0,0,.2)',borderRadius:10,overflow:'hidden'}}>
+            {allBusinesses.map(b=>(
+              <div
+                key={b.id}
+                onClick={()=>{switchBusiness(b);setOpen(false);}}
+                style={{display:'flex',alignItems:'center',gap:8,padding:'9px 12px',cursor:'pointer',background:b.id===business.id?'rgba(37,99,235,.3)':'transparent',transition:'all .1s'}}
+              >
+                <div style={{width:6,height:6,borderRadius:'50%',background:b.id===business.id?'var(--primary)':'rgba(255,255,255,.2)',flexShrink:0}}/>
+                <span style={{fontSize:13,color:b.id===business.id?'#fff':'rgba(255,255,255,.6)',fontWeight:b.id===business.id?700:400,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{b.name}</span>
+                {b.id===business.id&&<span style={{fontSize:10,color:'rgba(255,255,255,.4)'}}>{IC.check}</span>}
+              </div>
+            ))}
+            <div
+              onClick={()=>{setOpen(false);setShowAdd(true);}}
+              style={{display:'flex',alignItems:'center',gap:8,padding:'9px 12px',cursor:'pointer',borderTop:'1px solid rgba(255,255,255,.06)',color:'rgba(255,255,255,.5)',fontSize:13,transition:'all .1s'}}
+            >
+              <span style={{fontSize:16,lineHeight:1}}>+</span>
+              <span>{t.addShop}</span>
+              {!isPremium&&<span style={{marginLeft:'auto',background:'#F59E0B',color:'#fff',fontSize:9,fontWeight:700,padding:'2px 6px',borderRadius:100}}>PRO</span>}
+            </div>
+          </div>
+        )}
+      </div>
+      {showAdd&&<AddShopModal t={t} session={session} isPremium={isPremium||allBusinesses.length===0} onClose={()=>setShowAdd(false)} onCreated={(biz)=>{refreshBusinesses();switchBusiness(biz);setShowAdd(false);toast(t.savedOk);}}/>}
+    </>
+  );
+}
+
+function Sidebar({page,setPage,lang,setLang,overdueCount,t,isAdmin}){
+  const {session,business}=useApp();
+  const email=session?.user?.email??'';
+  const initials=(business?.name??email).slice(0,2).toUpperCase();
+  const langs=[{k:'tg',l:'Тоҷ'},{k:'ru',l:'Рус'},{k:'uz',l:'Ўзб'},{k:'en',l:'Eng'}];
+  const nav=[{id:'dashboard',icon:IC.dashboard,label:t.dashboard},{id:'debts',icon:IC.debts,label:t.debts,badge:overdueCount},{id:'clients',icon:IC.clients,label:t.clients},{id:'overdueHistory',icon:IC.history,label:t.overdueHistory},{id:'settings',icon:IC.settings,label:t.settingsTitle},...(isAdmin?[{id:'admin',icon:IC.admin,label:t.admin}]:[])]; 
+  return(
+    <aside className="sidebar">
+      <div className="sidebar-logo"><div className="logo-wrap"><div className="logo-icon"><LogoSVG size={26}/></div><div><div className="logo-name">{t.appName}</div><div className="logo-tagline">{t.appSub}</div></div></div></div>
+      <ShopSwitcher t={t} collapsed={false}/>
+      <div className="lang-switcher">{langs.map(l=><button key={l.k} className={`lang-btn${lang===l.k?' active':''}`} onClick={()=>setLang(l.k)}>{l.l}</button>)}</div>
+      <nav className="nav">{nav.map(n=>(
+        <button key={n.id} className={`nav-item${page===n.id?' active':''}`} onClick={()=>setPage(n.id)}>
+          <div className="nav-iw">{n.icon}</div><span style={{flex:1}}>{n.label}</span>{n.badge>0&&<span className="nav-badge">{n.badge}</span>}
+        </button>
+      ))}</nav>
+      <div className="sidebar-footer"><div className="user-row"><div className="user-av">{initials}</div><div style={{flex:1,minWidth:0}}><div className="user-name">{business?.name??'...'}</div><div className="user-email">{email}</div></div><button className="logout-btn" onClick={()=>sb.auth.signOut()} title={t.logout}>{IC.logout}</button></div></div>
+    </aside>
+  );
+}
+
+function MobileHeader({t,lang,setLang,page}){
+  const {business,allBusinesses,switchBusiness}=useApp();
+  const langs=[{k:'tg',l:'Тоҷ'},{k:'ru',l:'Рус'},{k:'uz',l:'Ўзб'},{k:'en',l:'Eng'}];
+  const titles={dashboard:t.dashboard,debts:t.debts,clients:t.clients,overdueHistory:t.overdueHistory,settings:t.settingsTitle,admin:t.admin};
+  const [showShops,setShowShops]=useState(false);
+  return(
+    <>
+      <div className="mobile-header">
+        <div style={{display:'flex',alignItems:'center',gap:9,flex:1,minWidth:0}}>
+          <LogoSVG size={26}/>
+          <div style={{minWidth:0}}>
+            <div className="mobile-header-title">{titles[page]??t.appName}</div>
+            {allBusinesses.length>1&&(
+              <button onClick={()=>setShowShops(o=>!o)} style={{background:'none',border:'none',padding:0,cursor:'pointer',fontSize:11,color:'var(--primary)',fontWeight:600,display:'flex',alignItems:'center',gap:3}}>
+                {business?.name} <span style={{fontSize:10}}>▼</span>
+              </button>
+            )}
+            {allBusinesses.length<=1&&business&&(
+              <div style={{fontSize:11,color:'var(--g400)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{business.name}</div>
+            )}
+          </div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
+          <div className="mobile-lang">
+            {langs.map(l=><button key={l.k} className={`mobile-lang-btn${lang===l.k?' active':''}`} onClick={()=>setLang(l.k)}>{l.l}</button>)}
+          </div>
+          <button
+            onClick={()=>sb.auth.signOut()}
+            title={t.logout}
+            style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:9,border:'1.5px solid var(--g200)',background:'#fff',cursor:'pointer',color:'var(--g500)',flexShrink:0}}
+          >
+            {IC.logout}
+          </button>
+        </div>
+      </div>
+      {showShops&&allBusinesses.length>1&&(
+        <div style={{background:'#fff',borderBottom:'1px solid var(--border)',padding:'8px 12px',display:'flex',gap:6,overflowX:'auto'}}>
+          {allBusinesses.map(b=>(
+            <button key={b.id} onClick={()=>{switchBusiness(b);setShowShops(false);}}
+              style={{padding:'6px 14px',borderRadius:100,border:'1.5px solid',borderColor:b.id===business?.id?'var(--primary)':'var(--g200)',background:b.id===business?.id?'var(--primary)':'#fff',color:b.id===business?.id?'#fff':'var(--g600)',fontSize:12,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0}}>
+              {b.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+function MobileNav({page,setPage,overdueCount,t,isAdmin}){
+  const nav=[
+    {id:'dashboard',icon:IC.dashboard,label:t.dashboard},
+    {id:'clients',icon:IC.clients,label:t.clients},
+    {id:'debts',icon:IC.debts,label:t.debts,badge:overdueCount,center:true},
+    {id:'overdueHistory',icon:IC.history,label:t.overdueHistory},
+    {id:'settings',icon:IC.settings,label:t.settingsTitle},
+  ];
+  if(isAdmin)nav.push({id:'admin',icon:IC.admin,label:t.admin});
+  return(
+    <div className="mobile-nav">
+      <div className="mobile-nav-glass">
+        {nav.map(n=>(
+          <button
+            key={n.id}
+            className={`mobile-nav-item${page===n.id?' active':''}${n.center?' nav-center-item':''}`}
+            onClick={()=>setPage(n.id)}
+          >
+            {n.badge>0&&<span className="mobile-nav-badge">{n.badge}</span>}
+            <div className="mobile-nav-icon-wrap">
+              <div className="mobile-nav-icon">{n.icon}</div>
+            </div>
+            <span className="mobile-nav-label">{n.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Global FAB — available on all pages ──
+function GlobalFAB({t,business,onRefresh}){
+  const [open,setOpen]=useState(false);
+  const [addOpen,setAddOpen]=useState(false);
+  const [payOpen,setPayOpen]=useState(false);
+  const [debts,setDebts]=useState([]);
+  function close(){setOpen(false);}
+  function handleAdd(){close();setTimeout(()=>setAddOpen(true),120);}
+  function handlePay(){
+    close();
+    // Load active debts for quick pay
+    if(business){
+      sb.from('debts').select('*').eq('business_id',business.id).neq('status','paid')
+        .then(({data})=>{setDebts(data??[]);setTimeout(()=>setPayOpen(true),120);});
+    }
+  }
+  return(
+    <>
+      {open&&<div className="fab-backdrop" onClick={close}/>}
+      <div className="fab-wrap">
+        {open&&(
+          <div className="fab-actions">
+            <button className="fab-action-btn add" onClick={handleAdd}>
+              <div className="fab-action-inner">
+                <div className="fab-action-icon">{IC.debts}</div>
+                <div>
+                  <div className="fab-action-label">{t.addDebt.replace(/\+\s*/,'')}</div>
+                  <div className="fab-action-sub">{t.clientName}</div>
+                </div>
+              </div>
+            </button>
+            <button className="fab-action-btn pay" onClick={handlePay}>
+              <div className="fab-action-inner">
+                <div className="fab-action-icon">{IC.pay}</div>
+                <div>
+                  <div className="fab-action-label">{t.payTitle}</div>
+                  <div className="fab-action-sub">{t.remaining}</div>
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
+        <button className={`fab-btn${open?' open':''}`} onClick={()=>setOpen(o=>!o)} aria-label="Actions">
+          <span className="fab-btn-icon">{IC.plus}</span>
+        </button>
+      </div>
+      {addOpen&&business&&<AddDebtModal business={business} onClose={()=>setAddOpen(false)} onSaved={()=>{setAddOpen(false);toast(t.addedOk);onRefresh();}} t={t}/>}
+      {payOpen&&<QuickPayModal debts={debts} onClose={()=>setPayOpen(false)} onPaid={()=>{setPayOpen(false);toast(t.paidOk);onRefresh();}} t={t}/>}
+    </>
+  );
+}
+
+const PAGES={dashboard:Dashboard,debts:DebtsPage,clients:ClientsPage,overdueHistory:OverdueHistoryPage,settings:SettingsPage,admin:AdminPage};
+function App(){
+  const [session,setSession]=useState(undefined);
+  const [business,setBusiness]=useState(null);
+  const [allBusinesses,setAllBusinesses]=useState([]);
+  const [page,setPage]=useState('dashboard');
+  const [lang,setLang]=useState(()=>{try{return localStorage.getItem('appLang')||'tg';}catch{return 'tg';}});
+  const [toastState,setToast]=useState(null);
+  const [overdueCount,setOverdueCount]=useState(0);
+  const [isAdmin,setIsAdmin]=useState(false);
+  _toast=setToast;const t=T[lang];
+
+  useEffect(()=>{try{localStorage.setItem('appLang',lang);}catch{}},[lang]);
+  useEffect(()=>{
+    sb.auth.getSession().then(({data:{session}})=>setSession(session));
+    const{data:{subscription}}=sb.auth.onAuthStateChange((_,s)=>setSession(s));
+    return()=>subscription.unsubscribe();
+  },[]);
+  useEffect(()=>{
+    if(!session){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);return;}
+    // Load ALL businesses for this user
+    sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true})
+      .then(({data})=>{
+        const list=data??[];
+        setAllBusinesses(list);
+        // Restore last selected business from localStorage
+        try{
+          const lastId=localStorage.getItem('lastBizId');
+          const found=list.find(b=>b.id===lastId);
+          setBusiness(found||list[0]||null);
+        }catch{setBusiness(list[0]||null);}
+      });
+    sb.from('admins').select('email').eq('email',session.user.email).single()
+      .then(({data})=>setIsAdmin(!!data));
+  },[session]);
+  useEffect(()=>{
+    if(!business)return;
+    try{localStorage.setItem('lastBizId',business.id);}catch{}
+    sb.from('debts').select('status,due_date').eq('business_id',business.id).neq('status','paid')
+      .then(({data})=>setOverdueCount((data??[]).filter(d=>getStatus(d)==='overdue').length));
+  },[business,page]);
+  useEffect(()=>{if(!toastState)return;const timer=setTimeout(()=>setToast(null),3200);return()=>clearTimeout(timer);},[toastState]);
+
+  function switchBusiness(biz){setBusiness(biz);setPage('dashboard');}
+  function refreshBusinesses(){
+    if(!session)return;
+    sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true})
+      .then(({data})=>setAllBusinesses(data??[]));
+  }
+
+  if(session===undefined)return<div className="loading-wrap" style={{minHeight:'100vh'}}><div className="spinner"/></div>;
+  if(!session)return<AuthPage lang={lang} setLang={setLang}/>;
+  const Page=PAGES[page]??Dashboard;
+  return(
+    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses}}>
+      <div className="layout">
+        <Sidebar page={page} setPage={setPage} lang={lang} setLang={setLang} overdueCount={overdueCount} t={t} isAdmin={isAdmin}/>
+        <div className="main">
+          <MobileHeader t={t} lang={lang} setLang={setLang} page={page}/>
+          <div className="main-inner"><Page t={t}/></div>
+        </div>
+        <MobileNav page={page} setPage={setPage} overdueCount={overdueCount} t={t} isAdmin={isAdmin}/>
+        <GlobalFAB t={t} business={business} onRefresh={()=>setPage(p=>p)}/>
+      </div>
+      {toastState&&<div key={toastState.id} className={`toast toast-${toastState.type}`}>{toastState.type==='success'?'✅':'❌'} {toastState.msg}</div>}
+    </AppCtx.Provider>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
