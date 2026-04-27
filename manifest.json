@@ -1,0 +1,27 @@
+{
+  "name": "Қарзи ман",
+  "short_name": "Qarzimon",
+  "description": "Учёт долгов — быстро, удобно, надёжно",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#2563EB",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='192' y2='192'%3E%3Cstop stop-color='%232563EB'/%3E%3Cstop offset='1' stop-color='%237C3AED'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M48 66h96M48 96h56M48 126h70' stroke='white' stroke-width='14' stroke-linecap='round'/%3E%3Ccircle cx='140' cy='126' r='28' fill='white' fill-opacity='.15' stroke='white' stroke-width='7'/%3E%3Cpath d='M130 126l9 9 15-18' stroke='white' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='512' y2='512'%3E%3Cstop stop-color='%232563EB'/%3E%3Cstop offset='1' stop-color='%237C3AED'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M128 176h256M128 256h150M128 336h188' stroke='white' stroke-width='36' stroke-linecap='round'/%3E%3Ccircle cx='374' cy='336' r='74' fill='white' fill-opacity='.15' stroke='white' stroke-width='18'/%3E%3Cpath d='M346 336l24 24 40-48' stroke='white' stroke-width='24' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "business", "productivity"],
+  "lang": "tg",
+  "dir": "ltr"
+}
