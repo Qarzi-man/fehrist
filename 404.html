@@ -325,6 +325,7 @@ const T={
     types:['Дорухона','Мағозаи хӯрокворӣ','Мағозаи сохтмон','Мағозаи либос','Мағозаи мебел','Ресторан/Кафе','Мағозаи электроника','Дигар'],
     cats:['Дору','Хӯрокворӣ','Маводи сохтмон','Либос','Мебел','Электроника','Дигар'],
     passMin8:'Ҳадди ақал 8 аломат',dueDateError:'Мӯҳлати пардохт аз санаи қарз барвақттар набояд бошад',
+    deleteYes:'Ҳа, нест кун',edit:'Таҳрир',
     logoutConfirm:'Шумо мутмаин ҳастед, ки хориҷ мешавед?',logoutYes:'Ҳа, хориҷ',logoutNo:'Не',
     receivable:'Ба ман қарздор',payable:'Ман қарздор',debtType:'Намуди қарз',
     creditorName:'Кредитор/Таъминкунанда',myDebts:'Қарзи ман',
@@ -374,6 +375,7 @@ const T={
     types:['Аптека','Продуктовый магазин','Строительный магазин','Магазин одежды','Магазин мебели','Ресторан/Кафе','Магазин электроники','Другое'],
     cats:['Лекарства','Продукты','Стройматериалы','Одежда','Мебель','Электроника','Другое'],
     passMin8:'Минимум 8 символов',dueDateError:'Срок оплаты не может быть раньше даты долга',
+    deleteYes:'Да, удалить',edit:'Изменить',
     logoutConfirm:'Вы уверены, что хотите выйти?',logoutYes:'Да, выйти',logoutNo:'Отмена',
     receivable:'Мне должны',payable:'Я должен',debtType:'Тип долга',
     creditorName:'Кредитор/Поставщик',myDebts:'Мои долги',
@@ -423,6 +425,7 @@ const T={
     types:["Dorixona","Oziq-ovqat do'koni","Qurilish do'koni","Kiyim do'koni","Mebel do'koni","Restoran/Kafe","Elektronika do'koni","Boshqa"],
     cats:["Dori","Oziq-ovqat","Qurilish materiallari","Kiyim","Mebel","Elektronika","Boshqa"],
     passMin8:"Kamida 8 belgi",dueDateError:"To'lov muddati qarz sanasidan oldin bo'lmasligi kerak",
+    deleteYes:"Ha, o'chir",edit:'Tahrirlash',
     logoutConfirm:"Haqiqatan ham chiqmoqchimisiz?",logoutYes:"Ha, chiqish",logoutNo:"Bekor",
     receivable:"Menga qarzdor",payable:"Men qarzdorman",debtType:"Qarz turi",
     creditorName:"Kreditor/Ta'minotchi",myDebts:"Mening qarzlarim",
@@ -472,6 +475,7 @@ const T={
     types:['Pharmacy','Grocery store','Hardware store','Clothing store','Furniture store','Restaurant/Cafe','Electronics store','Other'],
     cats:['Medicine','Groceries','Construction','Clothing','Furniture','Electronics','Other'],
     passMin8:'Minimum 8 characters',dueDateError:'Due date cannot be earlier than the issue date',
+    deleteYes:'Yes, delete',edit:'Edit',
     logoutConfirm:'Are you sure you want to sign out?',logoutYes:'Yes, sign out',logoutNo:'Cancel',
     receivable:'They owe me',payable:'I owe',debtType:'Debt type',
     creditorName:'Creditor/Supplier',myDebts:'My debts',
@@ -511,6 +515,20 @@ function LogoutConfirmModal({t,onConfirm,onClose}){
         <div style={{display:'flex',gap:8}}>
           <button className="btn btn-full" onClick={onClose}>{t.logoutNo}</button>
           <button className="btn btn-primary btn-full" onClick={onConfirm}>{t.logoutYes}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+function DeleteConfirmModal({t,onConfirm,onClose}){
+  return(
+    <div className="logout-confirm-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="logout-confirm-box">
+        <div style={{fontSize:36,marginBottom:12}}>🗑️</div>
+        <div style={{fontSize:17,fontWeight:800,color:'var(--g900)',marginBottom:6}}>{t.deleteConfirm}</div>
+        <div style={{display:'flex',gap:8,marginTop:4}}>
+          <button className="btn btn-full" onClick={onClose}>{t.logoutNo}</button>
+          <button className="btn btn-danger btn-full" onClick={onConfirm}>{t.deleteYes||t.delete}</button>
         </div>
       </div>
     </div>
@@ -743,9 +761,9 @@ function LoginForm({t,onSwitch}){
   const [email,setEmail]=useState('');const [pass,setPass]=useState('');
   const [error,setError]=useState('');const [loading,setLoading]=useState(false);
   const [forgotMode,setForgotMode]=useState(false);
-  const [fEmail,setFEmail]=useState('');const [fSent,setFSent]=useState(false);const [fLoad,setFLoad]=useState(false);
+  const [fEmail,setFEmail]=useState('');const [fSent,setFSent]=useState(false);const [fLoad,setFLoad]=useState(false);const [fError,setFError]=useState('');
   async function submit(e){e.preventDefault();setError('');setLoading(true);const{error}=await sb.auth.signInWithPassword({email,password:pass});if(error)setError(t.loginError||'Неверный email или пароль');setLoading(false);}
-  async function sendReset(e){e.preventDefault();setFLoad(true);await sb.auth.resetPasswordForEmail(fEmail,{redirectTo:window.location.origin});setFSent(true);setFLoad(false);}
+  async function sendReset(e){e.preventDefault();setFError('');setFLoad(true);const{error}=await sb.auth.resetPasswordForEmail(fEmail,{redirectTo:window.location.origin});setFLoad(false);if(error){setFError(error.message);return;}setFSent(true);}
   if(forgotMode)return(
     <>
       <div className="auth-title">🔑 {t.forgotTitle}</div>
@@ -754,13 +772,15 @@ function LoginForm({t,onSwitch}){
         <>
           <div style={{textAlign:'center',fontSize:48,margin:'14px 0'}}>📧</div>
           <div style={{textAlign:'center',color:'var(--green)',fontWeight:700,marginBottom:6}}>{t.forgotSent}</div>
-          <div style={{textAlign:'center',fontSize:13,color:'var(--g400)',marginBottom:18}}>{t.forgotCheck}: <strong>{fEmail}</strong></div>
+          <div style={{textAlign:'center',fontSize:13,color:'var(--g400)',marginBottom:6}}>{t.forgotCheck}: <strong>{fEmail}</strong></div>
+          <div style={{textAlign:'center',fontSize:12,color:'var(--g500)',marginBottom:18,padding:'8px 12px',background:'var(--g50)',borderRadius:'var(--r)'}}>📌 Спам папкасини ҳам тафтиш кунед · Проверьте папку Спам</div>
           <button className="btn btn-primary btn-full" onClick={()=>{setForgotMode(false);setFSent(false);}}>{t.forgotLogin}</button>
         </>
       ):(
         <form onSubmit={sendReset}>
           <label>{t.email}</label>
           <input type="email" value={fEmail} onChange={e=>setFEmail(e.target.value)} placeholder="you@example.com" required autoFocus/>
+          {fError&&<div className="alert alert-error" style={{marginTop:8}}>⚠️ {fError}</div>}
           <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={fLoad}>{fLoad?'...':t.forgotSend}</button>
           <button type="button" className="btn btn-full" style={{marginTop:8}} onClick={()=>setForgotMode(false)}>{t.forgotBack}</button>
         </form>
@@ -1270,8 +1290,9 @@ function QuickPayModal({debts,onClose,onPaid,t}){
 function Dashboard({t}){
   const {business,setPage}=useApp();
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
-  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);
+  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);const [deleteTarget,setDeleteTarget]=useState(null);
   async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
+  async function confirmDelete(d){await sb.from('debts').delete().eq('id',d.id);setDeleteTarget(null);load();}
   useEffect(()=>{load();},[business]);
   const active=debts.filter(d=>getStatus(d)!=='paid');
   const overdue=debts.filter(d=>getStatus(d)==='overdue');
@@ -1330,10 +1351,13 @@ function Dashboard({t}){
           </div>
           {loading?<div className="loading-wrap"><div className="spinner"/></div>
           :debts.length===0?<div className="empty-state" style={{padding:'20px'}}><div className="empty-icon">{IC.debts}</div><div className="empty-title">{t.noDebts}</div></div>
-          :<div>{debts.slice(0,6).map(d=>{const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);
+          :<div>{debts.slice(0,6).map(d=>{const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);const isPayable=d.debt_type==='payable';
             return<div key={d.id} style={{display:'flex',alignItems:'center',padding:'11px 16px',borderBottom:'1px solid var(--border)',gap:12}}>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.client_name}</div>
+                <div style={{display:'flex',alignItems:'center',gap:5}}>
+                  <span style={{fontSize:10,background:isPayable?'var(--green-bg)':'var(--primary-bg)',color:isPayable?'var(--green-t)':'var(--primary)',padding:'1px 5px',borderRadius:4,fontWeight:700,flexShrink:0}}>{isPayable?'📤':'💰'}</span>
+                  <div style={{fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.client_name}</div>
+                </div>
                 <div style={{fontSize:11,color:'var(--g400)',marginTop:1}}>{d.phone} · {fmtDate(d.due_date)}</div>
               </div>
               <div style={{textAlign:'right',flexShrink:0}}>
@@ -1364,12 +1388,13 @@ function Dashboard({t}){
               </tr>;})}
             </tbody>
           </table></div>
-          <div className="debt-cards">{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onDelete={async dd=>{if(!confirm(t.deleteConfirm))return;await sb.from('debts').delete().eq('id',dd.id);load();}} onHistory={setHistDebt}/>)}</div>
+          <div className="debt-cards">{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onDelete={dd=>setDeleteTarget(dd)} onHistory={setHistDebt}/>)}</div>
         </div>
       )}
       {addOpen&&<AddDebtModal business={business} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast(t.addedOk);}} t={t}/>}
       {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast(t.paidOk);}} t={t}/>}
       {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
+      {deleteTarget&&<DeleteConfirmModal t={t} onConfirm={()=>confirmDelete(deleteTarget)} onClose={()=>setDeleteTarget(null)}/>}
     </>
   );
 }
@@ -1379,10 +1404,11 @@ function DebtsPage({t}){
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
   const [tab,setTab]=useState('receivable'); // receivable | payable
   const [search,setSearch]=useState('');const [fStatus,setFStatus]=useState('');const [sort,setSort]=useState('date_desc');
-  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);
+  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);const [deleteTarget,setDeleteTarget]=useState(null);
   async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
   useEffect(()=>{load();},[business]);
-  async function del(d){if(!confirm(t.deleteConfirm))return;await sb.from('debts').delete().eq('id',d.id);toast(t.deletedOk,'error');load();}
+  async function confirmDelete(d){await sb.from('debts').delete().eq('id',d.id);toast(t.deletedOk,'error');setDeleteTarget(null);load();}
+  async function del(d){setDeleteTarget(d);}
   const list=useMemo(()=>{
     let r=debts.filter(d=>{
       const dtype=d.debt_type||'receivable';
@@ -1447,6 +1473,7 @@ function DebtsPage({t}){
       {addOpen&&<AddDebtModal business={business} initialType={tab} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast(t.addedOk);}} t={t}/>}
       {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast(t.paidOk);}} t={t}/>}
       {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
+      {deleteTarget&&<DeleteConfirmModal t={t} onConfirm={()=>confirmDelete(deleteTarget)} onClose={()=>setDeleteTarget(null)}/>}
     </>
   );
 }
@@ -1682,20 +1709,34 @@ function OverdueHistoryPage({t}){
 
 function SettingsPage({t}){
   const {business,setBusiness,session,allBusinesses,switchBusiness}=useApp();
-  const [name,setName]=useState('');const [type,setType]=useState('');const [saving,setSaving]=useState(false);
+  const [name,setName]=useState('');const [type,setType]=useState('');const [saving,setSaving]=useState(false);const [editMode,setEditMode]=useState(false);
   useEffect(()=>{if(business){setName(business.name);setType(business.type);};},[business]);
-  async function save(e){e.preventDefault();setSaving(true);const{data}=await sb.from('businesses').update({name,type}).eq('id',business.id).select().single();if(data){setBusiness(data);toast(t.savedOk);}setSaving(false);}
+  async function save(e){e.preventDefault();setSaving(true);const{data}=await sb.from('businesses').update({name,type}).eq('id',business.id).select().single();if(data){setBusiness(data);toast(t.savedOk);setEditMode(false);}setSaving(false);}
+  function cancelEdit(){setName(business.name);setType(business.type);setEditMode(false);}
   return(
     <>
       <div className="page-header"><div><div className="page-title">{t.settingsTitle}</div></div></div>
       <div className="card" style={{maxWidth:460,marginBottom:16}}>
-        <div className="card-header"><span className="card-title">{t.profileTitle}</span></div>
-        <form onSubmit={save} style={{padding:18}}>
-          <label>{t.email}</label><input value={session?.user?.email??''} disabled/>
-          <label>{t.bizName}</label><input value={name} onChange={e=>setName(e.target.value)} required/>
-          <label>{t.bizType}</label><select value={type} onChange={e=>setType(e.target.value)}>{t.types.map(tp=><option key={tp}>{tp}</option>)}</select>
-          <button className="btn btn-primary" type="submit" style={{marginTop:18}} disabled={saving}>{saving?'...':t.save}</button>
-        </form>
+        <div className="card-header">
+          <span className="card-title">{t.profileTitle}</span>
+          {!editMode&&<button className="btn btn-sm" onClick={()=>setEditMode(true)}>✏️ {t.edit||'Изменить'}</button>}
+        </div>
+        {editMode?(
+          <form onSubmit={save} style={{padding:18}}>
+            <label>{t.bizName}</label><input value={name} onChange={e=>setName(e.target.value)} required autoFocus/>
+            <label>{t.bizType}</label><select value={type} onChange={e=>setType(e.target.value)}>{t.types.map(tp=><option key={tp}>{tp}</option>)}</select>
+            <div style={{display:'flex',gap:8,marginTop:18}}>
+              <button type="button" className="btn" onClick={cancelEdit}>{t.cancel}</button>
+              <button className="btn btn-primary" type="submit" disabled={saving}>{saving?'...':t.save}</button>
+            </div>
+          </form>
+        ):(
+          <div style={{padding:18}}>
+            <div style={{fontSize:15,fontWeight:700,color:'var(--g900)'}}>{business?.name}</div>
+            <div style={{fontSize:13,color:'var(--g400)',marginTop:3}}>{business?.type}</div>
+            <div style={{marginTop:12,fontSize:12,color:'var(--g500)',padding:'8px 10px',background:'var(--g50)',borderRadius:'var(--r)'}}>📧 {session?.user?.email}</div>
+          </div>
+        )}
       </div>
       {allBusinesses.length>1&&(
         <div className="card" style={{maxWidth:460,marginBottom:16}}>
@@ -2137,6 +2178,7 @@ function App(){
   const [overdueCount,setOverdueCount]=useState(0);
   const [isAdmin,setIsAdmin]=useState(false);
   const [resetMode,setResetMode]=useState(false);
+  const [showOfferModal,setShowOfferModal]=useState(false);
   _toast=setToast;const t=T[lang];
 
   useEffect(()=>{try{localStorage.setItem('appLang',lang);}catch{}},[lang]);
@@ -2176,9 +2218,10 @@ function App(){
   useEffect(()=>{
     if(!business)return;
     try{localStorage.setItem('lastBizId',business.id);}catch{}
+    if(!business.offer_accepted_at)setShowOfferModal(true);
     sb.from('debts').select('status,due_date').eq('business_id',business.id).neq('status','paid')
       .then(({data})=>setOverdueCount((data??[]).filter(d=>getStatus(d)==='overdue').length));
-  },[business,page]);
+  },[business?.id]);
   useEffect(()=>{if(!toastState)return;const timer=setTimeout(()=>setToast(null),3200);return()=>clearTimeout(timer);},[toastState]);
 
   function switchBusiness(biz){setBusiness(biz);setPage('dashboard');}
@@ -2188,6 +2231,12 @@ function App(){
       .then(({data})=>setAllBusinesses(data??[]));
   }
 
+  async function acceptOfferForExisting(){
+    const now=new Date().toISOString();
+    await sb.from('businesses').update({offer_accepted_at:now,offer_accepted:true}).eq('id',business.id);
+    setBusiness(b=>({...b,offer_accepted_at:now,offer_accepted:true}));
+    setShowOfferModal(false);
+  }
   if(session===undefined)return<div className="loading-wrap" style={{minHeight:'100vh'}}><div className="spinner"/></div>;
   if(!session)return<AuthPage lang={lang} setLang={setLang}/>;
   if(resetMode)return<PasswordResetPage t={t} lang={lang} setLang={setLang} onDone={()=>setResetMode(false)}/>;
@@ -2204,6 +2253,7 @@ function App(){
         <GlobalFAB t={t} business={business} onRefresh={()=>setPage(p=>p)}/>
       </div>
       {toastState&&<div key={toastState.id} className={`toast toast-${toastState.type}`}>{toastState.type==='success'?'✅':'❌'} {toastState.msg}</div>}
+      {showOfferModal&&business&&<OfferModal t={t} onAccept={acceptOfferForExisting} onClose={()=>setShowOfferModal(false)} initialLang={lang}/>}
     </AppCtx.Provider>
   );
 }
