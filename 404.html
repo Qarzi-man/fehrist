@@ -238,7 +238,8 @@ tr:hover td{background:#FAFBFF}
 @keyframes fabUp{from{opacity:0;transform:translateX(-50%) translateY(16px) scale(.92)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
 @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}} @keyframes fabPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:.2;transform:scale(1.15)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@media(max-width:768px){.fab-wrap{display:none}}
+@media(max-width:768px){.fab-wrap{display:none!important}}
+@media(min-width:769px){.fab-wrap{display:flex}}
 @media(max-width:768px){
   :root{--sidebar-w:0px}
   .sidebar{display:none}
@@ -333,6 +334,7 @@ const T={
     overdueHistory:'Таърихи қарздорони мӯҳлатгузошта',
     totalReceivable:'Маблағи гирифтанӣ',totalPayable:'Маблағи пардохтанӣ',
     contactDev:'Тамос бо сайтсоз',usersCount:'Корбарон',totalActiveSum:'Умумии фаъол',
+    loginError:'Email ё рамз нодуруст аст',
   },
   ru:{
     appName:'Мой долг',appSub:'Учёт задолженностей',
@@ -379,6 +381,7 @@ const T={
     overdueHistory:'Просроченные долги',
     totalReceivable:'К получению',totalPayable:'Должен выплатить',
     contactDev:'Связаться с разработчиком',usersCount:'Пользователей',totalActiveSum:'Общая сумма',
+    loginError:'Неверный email или пароль',
   },
   uz:{
     appName:'Mening qarzim',appSub:'Qarz hisobi',
@@ -425,6 +428,7 @@ const T={
     overdueHistory:"Muddati o'tgan qarzlar",
     totalReceivable:"Olinadigan summa",totalPayable:"To'lanadigan summa",
     contactDev:"Dasturchi bilan bog'lanish",usersCount:"Foydalanuvchilar",totalActiveSum:"Umumiy summa",
+    loginError:"Email yoki parol noto'g'ri",
   },
   en:{
     appName:'My Debt',appSub:'Debt management',
@@ -471,6 +475,7 @@ const T={
     overdueHistory:'Overdue debts',
     totalReceivable:'To receive',totalPayable:'To pay',
     contactDev:'Contact developer',usersCount:'Users',totalActiveSum:'Total active',
+    loginError:'Invalid email or password',
   }
 };
 
@@ -521,24 +526,6 @@ function getOverdueCat(days,t){
   if(days<=180)return{label:t.cat3,cls:'cat-3'};
   if(days<=365)return{label:t.cat4,cls:'cat-4'};
   return{label:t.cat5,cls:'cat-5'};
-}
-function translateCat(cat,t){
-  // Map all possible category names across languages to current language
-  const allCats={
-    0:['Дору','Лекарства','Dori','Medicine'],
-    1:['Хӯрокворӣ','Продукты','Oziq-ovqat','Groceries'],
-    2:['Маводи сохтмон','Стройматериалы','Qurilish materiallari','Construction'],
-    3:['Либос','Одежда','Kiyim','Clothing'],
-    4:['Мебел','Мебель','Mebel','Furniture'],
-    5:['Электроника','Электроника','Elektronika','Electronics'],
-    6:['Дигар','Другое','Boshqa','Other'],
-  };
-  for(const [idx,variants] of Object.entries(allCats)){
-    if(variants.some(v=>v.toLowerCase()===cat?.toLowerCase())){
-      return t.cats[Number(idx)]||cat;
-    }
-  }
-  return cat;
 }
 function stLabel(st,t){return{active:t.active,due:t.dueSoon,overdue:t.overdue,paid:t.paid,partial:t.partial}[st]??st;}
 function formatPhone(v){return v.replace(/\D/g,'').slice(0,15);}
@@ -760,7 +747,7 @@ function LoginForm({t,onSwitch}){
   const [error,setError]=useState('');const [loading,setLoading]=useState(false);
   const [forgotMode,setForgotMode]=useState(false);
   const [fEmail,setFEmail]=useState('');const [fSent,setFSent]=useState(false);const [fLoad,setFLoad]=useState(false);
-  async function submit(e){e.preventDefault();setError('');setLoading(true);const{error}=await sb.auth.signInWithPassword({email,password:pass});if(error)setError('⚠️ '+t.email+'?');setLoading(false);}
+  async function submit(e){e.preventDefault();setError('');setLoading(true);const{error}=await sb.auth.signInWithPassword({email,password:pass});if(error)setError(t.loginError||'Неверный email или пароль');setLoading(false);}
   async function sendReset(e){e.preventDefault();setFLoad(true);await sb.auth.resetPasswordForEmail(fEmail,{redirectTo:window.location.origin});setFSent(true);setFLoad(false);}
   if(forgotMode)return(
     <>
@@ -937,66 +924,6 @@ function RegisterForm({t,onSwitch}){
 }
 
 
-// ── Voice Input Architecture (ready for future implementation) ──
-function useVoiceInput(onResult){
-  const [listening,setListening]=useState(false);
-  const [supported]=useState(()=>{
-    try{return typeof window!=='undefined'&&('SpeechRecognition' in window||'webkitSpeechRecognition' in window);}
-    catch{return false;}
-  });
-  const recRef=React.useRef(null);
-
-  function start(){
-    if(!supported)return;
-    try{
-      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-      const rec=new SR();
-      rec.continuous=false;
-      rec.interimResults=false;
-      rec.lang='ru-RU'; // ru-RU works best in CIS region; tg-TJ not widely supported yet
-      rec.onstart=()=>setListening(true);
-      rec.onend=()=>setListening(false);
-      rec.onerror=(e)=>{console.log('Voice error:',e.error);setListening(false);}
-      rec.onresult=(e)=>{
-        const transcript=e.results[0][0].transcript;
-        if(onResult)onResult(transcript);
-      };
-      rec.start();
-      recRef.current=rec;
-    }catch(e){setListening(false);}
-  }
-  function stop(){
-    try{recRef.current?.stop();}catch{}
-    setListening(false);
-  }
-  return{listening,supported,start,stop};
-}
-
-// ── Mic Button Component ──
-function MicButton({onTranscript,lang,style={}}){
-  const {listening,supported,start,stop}=useVoiceInput(onTranscript);
-  // Show button always - if not supported show disabled state
-  return(
-    <button
-      type="button"
-      onClick={()=>{if(supported){listening?stop():start();}else{alert('Браузер не поддерживает голосовой ввод. Используйте Chrome.');}}}
-      title={listening?"Stop":"Voice input"}
-      style={{
-        display:'flex',alignItems:'center',justifyContent:'center',
-        width:40,height:40,borderRadius:10,border:'1.5px solid',flexShrink:0,
-        borderColor:listening?'var(--red)':supported?'var(--primary)':'var(--g200)',
-        background:listening?'var(--red-bg)':supported?'var(--primary-bg)':'var(--g50)',
-        color:listening?'var(--red)':supported?'var(--primary)':'var(--g300)',
-        cursor:'pointer',transition:'all .15s',
-        animation:listening?'micPulse 1s ease-in-out infinite':'none',
-        ...style
-      }}
-    >
-      {IC.mic}
-    </button>
-  );
-}
-
 function AddDebtModal({business,onClose,onSaved,t,initialType}){
   const [debtType,setDebtType]=useState(initialType||'receivable');
   const [f,setF]=useState({name:'',phone:'',amount:'',cat:t.cats[0],dateIssued:todayStr(),dueDate:'',comment:''});
@@ -1010,7 +937,7 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
 
   async function checkPhone(phone){
     set('phone',phone);
-    if(phone.length<7)return;
+    if(phone.length<7){setDupClient(null);return;}
     const{data}=await sb.from('debts').select('client_name,phone').eq('business_id',business.id).eq('phone',phone.trim()).limit(1);
     setDupClient(data&&data.length>0?data[0]:null);
   }
@@ -1313,14 +1240,21 @@ function PayHistoryModal({debt,onClose,t}){
   );
 }
 
-function DebtCard({d,t,onPay,onDelete,onHistory}){
+function DebtCard({d,t,onPay,onDelete,onHistory,isPayable}){
   const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
+  const _isPayable=isPayable||(d.debt_type==='payable');
   return(
     <div className="debt-card">
       <div className="debt-card-top">
-        <div><div className="debt-card-name">{d.client_name}</div><div className="debt-card-phone">{d.phone}</div></div>
+        <div>
+          <div style={{display:'flex',alignItems:'center',gap:5}}>
+            {_isPayable&&<span style={{fontSize:11,background:'var(--green-bg)',color:'var(--green-t)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0}}>📤</span>}
+            <div className="debt-card-name">{d.client_name}</div>
+          </div>
+          <div className="debt-card-phone">{d.phone}</div>
+        </div>
         <div className="debt-card-amount">
-          <div className={`debt-card-sum${st==='paid'?' paid-sum':''}`}>{fmt(rem)}</div>
+          <div className={`debt-card-sum${st==='paid'?' paid-sum':''}`} style={_isPayable&&st!=='paid'?{color:'var(--green)'}:undefined}>{fmt(rem)}</div>
           <div style={{fontSize:11,color:'var(--g400)'}}>{t.sum}</div>
         </div>
       </div>
@@ -1386,46 +1320,6 @@ function QuickPayModal({debts,onClose,onPaid,t}){
   );
 }
 
-// ── Floating Action Button ──
-function FAB({t,onAddDebt,onPayDebt}){
-  const [open,setOpen]=useState(false);
-  function close(){setOpen(false);}
-  function handleAdd(){close();setTimeout(onAddDebt,120);}
-  function handlePay(){close();setTimeout(onPayDebt,120);}
-  return(
-    <>
-      {open&&<div className="fab-backdrop" onClick={close}/>}
-      <div className="fab-wrap">
-        {open&&(
-          <div className="fab-actions">
-            <button className="fab-action-btn add" onClick={handleAdd}>
-              <div className="fab-action-inner">
-                <div className="fab-action-icon">{IC.debts}</div>
-                <div>
-                  <div className="fab-action-label">{t.addDebt.replace(/\+\s*/,'')}</div>
-                  <div className="fab-action-sub">{t.clientName}</div>
-                </div>
-              </div>
-            </button>
-            <button className="fab-action-btn pay" onClick={handlePay}>
-              <div className="fab-action-inner">
-                <div className="fab-action-icon">{IC.pay}</div>
-                <div>
-                  <div className="fab-action-label">{t.payTitle}</div>
-                  <div className="fab-action-sub">{t.remaining}</div>
-                </div>
-              </div>
-            </button>
-          </div>
-        )}
-        <button className={`fab-btn${open?' open':''}`} onClick={()=>setOpen(o=>!o)} aria-label="Actions">
-          <span className="fab-btn-icon">{IC.plus}</span>
-        </button>
-      </div>
-    </>
-  );
-}
-
 function Dashboard({t}){
   const {business,setPage}=useApp();
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
@@ -1435,11 +1329,8 @@ function Dashboard({t}){
   const active=debts.filter(d=>getStatus(d)!=='paid');
   const overdue=debts.filter(d=>getStatus(d)==='overdue');
   const paid=debts.filter(d=>getStatus(d)==='paid');
-  const totalActive=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
   const totalOverdue=overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
   const totalPaid=paid.reduce((s,d)=>s+Number(d.amount),0);
-  const clients=new Set(active.map(d=>d.phone)).size;
-  const debtorClients=new Set(overdue.map(d=>d.phone)).size;
   const receivableActive=active.filter(d=>(d.debt_type||'receivable')==='receivable');
   const payableActive=active.filter(d=>d.debt_type==='payable');
   const totalReceivable=receivableActive.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
@@ -1761,13 +1652,14 @@ function OverdueHistoryPage({t}){
   const [debts,setDebts]=useState([]);const [payments,setPayments]=useState([]);const [loading,setLoading]=useState(true);
   const [search,setSearch]=useState('');const [sort,setSort]=useState('overdue');const [histDebt,setHistDebt]=useState(null);
   useEffect(()=>{
-    if(!business)return;setLoading(true);
-    Promise.all([
-      sb.from('debts').select('*').eq('business_id',business.id).neq('status','paid'),
-      sb.from('payments').select('*'),
-    ]).then(([{data:d},{data:p}])=>{
+    if(!business)return;
+    setLoading(true);
+    (async()=>{
+      const{data:d}=await sb.from('debts').select('*').eq('business_id',business.id).neq('status','paid');
+      const debtIds=(d??[]).map(x=>x.id);
+      const{data:p}=debtIds.length?await sb.from('payments').select('*').in('debt_id',debtIds):{data:[]};
       setDebts(d??[]);setPayments(p??[]);setLoading(false);
-    });
+    })();
   },[business]);
   const overdue=useMemo(()=>{
     let r=debts.filter(d=>getStatus(d)==='overdue');
@@ -1950,7 +1842,7 @@ function AdminPage({t}){
               return<tr key={d.id}><td><strong>{d.client_name}</strong>{d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}</td><td style={{color:'var(--g500)'}}>{d.phone}</td><td style={{fontWeight:600}}>{fmt(d.amount)} {t.sum}</td><td style={{fontWeight:700,color:rem>0?'var(--red)':'var(--g400)'}}>{fmt(rem)} {t.sum}</td><td style={{fontSize:12}}>{d.due_date}</td><td>{st==='overdue'&&cat?<span className={`pill ${cat.cls}`}>{cat.label}</span>:<span className={`pill ${statusClass(st)}`}><span className="pill-dot"/>{stLabel(st,t)}</span>}</td></tr>;})}
             </tbody>
           </table></div>
-          <div className="debt-cards">{bizDebts.map(d=><DebtCard key={d.id} d={d} t={t} onPay={()=>{}} onDelete={()=>{}}/>)}</div>
+          <div className="debt-cards">{bizDebts.map(d=><DebtCard key={d.id} d={d} t={t} onPay={()=>{}} onDelete={()=>{}} onHistory={()=>{}}/>)}</div>
         </>}
       </div>
     </>
@@ -1997,66 +1889,6 @@ function AdminPage({t}){
   );
 }
 
-
-// ── Add Shop Modal ──
-function AddShopModal({t,session,onClose,onCreated,isPremium}){
-  const [name,setName]=useState('');
-  const [type,setType]=useState(t.types[0]);
-  const [saving,setSaving]=useState(false);
-  const [error,setError]=useState('');
-  async function submit(e){
-    e.preventDefault();
-    if(!name.trim()){setError(t.bizName+'!');return;}
-    setSaving(true);
-    const{data,error:err}=await sb.from('businesses').insert({
-      owner_id:session.user.id,name:name.trim(),type,
-      is_premium:false,is_active:true,
-      offer_accepted:true,offer_accepted_at:new Date().toISOString()
-    }).select().single();
-    setSaving(false);
-    if(err){setError(err.message);return;}
-    onCreated(data);
-  }
-  return(
-    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="modal-box">
-        <div className="modal-handle"/>
-        <div style={{display:'flex',alignItems:'center',gap:9}}>
-          <span style={{color:'var(--primary)'}}>{IC.store}</span>
-          <div className="modal-title">{t.addShop}</div>
-        </div>
-        {!isPremium&&(
-          <div style={{background:'linear-gradient(135deg,#FEF9C3,#FEF3C7)',border:'1px solid #FDE68A',borderRadius:'var(--r)',padding:'12px 14px',marginTop:14,display:'flex',gap:10,alignItems:'flex-start'}}>
-            <span style={{fontSize:18,flexShrink:0}}>⭐</span>
-            <div>
-              <div style={{fontWeight:700,fontSize:13,color:'#92400E'}}>{t.premiumOnly}</div>
-              <div style={{fontSize:12,color:'#B45309',marginTop:2}}>{t.premiumHint}</div>
-              <div style={{fontSize:11,color:'#78350F',marginTop:6,opacity:.7}}>{t.freeLimit}</div>
-            </div>
-          </div>
-        )}
-        {isPremium&&(
-          <form onSubmit={submit} style={{marginTop:4}}>
-            <label>{t.shopName} *</label>
-            <input value={name} onChange={e=>setName(e.target.value)} autoFocus style={{fontSize:16}}/>
-            <label>{t.bizType}</label>
-            <select value={type} onChange={e=>setType(e.target.value)}>{t.types.map(tp=><option key={tp}>{tp}</option>)}</select>
-            {error&&<div className="alert alert-error">{error}</div>}
-            <div className="modal-footer">
-              <button type="button" className="btn" onClick={onClose}>{t.cancel}</button>
-              <button type="submit" className="btn btn-primary" disabled={saving}>{saving?'...':t.createShop}</button>
-            </div>
-          </form>
-        )}
-        {!isPremium&&(
-          <div className="modal-footer">
-            <button className="btn btn-full" onClick={onClose}>{t.cancel}</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ── Shop Switcher (in Sidebar + Settings) ──
 function ShopSwitcher({t,collapsed}){
@@ -2185,6 +2017,7 @@ function MobileNav({page,setPage,overdueCount,t,isAdmin,business,onRefresh}){
     {id:'dashboard',icon:IC.dashboard,label:t.dashboard},
     {id:'debts',icon:IC.debts,label:t.debts,badge:overdueCount},
     {id:'clients',icon:IC.clients,label:t.clients},
+    {id:'overdueHistory',icon:IC.warning,label:t.overdueHistory},
     {id:'settings',icon:IC.settings,label:t.settingsTitle},
   ];
   function openAdd(type){setFabOpen(false);setAddType(type);setTimeout(()=>setAddOpen(true),120);}
