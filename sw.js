@@ -1,4 +1,4 @@
-const CACHE = 'qarzimon-v7';
+const CACHE = 'qarzimon-v8';
 const STATIC = [
   '/',
   '/404.html',
