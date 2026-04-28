@@ -209,6 +209,10 @@ tr:hover td{background:#FAFBFF}
 .admin-biz-row:hover{background:var(--g50)}
 .admin-biz-row:last-child{border-bottom:none}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.export-excel-btn{display:flex}
+@media(max-width:768px){.export-excel-btn{display:none!important}}
+.contact-link{display:inline-flex;align-items:center;gap:6px;color:var(--primary);text-decoration:none;font-size:13px;font-weight:500}
+.contact-link:hover{text-decoration:underline}
 
 
 .fab-wrap{display:none;position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:150;align-items:center;flex-direction:column}
@@ -273,7 +277,7 @@ tr:hover td{background:#FAFBFF}
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="root"><div id="init-loader" style="position:fixed;inset:0;background:#0F172A;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:9999"><div class="spinner" style="border-color:rgba(37,99,235,.25);border-top-color:#2563EB;width:40px;height:40px;border-width:3px"></div><div style="color:rgba(255,255,255,.45);font-size:14px;font-weight:700;font-family:Inter,-apple-system,sans-serif;letter-spacing:.06em">QARZIMAN</div></div></div>
 <script type="text/babel">
 const {createClient}=supabase;
 const sb=createClient('https://fortxhggcnvbhrapkaul.supabase.co','sb_publishable_wpL9aGzMTm4GdKyv9TUe5A_UMmkQAqq');
@@ -314,7 +318,7 @@ const T={
     settingsTitle:'Танзимот',profileTitle:'Профили тиҷорат',myShops:'Мағозаҳои ман',addShop:'Мағоза илова',switchShop:'Иваз кардан',premiumOnly:'Функсияи Premium',premiumHint:'Барои илова кардани мағозаи дигар ба Premium гузаред',currentShop:'Мағозаи ҷорӣ',shopName:'Номи мағоза',createShop:'Сохтан',freeLimit:'1 мағоза ройгон',premiumIncludes:'Premium дар бар мегирад:',premiumFeature1:'Якчанд мағоза',premiumFeature2:'Содироти Excel',premiumFeature3:'Огоҳнома тавассути SMS',premiumFeature4:'Дастгирии афзалиятнок',
     recentDebts:'Қарзҳои охирин',seeAll:'Ҳама →',
     maxPay:'Аз ҳад зиёд',minPay:'Ҳадди ақал 0.01',
-    emailConfirmHint:'Барои тасдиқи почта ба inbox нигаред ва пайвандро клик кунед, сипас дубора ворид шавед.',payHistory:'Таърихи пардохт',clientHistory:'Таърихи мизоҷ',offerTitle:'Шартнома-оферта',offerAccept:'Қабул мекунам',offerBack:'Бозгашт',offerMust:'Шумо бояд бо оферта розӣ шавед',debtorClients:'Бадҳисоб',noPayments:'Пардохт нест',noPaymentsHint:'Пардохт пас аз қайд намудан пайдо мешавад',dupPhone:'Ин рақами телефон аллакай мавҷуд аст',dupPhoneClient:'Мизоҷ:',dupPhoneAdd:'Барои мизоҷи мавҷуд қарз илова кардан?',dupPhoneConfirm:'Ҳа, илова кун',dupPhoneCancel:'Бекор кун',offerConfirmed:'Оферта тасдиқшуд',offerNotConfirmed:'Оферта тасдиқ нашудааст',overdueHistory:'Таърихи мизоҷони мушкилситон',forgotPass:'Рамзро фаромӯш кардед?',forgotTitle:'Барқарор кардани рамз',forgotSub:'Почтаи электрониро ворид кунед',
+    emailConfirmHint:'Барои тасдиқи почта ба inbox нигаред ва пайвандро клик кунед, сипас дубора ворид шавед.',payHistory:'Таърихи пардохт',clientHistory:'Таърихи мизоҷ',offerTitle:'Шартнома-оферта',offerAccept:'Қабул мекунам',offerBack:'Бозгашт',offerMust:'Шумо бояд бо оферта розӣ шавед',debtorClients:'Бадҳисоб',noPayments:'Пардохт нест',noPaymentsHint:'Пардохт пас аз қайд намудан пайдо мешавад',dupPhone:'Ин рақами телефон аллакай мавҷуд аст',dupPhoneClient:'Мизоҷ:',dupPhoneAdd:'Барои мизоҷи мавҷуд қарз илова кардан?',dupPhoneConfirm:'Ҳа, илова кун',dupPhoneCancel:'Бекор кун',offerConfirmed:'Оферта тасдиқшуд',offerNotConfirmed:'Оферта тасдиқ нашудааст',forgotPass:'Рамзро фаромӯш кардед?',forgotTitle:'Барқарор кардани рамз',forgotSub:'Почтаи электрониро ворид кунед',
     forgotSent:'Хат фиристода шуд!',forgotCheck:'Хатро тафтиш кунед',forgotSend:'Фиристодан',forgotBack:'← Бозгашт',forgotLogin:'← Даромадан',
     adminPanel:'Панели маъмур',allShops:'Ҳама мағозаҳо',shopDebts:'Қарзҳои мағоза',back:'← Бозгашт',
     types:['Дорухона','Мағозаи хӯрокворӣ','Мағозаи сохтмон','Мағозаи либос','Мағозаи мебел','Ресторан/Кафе','Мағозаи электроника','Дигар'],
@@ -323,9 +327,12 @@ const T={
     logoutConfirm:'Шумо мутмаин ҳастед, ки хориҷ мешавед?',logoutYes:'Ҳа, хориҷ',logoutNo:'Не',
     receivable:'Ба ман қарздор',payable:'Ман қарздор',debtType:'Намуди қарз',
     creditorName:'Кредитор/Таъминкунанда',myDebts:'Қарзи ман',
-    receiptLabel:'Чек замимакунӣ',receiptAdded:'Чек замима шуд',
+    receiptLabel:'Чек замимакунӣ',receiptAdded:'Чек замима шуд',viewReceipt:'Чекро бинед',
     iOwe:'Ман қарздорам',theyOwe:'Ба ман қарздоранд',
     totalIOwe:'Ман бояд',totalTheyOwe:'Ба ман бояд',
+    overdueHistory:'Таърихи қарздорони мӯҳлатгузошта',
+    totalReceivable:'Маблағи гирифтанӣ',totalPayable:'Маблағи пардохтанӣ',
+    contactDev:'Тамос бо сайтсоз',usersCount:'Корбарон',totalActiveSum:'Умумии фаъол',
   },
   ru:{
     appName:'Мой долг',appSub:'Учёт задолженностей',
@@ -357,7 +364,7 @@ const T={
     settingsTitle:'Настройки',profileTitle:'Профиль бизнеса',myShops:'Мои магазины',addShop:'Добавить магазин',switchShop:'Переключить',premiumOnly:'Premium функция',premiumHint:'Для добавления нескольких магазинов перейдите на Premium',currentShop:'Текущий магазин',shopName:'Название магазина',createShop:'Создать',freeLimit:'1 магазин бесплатно',premiumIncludes:'Premium включает:',premiumFeature1:'Несколько магазинов',premiumFeature2:'Экспорт в Excel',premiumFeature3:'SMS уведомления',premiumFeature4:'Приоритетная поддержка',
     recentDebts:'Последние долги',seeAll:'Все →',
     maxPay:'Превышает остаток',minPay:'Минимум 0.01',
-    emailConfirmHint:'Проверьте входящие письма, нажмите ссылку подтверждения и войдите снова.',payHistory:'История оплат',clientHistory:'История клиента',offerTitle:'Договор-оферта',offerAccept:'Принимаю',offerBack:'Назад',offerMust:'Необходимо принять оферту',debtorClients:'Должников',noPayments:'Оплат пока нет',noPaymentsHint:'Платежи появятся после записи оплаты',dupPhone:'Этот номер уже существует',dupPhoneClient:'Клиент:',dupPhoneAdd:'Добавить долг существующему клиенту?',dupPhoneConfirm:'Да, добавить',dupPhoneCancel:'Отмена',offerConfirmed:'Оферта принята',offerNotConfirmed:'Оферта не принята',overdueHistory:'История должников',forgotPass:'Забыли пароль?',forgotTitle:'Сброс пароля',forgotSub:'Введите email — пришлём ссылку',
+    emailConfirmHint:'Проверьте входящие письма, нажмите ссылку подтверждения и войдите снова.',payHistory:'История оплат',clientHistory:'История клиента',offerTitle:'Договор-оферта',offerAccept:'Принимаю',offerBack:'Назад',offerMust:'Необходимо принять оферту',debtorClients:'Должников',noPayments:'Оплат пока нет',noPaymentsHint:'Платежи появятся после записи оплаты',dupPhone:'Этот номер уже существует',dupPhoneClient:'Клиент:',dupPhoneAdd:'Добавить долг существующему клиенту?',dupPhoneConfirm:'Да, добавить',dupPhoneCancel:'Отмена',offerConfirmed:'Оферта принята',offerNotConfirmed:'Оферта не принята',forgotPass:'Забыли пароль?',forgotTitle:'Сброс пароля',forgotSub:'Введите email — пришлём ссылку',
     forgotSent:'Письмо отправлено!',forgotCheck:'Проверьте почту и нажмите ссылку',forgotSend:'Отправить ссылку',forgotBack:'← Назад',forgotLogin:'← Войти',
     adminPanel:'Админ-панель',allShops:'Все магазины',shopDebts:'Долги магазина',back:'← Назад',
     types:['Аптека','Продуктовый магазин','Строительный магазин','Магазин одежды','Магазин мебели','Ресторан/Кафе','Магазин электроники','Другое'],
@@ -366,9 +373,12 @@ const T={
     logoutConfirm:'Вы уверены, что хотите выйти?',logoutYes:'Да, выйти',logoutNo:'Отмена',
     receivable:'Мне должны',payable:'Я должен',debtType:'Тип долга',
     creditorName:'Кредитор/Поставщик',myDebts:'Мои долги',
-    receiptLabel:'Прикрепить чек',receiptAdded:'Чек прикреплён',
+    receiptLabel:'Прикрепить чек',receiptAdded:'Чек прикреплён',viewReceipt:'Просмотреть чек',
     iOwe:'Я должен',theyOwe:'Мне должны',
     totalIOwe:'Итого должен',totalTheyOwe:'Итого должны мне',
+    overdueHistory:'Просроченные долги',
+    totalReceivable:'К получению',totalPayable:'Должен выплатить',
+    contactDev:'Связаться с разработчиком',usersCount:'Пользователей',totalActiveSum:'Общая сумма',
   },
   uz:{
     appName:'Mening qarzim',appSub:'Qarz hisobi',
@@ -400,7 +410,7 @@ const T={
     settingsTitle:'Sozlamalar',profileTitle:'Biznes profili',myShops:"Do'konlarim",addShop:"Do'kon qo'shish",switchShop:'Almashtirish',premiumOnly:'Premium funksiya',premiumHint:"Bir nechta do'kon qo'shish uchun Premiumga o'ting",currentShop:"Joriy do'kon",shopName:"Do'kon nomi",createShop:'Yaratish',freeLimit:"1 ta do'kon bepul",premiumIncludes:"Premium o'z ichiga oladi:",premiumFeature1:"Bir nechta do'kon",premiumFeature2:"Excel eksporti",premiumFeature3:"SMS xabarnomalar",premiumFeature4:"Ustuvor qo'llab-quvvatlash",
     recentDebts:'Oxirgi qarzlar',seeAll:'Barchasi →',
     maxPay:'Qoldiqdan oshdi',minPay:'Minimum 0.01',
-    emailConfirmHint:'Kiruvchi xatlarga qarang, tasdiqlash havolasini bosing va qayta kiring.',payHistory:"To'lovlar tarixi",clientHistory:'Mijoz tarixi',offerTitle:'Oferta shartnomasi',offerAccept:'Qabul qilaman',offerBack:'Orqaga',offerMust:'Ofertani qabul qilish shart',debtorClients:'Qarzdorlar',noPayments:"To'lovlar yo'q",noPaymentsHint:"To'lovlar qayd etilgandan so'ng ko'rinadi",dupPhone:'Bu raqam allaqachon mavjud',dupPhoneClient:'Mijoz:',dupPhoneAdd:'Mavjud mijozga qarz qo\'shish?',dupPhoneConfirm:'Ha, qo\'shish',dupPhoneCancel:'Bekor qilish',offerConfirmed:'Oferta qabul qilindi',offerNotConfirmed:'Oferta qabul qilinmagan',overdueHistory:'Qarzdorlar tarixi',forgotPass:'Parolni unutdingizmi?',forgotTitle:'Parolni tiklash',forgotSub:'Email kiriting — havola yuboramiz',
+    emailConfirmHint:'Kiruvchi xatlarga qarang, tasdiqlash havolasini bosing va qayta kiring.',payHistory:"To'lovlar tarixi",clientHistory:'Mijoz tarixi',offerTitle:'Oferta shartnomasi',offerAccept:'Qabul qilaman',offerBack:'Orqaga',offerMust:'Ofertani qabul qilish shart',debtorClients:'Qarzdorlar',noPayments:"To'lovlar yo'q",noPaymentsHint:"To'lovlar qayd etilgandan so'ng ko'rinadi",dupPhone:'Bu raqam allaqachon mavjud',dupPhoneClient:'Mijoz:',dupPhoneAdd:'Mavjud mijozga qarz qo\'shish?',dupPhoneConfirm:'Ha, qo\'shish',dupPhoneCancel:'Bekor qilish',offerConfirmed:'Oferta qabul qilindi',offerNotConfirmed:'Oferta qabul qilinmagan',forgotPass:'Parolni unutdingizmi?',forgotTitle:'Parolni tiklash',forgotSub:'Email kiriting — havola yuboramiz',
     forgotSent:'Xat yuborildi!',forgotCheck:'Pochtangizni tekshiring',forgotSend:'Havola yuborish',forgotBack:'← Orqaga',forgotLogin:'← Kirish',
     adminPanel:'Admin paneli',allShops:"Barcha do'konlar",shopDebts:"Do'kon qarzlari",back:'← Orqaga',
     types:["Dorixona","Oziq-ovqat do'koni","Qurilish do'koni","Kiyim do'koni","Mebel do'koni","Restoran/Kafe","Elektronika do'koni","Boshqa"],
@@ -409,9 +419,12 @@ const T={
     logoutConfirm:"Haqiqatan ham chiqmoqchimisiz?",logoutYes:"Ha, chiqish",logoutNo:"Bekor",
     receivable:"Menga qarzdor",payable:"Men qarzdorman",debtType:"Qarz turi",
     creditorName:"Kreditor/Ta'minotchi",myDebts:"Mening qarzlarim",
-    receiptLabel:"Chek biriktirish",receiptAdded:"Chek biriktirildi",
+    receiptLabel:"Chek biriktirish",receiptAdded:"Chek biriktirildi",viewReceipt:"Chekni ko'rish",
     iOwe:"Men qarzdorman",theyOwe:"Menga qarzdorlar",
     totalIOwe:"Jami men to'layman",totalTheyOwe:"Jami menga to'lashadi",
+    overdueHistory:"Muddati o'tgan qarzlar",
+    totalReceivable:"Olinadigan summa",totalPayable:"To'lanadigan summa",
+    contactDev:"Dasturchi bilan bog'lanish",usersCount:"Foydalanuvchilar",totalActiveSum:"Umumiy summa",
   },
   en:{
     appName:'My Debt',appSub:'Debt management',
@@ -443,7 +456,7 @@ const T={
     settingsTitle:'Settings',profileTitle:'Business profile',myShops:'My shops',addShop:'Add shop',switchShop:'Switch',premiumOnly:'Premium feature',premiumHint:'Upgrade to Premium to add multiple shops',currentShop:'Current shop',shopName:'Shop name',createShop:'Create',freeLimit:'1 shop free',premiumIncludes:'Premium includes:',premiumFeature1:'Multiple shops',premiumFeature2:'Excel export',premiumFeature3:'SMS notifications',premiumFeature4:'Priority support',
     recentDebts:'Recent debts',seeAll:'All →',
     maxPay:'Exceeds remaining',minPay:'Minimum 0.01',
-    emailConfirmHint:'Check your inbox for a confirmation email, click the link, then sign in again.',payHistory:'Payment history',clientHistory:'Client history',offerTitle:'Public offer agreement',offerAccept:'I accept',offerBack:'Back',offerMust:'You must accept the offer',debtorClients:'Debtors',noPayments:'No payments yet',noPaymentsHint:'Payments will appear after recording',dupPhone:'This phone number already exists',dupPhoneClient:'Client:',dupPhoneAdd:'Add debt to existing client?',dupPhoneConfirm:'Yes, add',dupPhoneCancel:'Cancel',offerConfirmed:'Offer accepted',offerNotConfirmed:'Offer not accepted',overdueHistory:'Overdue history',forgotPass:'Forgot password?',forgotTitle:'Reset password',forgotSub:'Enter your email — we will send a link',
+    emailConfirmHint:'Check your inbox for a confirmation email, click the link, then sign in again.',payHistory:'Payment history',clientHistory:'Client history',offerTitle:'Public offer agreement',offerAccept:'I accept',offerBack:'Back',offerMust:'You must accept the offer',debtorClients:'Debtors',noPayments:'No payments yet',noPaymentsHint:'Payments will appear after recording',dupPhone:'This phone number already exists',dupPhoneClient:'Client:',dupPhoneAdd:'Add debt to existing client?',dupPhoneConfirm:'Yes, add',dupPhoneCancel:'Cancel',offerConfirmed:'Offer accepted',offerNotConfirmed:'Offer not accepted',forgotPass:'Forgot password?',forgotTitle:'Reset password',forgotSub:'Enter your email — we will send a link',
     forgotSent:'Email sent!',forgotCheck:'Check your inbox and click the link',forgotSend:'Send link',forgotBack:'← Back',forgotLogin:'← Sign in',
     adminPanel:'Admin panel',allShops:'All shops',shopDebts:'Shop debts',back:'← Back',
     types:['Pharmacy','Grocery store','Hardware store','Clothing store','Furniture store','Restaurant/Cafe','Electronics store','Other'],
@@ -452,9 +465,12 @@ const T={
     logoutConfirm:'Are you sure you want to sign out?',logoutYes:'Yes, sign out',logoutNo:'Cancel',
     receivable:'They owe me',payable:'I owe',debtType:'Debt type',
     creditorName:'Creditor/Supplier',myDebts:'My debts',
-    receiptLabel:'Attach receipt',receiptAdded:'Receipt attached',
+    receiptLabel:'Attach receipt',receiptAdded:'Receipt attached',viewReceipt:'View receipt',
     iOwe:'I owe',theyOwe:'They owe me',
     totalIOwe:'Total I owe',totalTheyOwe:'Total owed to me',
+    overdueHistory:'Overdue debts',
+    totalReceivable:'To receive',totalPayable:'To pay',
+    contactDev:'Contact developer',usersCount:'Users',totalActiveSum:'Total active',
   }
 };
 
@@ -601,10 +617,10 @@ function AuthPage({lang,setLang}){
   const langs=[{k:'tg',l:'Тоҷ'},{k:'ru',l:'Рус'},{k:'uz',l:'Ўзб'},{k:'en',l:'Eng'}];
 
   const features=[
-    {icon:IC.dashboard,text:{tg:'Дашборди ҳамаҷониба',ru:'Полный дашборд',uz:"To'liq boshqaruv paneli",en:'Full analytics dashboard'}},
-    {icon:IC.warning,text:{tg:'Тасниф аз рӯи мӯҳлат',ru:'Классификация просрочки',uz:'Kechikish tasnifi',en:'Overdue classification'}},
-    {icon:IC.excel,text:{tg:'Содироти Excel ва HTML',ru:'Экспорт в Excel',uz:"Excel eksporti",en:'Excel export'}},
-    {icon:IC.store,text:{tg:'Якчанд мағоза (Premium)',ru:'Несколько магазинов (Premium)',uz:"Bir nechta do'kon (Premium)",en:'Multiple shops (Premium)'}},
+    {icon:IC.dashboard,text:{tg:'Дашборди ҳамаҷониба',ru:'Полный дашборд учёта долгов',uz:"To'liq qarz boshqaruv paneli",en:'Full debt analytics dashboard'}},
+    {icon:IC.debts,text:{tg:'Ҳисоби қарзи додашуда ва гирифташуда',ru:'Учёт выданных и полученных долгов',uz:"Berilgan va olingan qarzlar hisobi",en:'Track given and received debts'}},
+    {icon:IC.warning,text:{tg:'Тасниф аз рӯи мӯҳлати гузашта',ru:'Классификация просроченных долгов',uz:"Muddati o'tgan qarzlar tasnifi",en:'Overdue debt classification'}},
+    {icon:IC.excel,text:{tg:'Содироти Excel',ru:'Экспорт в Excel',uz:"Excel eksporti",en:'Export to Excel'}},
   ];
 
   const valueProp={
@@ -794,7 +810,7 @@ function OfferModal({t,onAccept,onClose,initialLang}){
   function onScroll(e){const el=e.target;if(el.scrollTop+el.clientHeight>=el.scrollHeight-20)setScrolled(true);}
   const offerTexts={
     tg:[
-      {n:'1. Мавзӯи шартнома',t:'Оферта-шартномаи мазкур тартиби истифодаи хидмати «Қарзи ман»-ро барои ҳисобдории қарзи дебиторӣ муайян мекунад. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) дастрасиро ба хидмат мувофиқи шартҳои шартномаи мазкур таъмин мекунад.'},
+      {n:'1. Мавзӯи шартнома',t:'Оферта-шартномаи мазкур тартиби истифодаи хидмати «Қарзи ман»-ро барои ҳисобдории қарзҳо (додашуда ва гирифташуда) муайян мекунад. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) дастрасиро ба хидмат мувофиқи шартҳои шартномаи мазкур таъмин мекунад.'},
       {n:'2. Шартҳои истифода',t:'Корбар ӯҳдадор аст хидматро танҳо барои мақсадҳои қонунӣ истифода барад. Додани дастрасӣ ба шахсони сеюм, бор кардани маълумоти нодуруст ва кӯшишҳои дастрасии ғайриқонунӣ манъ аст.'},
       {n:'3. Махфият',t:'Ҳамаи маълумоте, ки корбар ворид мекунад, махфӣ мебошанд. Оператор маълумоти шахсиро бидуни розигии корбар ба шахсони сеюм намедиҳад.'},
       {n:'4. Масъулият',t:'Оператор барои зарарҳое, ки дар натиҷаи истифодаи нодурусти хидмат ба вуҷуд меоянд, ҷавобгар нест. Корбар барои дурустии маълумоти ворид кардааш масъул аст.'},
@@ -803,7 +819,7 @@ function OfferModal({t,onAccept,onClose,initialLang}){
       {n:'7. Реквизитҳо',t:'ИП Исмонов Ғафурҷон Фарҳодҷонович · ЕИН: 0331564805 · Ҷумҳурии Тоҷикистон'},
     ],
     ru:[
-      {n:'1. Предмет договора',t:'Настоящая публичная оферта регулирует использование веб-сервиса «Қарзи ман» для учёта дебиторской задолженности. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) предоставляет доступ к сервису на условиях настоящего Договора.'},
+      {n:'1. Предмет договора',t:'Настоящая публичная оферта регулирует использование веб-сервиса «Қарзи ман» для учёта долгов — как выданных, так и полученных. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) предоставляет доступ к сервису на условиях настоящего Договора.'},
       {n:'2. Условия использования',t:'Пользователь обязуется использовать сервис только в законных целях. Запрещается передача доступа третьим лицам, загрузка недостоверных данных, попытки взлома системы.'},
       {n:'3. Конфиденциальность',t:'Все данные пользователя конфиденциальны. Оператор не передаёт персональные данные третьим лицам без согласия пользователя.'},
       {n:'4. Ответственность',t:'Оператор не несёт ответственности за убытки от некорректного использования. Пользователь отвечает за достоверность вводимых данных.'},
@@ -812,7 +828,7 @@ function OfferModal({t,onAccept,onClose,initialLang}){
       {n:'7. Реквизиты',t:'ИП Исмонов Ғафурҷон Фарҳодҷонович · ЕИН: 0331564805 · Республика Таджикистан'},
     ],
     uz:[
-      {n:"1. Shartnoma mavzusi",t:"Ushbu ommaviy oferta Mening qarzim veb-xizmatidan foydalanish tartibini belgilaydi. YaT Ismonov Gafurjon Farhodjonovich (EIN: 0331564805) xizmatga kirishni ushbu shartnoma shartlari asosida taminlaydi."},
+      {n:"1. Shartnoma mavzusi",t:"Ushbu ommaviy oferta Mening qarzim veb-xizmatidan (berilgan va olingan qarzlarni hisobga olish) foydalanish tartibini belgilaydi. YaT Ismonov Gafurjon Farhodjonovich (EIN: 0331564805) xizmatga kirishni ushbu shartnoma shartlari asosida taminlaydi."},
       {n:"2. Foydalanish shartlari",t:"Foydalanuvchi xizmatdan faqat qonuniy maqsadlarda foydalanishga majburdir. Uchinchi shaxslarga kirish huquqini berish, noto'g'ri malumot yuklash taqiqlanadi."},
       {n:"3. Maxfiylik",t:"Foydalanuvchi kiritgan barcha malumotlar maxfiy hisoblanadi. Operator shaxsiy malumotlarni foydalanuvchi roziligisiz uchinchi shaxslarga bermaydi."},
       {n:"4. Masuliyat",t:"Operator xizmatdan noto'g'ri foydalanish natijasida yetkazilgan zararlar uchun javobgar emas. Foydalanuvchi kiritilgan malumotlarning to'g'riligi uchun o'zi javob beradi."},
@@ -821,7 +837,7 @@ function OfferModal({t,onAccept,onClose,initialLang}){
       {n:"7. Rekvizitlar",t:"YaT Ismonov Gafurjon Farhodjonovich · EIN: 0331564805 · Tojikiston Respublikasi"},
     ],
     en:[
-      {n:'1. Subject of Agreement',t:'This public offer governs the use of the «My Debt» web service for accounts receivable management. IE Ismonov Ghafurjon Farhodjonovich (EIN: 0331564805) provides access to the service under these terms.'},
+      {n:'1. Subject of Agreement',t:'This public offer governs the use of the «My Debt» web service for tracking debts — both given and received. IE Ismonov Ghafurjon Farhodjonovich (EIN: 0331564805) provides access to the service under these terms.'},
       {n:'2. Terms of Use',t:'The user agrees to use the service only for lawful purposes. Transferring access to third parties, uploading false data, and unauthorized access attempts are prohibited.'},
       {n:'3. Confidentiality',t:'All user data is confidential. The operator does not share personal data with third parties without user consent.'},
       {n:'4. Liability',t:'The operator is not liable for losses caused by improper use of the service. The user is responsible for the accuracy of the data entered.'},
@@ -1276,6 +1292,7 @@ function PayHistoryModal({debt,onClose,t}){
                   </div>
                 </div>
                 {p.note&&<div style={{fontSize:11,color:'var(--g500)',marginTop:6,padding:'5px 8px',background:'var(--g50)',borderRadius:6,fontStyle:'italic'}}>"{p.note}"</div>}
+                {p.receipt_url&&<a href={p.receipt_url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:6,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>}
               </div>
             </div>
           ))}
@@ -1316,6 +1333,7 @@ function DebtCard({d,t,onPay,onDelete,onHistory}){
         <span>{d.category}</span>
       </div>
       {d.comment&&<div style={{fontSize:12,color:'var(--g400)',marginTop:4,fontStyle:'italic'}}>{d.comment}</div>}
+      {d.receipt_url&&<a href={d.receipt_url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:4,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>}
       <div className="debt-card-actions">
         {st!=='paid'&&<button className="btn btn-green" onClick={()=>onPay(d)}>💳 {t.confirmPay.replace('✓ ','')}</button>}
         <button className="btn btn-sm" onClick={()=>onHistory(d)}>📋</button>
@@ -1422,6 +1440,10 @@ function Dashboard({t}){
   const totalPaid=paid.reduce((s,d)=>s+Number(d.amount),0);
   const clients=new Set(active.map(d=>d.phone)).size;
   const debtorClients=new Set(overdue.map(d=>d.phone)).size;
+  const receivableActive=active.filter(d=>(d.debt_type||'receivable')==='receivable');
+  const payableActive=active.filter(d=>d.debt_type==='payable');
+  const totalReceivable=receivableActive.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+  const totalPayable=payableActive.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
   const ovCats=[{label:t.cat1,days:[1,30],cls:'cat-1'},{label:t.cat2,days:[31,90],cls:'cat-2'},{label:t.cat3,days:[91,180],cls:'cat-3'},{label:t.cat4,days:[181,365],cls:'cat-4'},{label:t.cat5,days:[366,99999],cls:'cat-5'}]
     .map(cat=>{const items=overdue.filter(d=>{const ov=daysOverdue(d);return ov>=cat.days[0]&&ov<=cat.days[1];});return{...cat,count:items.length,sum:items.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0)};});
 
@@ -1430,16 +1452,16 @@ function Dashboard({t}){
       <div className="page-header">
         <div><div className="page-title">{t.dashboard}</div><div className="page-sub">{business?.name}</div></div>
         <div className="page-actions">
-          <button className="btn btn-sm" onClick={()=>exportToExcel(debts,business?.name||'',t)} style={{display:'flex',alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button>
+          <button className="btn btn-sm export-excel-btn" onClick={()=>exportToExcel(debts,business?.name||'',t)} style={{alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button>
           <button className="btn btn-primary" onClick={()=>setAddOpen(true)}>{t.addDebt}</button>
         </div>
       </div>
       <div className="stats-grid">
         {[
-          {label:t.activeDebts,val:active.length,sub:fmt(totalActive)+' '+t.sum,color:'var(--primary)',bg:'var(--primary-bg)',icon:IC.debts},
-          {label:t.expectedSum,val:fmt(totalActive)+' '+t.sum,sub:active.length+' '+t.clientsCount.toLowerCase(),color:'var(--g700)',bg:'var(--g100)',icon:IC.pay,sm:true},
+          {label:t.theyOwe||'Мне должны',val:fmt(totalReceivable)+' '+t.sum,sub:receivableActive.length+' '+t.debts.toLowerCase(),color:'var(--primary)',bg:'var(--primary-bg)',icon:IC.debts,sm:true},
+          {label:t.iOwe||'Я должен',val:fmt(totalPayable)+' '+t.sum,sub:payableActive.length+' '+t.debts.toLowerCase(),color:'var(--green)',bg:'var(--green-bg)',icon:IC.pay,sm:true},
           {label:t.overdueDebts,val:overdue.length,sub:fmt(totalOverdue)+' '+t.sum,color:'var(--red)',bg:'var(--red-bg)',icon:IC.warning},
-          {label:t.paidDebts,val:paid.length,sub:fmt(totalPaid)+' '+t.sum,color:'var(--green)',bg:'var(--green-bg)',icon:IC.check},
+          {label:t.paidDebts,val:paid.length,sub:fmt(totalPaid)+' '+t.sum,color:'var(--g700)',bg:'var(--g100)',icon:IC.check},
         ].map((s,i)=>(
           <div key={i} className="stat-card">
             <div className="stat-accent" style={{background:s.color}}/>
@@ -1490,7 +1512,7 @@ function Dashboard({t}){
       </div>
       {overdue.length>0&&(
         <div className="card">
-          <div className="card-header"><div><div style={{display:"flex",alignItems:"center",gap:7}}><span style={{color:"var(--red)"}}>{IC.warning}</span><div className="card-title">{t.overdueDebts}</div></div><div className="card-sub">{overdue.length}</div></div><button className="btn btn-sm" onClick={()=>exportToExcel(overdue,business?.name+'_ov',t)} style={{display:'flex',alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button></div>
+          <div className="card-header"><div><div style={{display:"flex",alignItems:"center",gap:7}}><span style={{color:"var(--red)"}}>{IC.warning}</span><div className="card-title">{t.overdueDebts}</div></div><div className="card-sub">{overdue.length}</div></div><button className="btn btn-sm export-excel-btn" onClick={()=>exportToExcel(overdue,business?.name+'_ov',t)} style={{alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button></div>
           <div className="table-wrap"><table>
             <thead><tr><th>{t.clientName}</th><th>{t.remaining}</th><th>{t.days}</th><th>{t.overdueClass}</th><th>{t.phone}</th><th></th></tr></thead>
             <tbody>{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=>{const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);const rem=Number(d.amount)-Number(d.paid_amount??0);
@@ -1541,7 +1563,7 @@ function DebtsPage({t}){
     <>
       <div className="page-header">
         <div><div className="page-title">{t.debts}</div><div className="page-sub">{list.length}</div></div>
-        <div className="page-actions"><button className="btn btn-sm" onClick={()=>exportToExcel(list,business?.name||'',t)} style={{display:'flex',alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button><button className="btn btn-primary" onClick={()=>setAddOpen(true)}>{t.addDebt}</button></div>
+        <div className="page-actions"><button className="btn btn-sm export-excel-btn" onClick={()=>exportToExcel(list,business?.name||'',t)} style={{alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button><button className="btn btn-primary" onClick={()=>setAddOpen(true)}>{t.addDebt}</button></div>
       </div>
       {/* Debt type tabs */}
       <div style={{display:'flex',gap:0,marginBottom:12,background:'#fff',border:'1px solid var(--border)',borderRadius:'var(--r-lg)',overflow:'hidden',boxShadow:'var(--shadow)'}}>
@@ -1821,10 +1843,8 @@ function OverdueHistoryPage({t}){
 }
 
 function SettingsPage({t}){
-  const {business,setBusiness,session,allBusinesses,switchBusiness,refreshBusinesses}=useApp();
+  const {business,setBusiness,session,allBusinesses,switchBusiness}=useApp();
   const [name,setName]=useState('');const [type,setType]=useState('');const [saving,setSaving]=useState(false);
-  const [showAdd,setShowAdd]=useState(false);
-  const isPremium=allBusinesses.some(b=>b.is_premium)||business?.is_premium;
   useEffect(()=>{if(business){setName(business.name);setType(business.type);};},[business]);
   async function save(e){e.preventDefault();setSaving(true);const{data}=await sb.from('businesses').update({name,type}).eq('id',business.id).select().single();if(data){setBusiness(data);toast(t.savedOk);}setSaving(false);}
   return(
@@ -1839,52 +1859,49 @@ function SettingsPage({t}){
           <button className="btn btn-primary" type="submit" style={{marginTop:18}} disabled={saving}>{saving?'...':t.save}</button>
         </form>
       </div>
+      {allBusinesses.length>1&&(
+        <div className="card" style={{maxWidth:460,marginBottom:16}}>
+          <div className="card-header">
+            <div style={{display:'flex',alignItems:'center',gap:8}}><span style={{color:'var(--primary)'}}>{IC.store}</span><span className="card-title">{t.myShops}</span><span className="card-sub" style={{marginLeft:4}}>({allBusinesses.length})</span></div>
+          </div>
+          <div>
+            {allBusinesses.map(biz=>(
+              <div key={biz.id} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderBottom:'1px solid var(--border)',background:biz.id===business?.id?'var(--primary-bg)':'#fff'}}>
+                <div style={{width:36,height:36,borderRadius:10,background:biz.id===business?.id?'var(--primary)':'var(--g100)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:biz.id===business?.id?'#fff':'var(--g400)'}}>
+                  {IC.store}
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:700,fontSize:14,color:biz.id===business?.id?'var(--primary)':'var(--g900)'}}>{biz.name}</div>
+                  <div style={{fontSize:11,color:'var(--g400)',marginTop:1}}>{biz.type}</div>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  {biz.id===business?.id
+                    ?<span style={{fontSize:11,color:'var(--primary)',fontWeight:700}}>✓ {t.currentShop}</span>
+                    :<button className="btn btn-sm" onClick={()=>switchBusiness(biz)}>{t.switchShop}</button>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="card" style={{maxWidth:460}}>
-        <div className="card-header">
-          <div style={{display:'flex',alignItems:'center',gap:8}}><span style={{color:'var(--primary)'}}>{IC.store}</span><span className="card-title">{t.myShops}</span><span className="card-sub" style={{marginLeft:4}}>({allBusinesses.length})</span></div>
-          <button className="btn btn-sm btn-primary" onClick={()=>setShowAdd(true)}>{t.addShop}</button>
-        </div>
-        <div>
-          {allBusinesses.map(biz=>(
-            <div key={biz.id} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderBottom:'1px solid var(--border)',background:biz.id===business?.id?'var(--primary-bg)':'#fff'}}>
-              <div style={{width:36,height:36,borderRadius:10,background:biz.id===business?.id?'var(--primary)':'var(--g100)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:biz.id===business?.id?'#fff':'var(--g400)'}}>
-                {IC.store}
-              </div>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontWeight:700,fontSize:14,color:biz.id===business?.id?'var(--primary)':'var(--g900)'}}>{biz.name}</div>
-                <div style={{fontSize:11,color:'var(--g400)',marginTop:1}}>{biz.type}</div>
-              </div>
-              <div style={{display:'flex',alignItems:'center',gap:8}}>
-                {biz.is_premium&&<span style={{background:'#F59E0B',color:'#fff',fontSize:9,fontWeight:700,padding:'2px 8px',borderRadius:100}}>PRO</span>}
-                {biz.id===business?.id
-                  ?<span style={{fontSize:11,color:'var(--primary)',fontWeight:700}}>✓ {t.currentShop}</span>
-                  :<button className="btn btn-sm" onClick={()=>switchBusiness(biz)}>{t.switchShop}</button>}
-              </div>
+        <div className="card-header"><span className="card-title">{t.contactDev||'Связаться с разработчиком'}</span></div>
+        <div style={{padding:'16px 18px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
+            <div style={{width:38,height:38,borderRadius:10,background:'var(--primary-bg)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'var(--primary)'}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
             </div>
-          ))}
-        </div>
-        {!isPremium&&(
-          <div style={{padding:'14px 16px',background:'linear-gradient(135deg,#FEF9C3,#FFFBEB)',borderTop:'1px solid #FDE68A'}}>
-            <div style={{display:'flex',gap:10,alignItems:'flex-start',marginBottom:10}}>
-              <span style={{fontSize:22,flexShrink:0}}>⭐</span>
-              <div>
-                <div style={{fontWeight:800,fontSize:13,color:'#92400E'}}>{t.premiumOnly}</div>
-                <div style={{fontSize:12,color:'#B45309',marginTop:2}}>{t.premiumHint}</div>
-              </div>
-            </div>
-            <div style={{fontSize:11,color:'#78350F',background:'rgba(255,255,255,.6)',borderRadius:8,padding:'8px 10px',lineHeight:1.6}}>
-              🚀 <strong>{t.premiumIncludes||"Premium включает:"}</strong><br/>
-              • {t.premiumFeature1||"Несколько магазинов"}<br/>
-              • {t.premiumFeature2||"Экспорт в Excel"}<br/>
-              • {t.premiumFeature3||"SMS уведомления клиентам"}<br/>
-              • {t.premiumFeature4||"Приоритетная поддержка"}<br/>
-              <br/>
-              📩 <a href="mailto:niyatorzuzoda@gmail.com" style={{color:'#92400E',fontWeight:700}}>niyatorzuzoda@gmail.com</a>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:'var(--g800)'}}>GAMMA GROUP</div>
+              <div style={{fontSize:11,color:'var(--g400)'}}>Консалтинг · Финансы · IT</div>
             </div>
           </div>
-        )}
+          <a href="mailto:niyatorzuzoda@gmail.com" className="contact-link">
+            📧 niyatorzuzoda@gmail.com
+          </a>
+          <div style={{fontSize:11,color:'var(--g400)',marginTop:6}}>Tajikistan · Нияторзузода</div>
+        </div>
       </div>
-      {showAdd&&<AddShopModal t={t} session={session} isPremium={isPremium||allBusinesses.length===0} onClose={()=>setShowAdd(false)} onCreated={(biz)=>{refreshBusinesses();switchBusiness(biz);setShowAdd(false);toast(t.savedOk);}}/>}
     </>
   );
 }
@@ -1897,9 +1914,13 @@ function AdminPage({t}){
       setLoading(true);
       const [{data:biz},{data:debts}]=await Promise.all([sb.from('businesses').select('*').order('created_at',{ascending:false}),sb.from('debts').select('*')]);
       const bizList=biz??[];const debtList=debts??[];
-      const totalDebt=debtList.reduce((s,d)=>s+Number(d.amount),0);const totalPaid=debtList.reduce((s,d)=>s+Number(d.paid_amount??0),0);
+      const activeDebts=debtList.filter(d=>getStatus(d)!=='paid');
       const overdue=debtList.filter(d=>getStatus(d)==='overdue');
-      setStats({bizCount:bizList.length,debtCount:debtList.length,totalDebt,totalPaid,overdueCount:overdue.length,totalOverdue:overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0)});
+      const totalPaid=debtList.reduce((s,d)=>s+Number(d.paid_amount??0),0);
+      const totalReceivableSum=activeDebts.filter(d=>(d.debt_type||'receivable')==='receivable').reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+      const totalPayableSum=activeDebts.filter(d=>d.debt_type==='payable').reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+      const uniqueClients=new Set(debtList.map(d=>d.phone)).size;
+      setStats({bizCount:bizList.length,debtCount:activeDebts.length,totalPaid,overdueCount:overdue.length,totalOverdue:overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),totalReceivable:totalReceivableSum,totalPayable:totalPayableSum,uniqueClients});
       setBusinesses(bizList.map(b=>{const bd=debtList.filter(d=>d.business_id===b.id);const active=bd.filter(d=>getStatus(d)!=='paid');const ov=bd.filter(d=>getStatus(d)==='overdue');return{...b,debtCount:bd.length,activeSum:active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),overdueCount:ov.length,overdueSum:ov.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),owner_offer_at:b.offer_accepted_at};}));
       setLoading(false);
     }
@@ -1911,11 +1932,11 @@ function AdminPage({t}){
     <>
       <div className="page-header">
         <div><button className="btn btn-sm" style={{marginBottom:8}} onClick={()=>setSelectedBiz(null)}>{t.back}</button><div className="page-title">🏪 {selectedBiz.name}</div><div className="page-sub">{selectedBiz.type} · {selectedBiz.created_at?.slice(0,10)}</div></div>
-        <button className="btn btn-sm" onClick={()=>exportToExcel(bizDebts,selectedBiz.name,t)} style={{display:'flex',alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button>
+        <button className="btn btn-sm export-excel-btn" onClick={()=>exportToExcel(bizDebts,selectedBiz.name,t)} style={{alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button>
       </div>
-      <div className="stats-grid" style={{gridTemplateColumns:'repeat(3,1fr)',marginBottom:14}}>
-        {[{label:t.activeDebts,val:bizDebts.filter(d=>getStatus(d)!=='paid').length,color:'var(--primary)',bg:'var(--primary-bg)',icon:'📋'},{label:t.overdueDebts,val:bizDebts.filter(d=>getStatus(d)==='overdue').length,color:'var(--red)',bg:'var(--red-bg)',icon:'⚠️'},{label:t.paidDebts,val:bizDebts.filter(d=>getStatus(d)==='paid').length,color:'var(--green)',bg:'var(--green-bg)',icon:'✅'}].map((s,i)=>(
-          <div key={i} className="stat-card"><div className="stat-accent" style={{background:s.color}}/><div className="stat-icon" style={{background:s.bg,color:s.color}}>{s.icon}</div><div className="stat-label">{s.label}</div><div className="stat-value" style={{color:s.color}}>{s.val}</div></div>
+      <div className="stats-grid" style={{marginBottom:14}}>
+        {(()=>{const bizActive=bizDebts.filter(d=>getStatus(d)!=='paid');const bizOverdue=bizDebts.filter(d=>getStatus(d)==='overdue');const bizPaid=bizDebts.filter(d=>getStatus(d)==='paid');const bizRec=bizActive.filter(d=>(d.debt_type||'receivable')==='receivable');const bizPay=bizActive.filter(d=>d.debt_type==='payable');return[{label:t.theyOwe||'К получению',val:fmt(bizRec.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0))+' '+t.sum,color:'var(--primary)',bg:'var(--primary-bg)',icon:'💰',sm:true},{label:t.iOwe||'Должен',val:fmt(bizPay.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0))+' '+t.sum,color:'var(--green)',bg:'var(--green-bg)',icon:'📤',sm:true},{label:t.overdueDebts,val:bizOverdue.length,color:'var(--red)',bg:'var(--red-bg)',icon:'⚠️'},{label:t.paidDebts,val:bizPaid.length,color:'var(--g700)',bg:'var(--g100)',icon:'✅'}];})().map((s,i)=>(
+          <div key={i} className="stat-card"><div className="stat-accent" style={{background:s.color}}/><div className="stat-icon" style={{background:s.bg,color:s.color}}>{s.icon}</div><div className="stat-label">{s.label}</div><div className="stat-value" style={{color:s.color,fontSize:s.sm?16:24}}>{s.val}</div></div>
         ))}
       </div>
       <div className="card">
@@ -1937,8 +1958,15 @@ function AdminPage({t}){
   return(
     <>
       <div className="page-header"><div><div style={{display:"flex",alignItems:"center",gap:10}}><span style={{color:"var(--amber)"}}>{IC.admin}</span><div className="page-title">{t.adminPanel}</div></div></div></div>
-      <div className="stats-grid">
-        {[{label:t.clientsCount,val:stats.bizCount,color:'var(--primary)',bg:'var(--primary-bg)',icon:'🏪'},{label:t.activeDebts,val:stats.debtCount,color:'var(--g700)',bg:'var(--g100)',icon:'📋'},{label:t.overdueDebts,val:stats.overdueCount,color:'var(--red)',bg:'var(--red-bg)',icon:'⚠️'},{label:t.paidDebts,val:fmt(stats.totalPaid)+' '+t.sum,color:'var(--green)',bg:'var(--green-bg)',icon:'✅',sm:true}].map((s,i)=>(
+      <div className="stats-grid" style={{gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))'}}>
+        {[
+          {label:t.usersCount||'Пользователей',val:stats.bizCount,color:'var(--primary)',bg:'var(--primary-bg)',icon:'🏪'},
+          {label:t.clientsCount,val:stats.uniqueClients,color:'var(--g700)',bg:'var(--g100)',icon:'👥'},
+          {label:t.theyOwe||'К получению',val:fmt(stats.totalReceivable)+' '+t.sum,color:'var(--primary)',bg:'var(--primary-bg)',icon:'💰',sm:true},
+          {label:t.iOwe||'Должен',val:fmt(stats.totalPayable)+' '+t.sum,color:'var(--green)',bg:'var(--green-bg)',icon:'📤',sm:true},
+          {label:t.overdueDebts,val:stats.overdueCount,color:'var(--red)',bg:'var(--red-bg)',icon:'⚠️'},
+          {label:t.paidDebts,val:fmt(stats.totalPaid)+' '+t.sum,color:'var(--g700)',bg:'var(--g100)',icon:'✅',sm:true},
+        ].map((s,i)=>(
           <div key={i} className="stat-card"><div className="stat-accent" style={{background:s.color}}/><div className="stat-icon" style={{background:s.bg,color:s.color}}>{s.icon}</div><div className="stat-label">{s.label}</div><div className="stat-value" style={{color:s.color,fontSize:s.sm?16:24}}>{s.val}</div></div>
         ))}
       </div>
@@ -1951,9 +1979,9 @@ function AdminPage({t}){
             <div style={{flex:1}}>
               <div style={{fontWeight:700,fontSize:14}}>{b.name}</div>
               <div style={{fontSize:12,color:'var(--g400)',marginTop:2}}>{b.type} · {b.created_at?.slice(0,10)}</div>
-              {(offerAt||b.debtCount>0)
-                ?<div style={{fontSize:11,color:'var(--green-t)',marginTop:2,fontWeight:600}}>✅ {t.offerConfirmed}{offerAt?' · '+offerAt.slice(0,10):''}</div>
-                :<div style={{fontSize:11,color:'var(--amber)',marginTop:2}}>⚠️ {t.offerNotConfirmed}</div>}
+              {offerAt
+                ?<div style={{fontSize:11,color:'var(--green-t)',marginTop:2,fontWeight:600}}>✅ {t.offerConfirmed} · {offerAt.slice(0,10)}</div>
+                :<div style={{fontSize:11,color:'var(--red)',marginTop:2,fontWeight:600}}>⚠️ {t.offerNotConfirmed}</div>}
             </div>
             <div style={{display:'flex',gap:12,alignItems:'center',flexShrink:0}}>
               <div style={{textAlign:'right'}}>
@@ -2032,11 +2060,8 @@ function AddShopModal({t,session,onClose,onCreated,isPremium}){
 
 // ── Shop Switcher (in Sidebar + Settings) ──
 function ShopSwitcher({t,collapsed}){
-  const {business,allBusinesses,switchBusiness,session,refreshBusinesses}=useApp();
+  const {business,allBusinesses,switchBusiness}=useApp();
   const [open,setOpen]=useState(false);
-  const [showAdd,setShowAdd]=useState(false);
-  const isPremium=business?.is_premium||allBusinesses.some(b=>b.is_premium);
-  const canAddMore=isPremium||allBusinesses.length<1;
   if(!business||allBusinesses.length===0)return null;
   return(
     <>
@@ -2069,18 +2094,9 @@ function ShopSwitcher({t,collapsed}){
                 {b.id===business.id&&<span style={{fontSize:10,color:'rgba(255,255,255,.4)'}}>{IC.check}</span>}
               </div>
             ))}
-            <div
-              onClick={()=>{setOpen(false);setShowAdd(true);}}
-              style={{display:'flex',alignItems:'center',gap:8,padding:'9px 12px',cursor:'pointer',borderTop:'1px solid rgba(255,255,255,.06)',color:'rgba(255,255,255,.5)',fontSize:13,transition:'all .1s'}}
-            >
-              <span style={{fontSize:16,lineHeight:1}}>+</span>
-              <span>{t.addShop}</span>
-              {!isPremium&&<span style={{marginLeft:'auto',background:'#F59E0B',color:'#fff',fontSize:9,fontWeight:700,padding:'2px 6px',borderRadius:100}}>PRO</span>}
-            </div>
           </div>
         )}
       </div>
-      {showAdd&&<AddShopModal t={t} session={session} isPremium={isPremium||allBusinesses.length===0} onClose={()=>setShowAdd(false)} onCreated={(biz)=>{refreshBusinesses();switchBusiness(biz);setShowAdd(false);toast(t.savedOk);}}/>}
     </>
   );
 }
