@@ -328,8 +328,8 @@ const T={
     logoutConfirm:'Шумо мутмаин ҳастед, ки хориҷ мешавед?',logoutYes:'Ҳа, хориҷ',logoutNo:'Не',
     receivable:'Ба ман қарздор',payable:'Ман қарздор',debtType:'Намуди қарз',
     creditorName:'Кредитор/Таъминкунанда',myDebts:'Қарзи ман',
-    receiptLabel:'Чек замимакунӣ',receiptAdded:'Чек замима шуд',viewReceipt:'Чекро бинед',
-    iOwe:'Ман қарздорам',theyOwe:'Ба ман қарздоранд',
+    receiptLabel:'Чек замимакунӣ',receiptAdded:'Чек замима шуд',viewReceipt:'Чекро бинед',uploadedReceipts:'Чекҳои зеркашӣшуда',debtReceipt:'Чеки қарз',payReceipt:'Чеки пардохт',
+    iOwe:'Ман қарздорам',theyOwe:'Аз ман қарздоранд',
     totalIOwe:'Ман бояд',totalTheyOwe:'Ба ман бояд',
     overdueHistory:'Мӯҳлатгузашта',
     totalReceivable:'Маблағи гирифтанӣ',totalPayable:'Маблағи пардохтанӣ',
@@ -377,7 +377,7 @@ const T={
     logoutConfirm:'Вы уверены, что хотите выйти?',logoutYes:'Да, выйти',logoutNo:'Отмена',
     receivable:'Мне должны',payable:'Я должен',debtType:'Тип долга',
     creditorName:'Кредитор/Поставщик',myDebts:'Мои долги',
-    receiptLabel:'Прикрепить чек',receiptAdded:'Чек прикреплён',viewReceipt:'Просмотреть чек',
+    receiptLabel:'Прикрепить чек',receiptAdded:'Чек прикреплён',viewReceipt:'Просмотреть чек',uploadedReceipts:'Загруженные чеки',debtReceipt:'Чек долга',payReceipt:'Чек оплаты',
     iOwe:'Я должен',theyOwe:'Мне должны',
     totalIOwe:'Итого должен',totalTheyOwe:'Итого должны мне',
     overdueHistory:'Просроченные',
@@ -426,7 +426,7 @@ const T={
     logoutConfirm:"Haqiqatan ham chiqmoqchimisiz?",logoutYes:"Ha, chiqish",logoutNo:"Bekor",
     receivable:"Menga qarzdor",payable:"Men qarzdorman",debtType:"Qarz turi",
     creditorName:"Kreditor/Ta'minotchi",myDebts:"Mening qarzlarim",
-    receiptLabel:"Chek biriktirish",receiptAdded:"Chek biriktirildi",viewReceipt:"Chekni ko'rish",
+    receiptLabel:"Chek biriktirish",receiptAdded:"Chek biriktirildi",viewReceipt:"Chekni ko'rish",uploadedReceipts:"Yuklangan cheklar",debtReceipt:"Qarz cheki",payReceipt:"To'lov cheki",
     iOwe:"Men qarzdorman",theyOwe:"Menga qarzdorlar",
     totalIOwe:"Jami men to'layman",totalTheyOwe:"Jami menga to'lashadi",
     overdueHistory:"Muddati o'tgan",
@@ -475,7 +475,7 @@ const T={
     logoutConfirm:'Are you sure you want to sign out?',logoutYes:'Yes, sign out',logoutNo:'Cancel',
     receivable:'They owe me',payable:'I owe',debtType:'Debt type',
     creditorName:'Creditor/Supplier',myDebts:'My debts',
-    receiptLabel:'Attach receipt',receiptAdded:'Receipt attached',viewReceipt:'View receipt',
+    receiptLabel:'Attach receipt',receiptAdded:'Receipt attached',viewReceipt:'View receipt',uploadedReceipts:'Uploaded receipts',debtReceipt:'Debt receipt',payReceipt:'Payment receipt',
     iOwe:'I owe',theyOwe:'They owe me',
     totalIOwe:'Total I owe',totalTheyOwe:'Total owed to me',
     overdueHistory:'Overdue',
@@ -500,16 +500,39 @@ const fmt=n=>Number(n??0).toLocaleString('ru-RU',{maximumFractionDigits:2});
 const fmtDate=str=>{if(!str||str==='—')return'—';const m=str.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[3]}.${m[2]}.${m[1]}`:str;};
 const todayStr=()=>new Date().toISOString().split('T')[0];
 
+async function compressImage(file){
+  if(!file.type.startsWith('image/'))return file;
+  return new Promise(res=>{
+    const img=new Image();const burl=URL.createObjectURL(file);
+    img.onload=()=>{
+      URL.revokeObjectURL(burl);
+      const canvas=document.createElement('canvas');
+      let w=img.width,h=img.height;
+      if(w>1200){h=Math.round(h*1200/w);w=1200;}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      canvas.toBlob(blob=>res(new File([blob],file.name.replace(/\.[^.]+$/,'.jpg'),{type:'image/jpeg'})),'image/jpeg',0.75);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(burl);res(file);};
+    img.src=burl;
+  });
+}
 async function uploadReceipt(file){
   if(!file)return{url:null,error:null};
   try{
-    const ext=file.name.split('.').pop().toLowerCase();
+    const compressed=await compressImage(file);
+    const ext=compressed.name.split('.').pop().toLowerCase();
     const name=`${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-    const{error}=await sb.storage.from('receipts').upload(name,file,{cacheControl:'3600',upsert:false});
+    const{error}=await sb.storage.from('receipts').upload(name,compressed,{cacheControl:'3600',upsert:false});
     if(error)return{url:null,error};
     const{data}=sb.storage.from('receipts').getPublicUrl(name);
     return{url:data?.publicUrl??null,error:null};
   }catch(e){return{url:null,error:e};}
+}
+function parseReceiptUrls(raw){
+  if(!raw)return[];
+  if(raw.startsWith('['))try{return JSON.parse(raw);}catch{}
+  return[raw];
 }
 
 function LogoutConfirmModal({t,onConfirm,onClose}){
@@ -937,7 +960,7 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
   const [f,setF]=useState({name:'',phone:'',amount:'',cat:t.cats[0],dateIssued:todayStr(),dueDate:'',comment:''});
   const [error,setError]=useState('');const [saving,setSaving]=useState(false);
   const [dupClient,setDupClient]=useState(null);
-  const [receiptFile,setReceiptFile]=useState(null);
+  const [receiptFiles,setReceiptFiles]=useState([]);
   const [receiptUploading,setReceiptUploading]=useState(false);
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
   const isPayable=debtType==='payable';
@@ -954,12 +977,16 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
     const clientName=nameOverride||f.name.trim();
     setSaving(true);
     let receiptUrl=null;
-    if(receiptFile){
+    if(receiptFiles.length>0){
       setReceiptUploading(true);
-      const res=await uploadReceipt(receiptFile);
+      const urls=[];
+      for(const rf of receiptFiles){
+        const res=await uploadReceipt(rf);
+        if(res?.error){setError('Ошибка загрузки чека. Создайте bucket «receipts» в Supabase Storage.');setReceiptUploading(false);setSaving(false);return;}
+        if(res?.url)urls.push(res.url);
+      }
       setReceiptUploading(false);
-      if(res?.error){setError('Ошибка загрузки чека. Создайте bucket «receipts» в Supabase Storage.');setSaving(false);return;}
-      receiptUrl=res?.url??null;
+      if(urls.length>0)receiptUrl=urls.length===1?urls[0]:JSON.stringify(urls);
     }
     const row={business_id:business.id,client_name:clientName,phone:f.phone.trim(),amount:+f.amount,date_issued:f.dateIssued,due_date:f.dueDate,category:f.cat,comment:f.comment.trim(),status:'active',paid_amount:0,debt_type:debtType};
     if(receiptUrl)row.receipt_url=receiptUrl;
@@ -1032,23 +1059,22 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
           <label>{t.comment}</label><textarea value={f.comment} onChange={e=>set('comment',e.target.value)} rows={2}/>
           {/* Receipt upload */}
           <div style={{marginTop:10}}>
-            {receiptFile?(
-              <div className="receipt-preview">
+            {receiptFiles.map((f,i)=>(
+              <div key={i} className="receipt-preview" style={{marginBottom:4}}>
                 <span style={{fontSize:18}}>🧾</span>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:12,fontWeight:600,color:'var(--green-t)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{receiptFile.name}</div>
-                  <div style={{fontSize:11,color:'var(--g400)'}}>{(receiptFile.size/1024).toFixed(1)} KB</div>
+                  <div style={{fontSize:12,fontWeight:600,color:'var(--green-t)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{f.name}</div>
+                  <div style={{fontSize:11,color:'var(--g400)'}}>{(f.size/1024).toFixed(1)} KB</div>
                 </div>
-                <button type="button" style={{background:'none',border:'none',cursor:'pointer',color:'var(--g400)',fontSize:18,padding:4}} onClick={()=>setReceiptFile(null)}>✕</button>
+                <button type="button" style={{background:'none',border:'none',cursor:'pointer',color:'var(--g400)',fontSize:18,padding:4}} onClick={()=>setReceiptFiles(p=>p.filter((_,j)=>j!==i))}>✕</button>
               </div>
-            ):(
-              <label className="receipt-upload" style={{cursor:'pointer'}}>
-                <input type="file" accept="image/*,application/pdf" style={{display:'none'}} onChange={e=>setReceiptFile(e.target.files?.[0]??null)}/>
-                <span style={{fontSize:18}}>📎</span>
-                <span style={{fontSize:13,color:'var(--g500)',fontWeight:500}}>{t.receiptLabel||'Прикрепить чек'}</span>
-                <span style={{marginLeft:'auto',fontSize:11,color:'var(--g300)'}}>JPG/PNG/PDF</span>
-              </label>
-            )}
+            ))}
+            <label className="receipt-upload" style={{cursor:'pointer',marginTop:receiptFiles.length>0?4:0}}>
+              <input type="file" accept="image/*,application/pdf" multiple style={{display:'none'}} onChange={e=>setReceiptFiles(p=>[...p,...Array.from(e.target.files||[])])}/>
+              <span style={{fontSize:18}}>📎</span>
+              <span style={{fontSize:13,color:'var(--g500)',fontWeight:500}}>{receiptFiles.length>0?('+ '+(t.receiptLabel||'Прикрепить чек')):(t.receiptLabel||'Прикрепить чек')}</span>
+              <span style={{marginLeft:'auto',fontSize:11,color:'var(--g300)'}}>JPG/PNG/PDF</span>
+            </label>
           </div>
           {error&&<div className="alert alert-error">{error}</div>}
           <div className="modal-footer">
@@ -1069,7 +1095,7 @@ function PayModal({debt,onClose,onSaved,t}){
   const [method,setMethod]=useState(t.cash);
   const [note,setNote]=useState('');
   const [error,setError]=useState('');const [saving,setSaving]=useState(false);
-  const [receiptFile,setReceiptFile]=useState(null);
+  const [receiptFiles,setReceiptFiles]=useState([]);
   async function submit(e){
     e.preventDefault();setError('');
     const amt=Number(amount);
@@ -1078,10 +1104,14 @@ function PayModal({debt,onClose,onSaved,t}){
     if(debt.date_issued&&actualDate<debt.date_issued){setError(t.dueDateError||'Дата оплаты не может быть раньше даты долга');return;}
     setSaving(true);
     let receiptUrl=null;
-    if(receiptFile){
-      const res=await uploadReceipt(receiptFile);
-      if(res?.error){setError('Ошибка загрузки чека. Создайте bucket «receipts» в Supabase Storage.');setSaving(false);return;}
-      receiptUrl=res?.url??null;
+    if(receiptFiles.length>0){
+      const urls=[];
+      for(const rf of receiptFiles){
+        const res=await uploadReceipt(rf);
+        if(res?.error){setError('Ошибка загрузки чека. Создайте bucket «receipts» в Supabase Storage.');setSaving(false);return;}
+        if(res?.url)urls.push(res.url);
+      }
+      if(urls.length>0)receiptUrl=urls.length===1?urls[0]:JSON.stringify(urls);
     }
     const payRow={debt_id:debt.id,amount:amt,paid_at:actualDate,expected_date:expectedDate,method,note};
     if(receiptUrl)payRow.receipt_url=receiptUrl;
@@ -1111,23 +1141,22 @@ function PayModal({debt,onClose,onSaved,t}){
           <label>{t.payNote}</label><input value={note} onChange={e=>setNote(e.target.value)}/>
           {/* Receipt upload */}
           <div style={{marginTop:10}}>
-            {receiptFile?(
-              <div className="receipt-preview">
+            {receiptFiles.map((f,i)=>(
+              <div key={i} className="receipt-preview" style={{marginBottom:4}}>
                 <span style={{fontSize:18}}>🧾</span>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:12,fontWeight:600,color:'var(--green-t)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{receiptFile.name}</div>
-                  <div style={{fontSize:11,color:'var(--g400)'}}>{(receiptFile.size/1024).toFixed(1)} KB</div>
+                  <div style={{fontSize:12,fontWeight:600,color:'var(--green-t)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{f.name}</div>
+                  <div style={{fontSize:11,color:'var(--g400)'}}>{(f.size/1024).toFixed(1)} KB</div>
                 </div>
-                <button type="button" style={{background:'none',border:'none',cursor:'pointer',color:'var(--g400)',fontSize:18,padding:4}} onClick={()=>setReceiptFile(null)}>✕</button>
+                <button type="button" style={{background:'none',border:'none',cursor:'pointer',color:'var(--g400)',fontSize:18,padding:4}} onClick={()=>setReceiptFiles(p=>p.filter((_,j)=>j!==i))}>✕</button>
               </div>
-            ):(
-              <label className="receipt-upload" style={{cursor:'pointer'}}>
-                <input type="file" accept="image/*,application/pdf" style={{display:'none'}} onChange={e=>setReceiptFile(e.target.files?.[0]??null)}/>
-                <span style={{fontSize:18}}>📎</span>
-                <span style={{fontSize:13,color:'var(--g500)',fontWeight:500}}>{t.receiptLabel||'Прикрепить чек'}</span>
-                <span style={{marginLeft:'auto',fontSize:11,color:'var(--g300)'}}>JPG/PNG/PDF</span>
-              </label>
-            )}
+            ))}
+            <label className="receipt-upload" style={{cursor:'pointer',marginTop:receiptFiles.length>0?4:0}}>
+              <input type="file" accept="image/*,application/pdf" multiple style={{display:'none'}} onChange={e=>setReceiptFiles(p=>[...p,...Array.from(e.target.files||[])])}/>
+              <span style={{fontSize:18}}>📎</span>
+              <span style={{fontSize:13,color:'var(--g500)',fontWeight:500}}>{receiptFiles.length>0?('+ '+(t.receiptLabel||'Прикрепить чек')):(t.receiptLabel||'Прикрепить чек')}</span>
+              <span style={{marginLeft:'auto',fontSize:11,color:'var(--g300)'}}>JPG/PNG/PDF</span>
+            </label>
           </div>
           {error&&<div className="alert alert-error">{error}</div>}
           <div className="modal-footer">
@@ -1238,10 +1267,11 @@ function PayHistoryModal({debt,onClose,t}){
                   </div>
                 </div>
                 {p.note&&<div style={{fontSize:11,color:'var(--g500)',marginTop:6,padding:'5px 8px',background:'var(--g50)',borderRadius:6,fontStyle:'italic'}}>"{p.note}"</div>}
-                {p.receipt_url&&(/\.(jpg|jpeg|png|gif|webp)/i.test(p.receipt_url)
-                  ?<img src={p.receipt_url} alt="receipt" onClick={()=>window.open(p.receipt_url,'_blank')} style={{marginTop:8,width:'100%',maxHeight:180,objectFit:'cover',borderRadius:8,cursor:'pointer',border:'1px solid var(--border)'}}/>
-                  :<a href={p.receipt_url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:6,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>
-                )}
+                {parseReceiptUrls(p.receipt_url).map((url,i)=>(
+                  /\.(jpg|jpeg|png|gif|webp)/i.test(url)
+                  ?<img key={i} src={url} alt="receipt" onClick={()=>window.open(url,'_blank')} style={{marginTop:8,width:'100%',maxHeight:180,objectFit:'cover',borderRadius:8,cursor:'pointer',border:'1px solid var(--border)'}}/>
+                  :<a key={i} href={url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:6,marginRight:6,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>
+                ))}
               </div>
             </div>
           ))}
@@ -1289,10 +1319,11 @@ function DebtCard({d,t,onPay,onDelete,onHistory,isPayable}){
         <span>{d.category}</span>
       </div>
       {d.comment&&<div style={{fontSize:12,color:'var(--g400)',marginTop:4,fontStyle:'italic'}}>{d.comment}</div>}
-      {d.receipt_url&&(/\.(jpg|jpeg|png|gif|webp)/i.test(d.receipt_url)
-        ?<img src={d.receipt_url} alt="receipt" onClick={()=>window.open(d.receipt_url,'_blank')} style={{marginTop:8,width:'100%',maxHeight:140,objectFit:'cover',borderRadius:8,cursor:'pointer',border:'1px solid var(--border)'}}/>
-        :<a href={d.receipt_url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:4,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>
-      )}
+      {parseReceiptUrls(d.receipt_url).map((url,i)=>(
+        /\.(jpg|jpeg|png|gif|webp)/i.test(url)
+        ?<img key={i} src={url} alt="receipt" onClick={()=>window.open(url,'_blank')} style={{marginTop:8,width:'100%',maxHeight:140,objectFit:'cover',borderRadius:8,cursor:'pointer',border:'1px solid var(--border)'}}/>
+        :<a key={i} href={url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:4,marginRight:6,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>
+      ))}
       <div className="debt-card-actions">
         {st!=='paid'&&<button className="btn btn-green" onClick={()=>onPay(d)}>💳 {t.confirmPay.replace('✓ ','')}</button>}
         <button className="btn btn-sm" onClick={()=>onHistory(d)}>📋</button>
@@ -1508,7 +1539,7 @@ function DebtsPage({t}){
                     {isPayable&&<span style={{fontSize:12,background:'var(--green-bg)',color:'var(--green-t)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0}}>📤</span>}
                     <div><div style={{fontWeight:600}}>{d.client_name}</div>{d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}</div>
                   </div>
-                  {d.receipt_url&&<a href={d.receipt_url} target="_blank" rel="noreferrer" style={{fontSize:11,color:'var(--primary)',display:'inline-flex',alignItems:'center',gap:3,marginTop:2}}>🧾 чек</a>}
+                  {parseReceiptUrls(d.receipt_url).map((url,i)=><a key={i} href={url} target="_blank" rel="noreferrer" style={{fontSize:11,color:'var(--primary)',display:'inline-flex',alignItems:'center',gap:3,marginTop:2,marginRight:4}}>🧾 чек{parseReceiptUrls(d.receipt_url).length>1?` ${i+1}`:''}</a>)}
                 </td>
                 <td style={{color:'var(--g500)'}}>{d.phone}</td>
                 <td style={{fontWeight:600}}>{fmt(d.amount)}</td>
