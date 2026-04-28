@@ -121,7 +121,7 @@ tr:hover td{background:#FAFBFF}
 .logout-btn{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.4);cursor:pointer;width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .12s;flex-shrink:0}
 .logout-btn:hover{background:rgba(255,255,255,.15);color:#fff}
 .main{flex:1;margin-left:var(--sidebar-w);overflow-y:auto;min-width:0}
-.main-inner{padding:24px;max-width:1100px}
+.main-inner{padding:24px}
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:10px;flex-wrap:wrap}
 .page-title{font-size:20px;font-weight:800;color:var(--g900);letter-spacing:-.02em}
 .page-sub{font-size:12px;color:var(--g400);margin-top:2px}
@@ -331,10 +331,12 @@ const T={
     receiptLabel:'Чек замимакунӣ',receiptAdded:'Чек замима шуд',viewReceipt:'Чекро бинед',
     iOwe:'Ман қарздорам',theyOwe:'Ба ман қарздоранд',
     totalIOwe:'Ман бояд',totalTheyOwe:'Ба ман бояд',
-    overdueHistory:'Таърихи қарздорони мӯҳлатгузошта',
+    overdueHistory:'Мӯҳлатгузашта',
     totalReceivable:'Маблағи гирифтанӣ',totalPayable:'Маблағи пардохтанӣ',
     contactDev:'Тамос бо сайтсоз',usersCount:'Корбарон',totalActiveSum:'Умумии фаъол',
     loginError:'Email ё рамз нодуруст аст',
+    newPass:'Рамзи нав',confirmPass:'Тасдиқи рамз',passNoMatch:'Рамзҳо мувофиқ нестанд',updatePass:'Навсозии рамз',passUpdated:'Рамз навсозӣ шуд ✓',
+    offerOld:'Аккаунти кӯҳна',
   },
   ru:{
     appName:'Мой долг',appSub:'Учёт задолженностей',
@@ -378,10 +380,12 @@ const T={
     receiptLabel:'Прикрепить чек',receiptAdded:'Чек прикреплён',viewReceipt:'Просмотреть чек',
     iOwe:'Я должен',theyOwe:'Мне должны',
     totalIOwe:'Итого должен',totalTheyOwe:'Итого должны мне',
-    overdueHistory:'Просроченные долги',
+    overdueHistory:'Просроченные',
     totalReceivable:'К получению',totalPayable:'Должен выплатить',
     contactDev:'Связаться с разработчиком',usersCount:'Пользователей',totalActiveSum:'Общая сумма',
     loginError:'Неверный email или пароль',
+    newPass:'Новый пароль',confirmPass:'Подтвердить пароль',passNoMatch:'Пароли не совпадают',updatePass:'Обновить пароль',passUpdated:'Пароль обновлён ✓',
+    offerOld:'Старый аккаунт',
   },
   uz:{
     appName:'Mening qarzim',appSub:'Qarz hisobi',
@@ -425,10 +429,12 @@ const T={
     receiptLabel:"Chek biriktirish",receiptAdded:"Chek biriktirildi",viewReceipt:"Chekni ko'rish",
     iOwe:"Men qarzdorman",theyOwe:"Menga qarzdorlar",
     totalIOwe:"Jami men to'layman",totalTheyOwe:"Jami menga to'lashadi",
-    overdueHistory:"Muddati o'tgan qarzlar",
+    overdueHistory:"Muddati o'tgan",
     totalReceivable:"Olinadigan summa",totalPayable:"To'lanadigan summa",
     contactDev:"Dasturchi bilan bog'lanish",usersCount:"Foydalanuvchilar",totalActiveSum:"Umumiy summa",
     loginError:"Email yoki parol noto'g'ri",
+    newPass:"Yangi parol",confirmPass:"Parolni tasdiqlash",passNoMatch:"Parollar mos kelmadi",updatePass:"Parolni yangilash",passUpdated:"Parol yangilandi ✓",
+    offerOld:"Eski hisob",
   },
   en:{
     appName:'My Debt',appSub:'Debt management',
@@ -472,10 +478,12 @@ const T={
     receiptLabel:'Attach receipt',receiptAdded:'Receipt attached',viewReceipt:'View receipt',
     iOwe:'I owe',theyOwe:'They owe me',
     totalIOwe:'Total I owe',totalTheyOwe:'Total owed to me',
-    overdueHistory:'Overdue debts',
+    overdueHistory:'Overdue',
     totalReceivable:'To receive',totalPayable:'To pay',
     contactDev:'Contact developer',usersCount:'Users',totalActiveSum:'Total active',
     loginError:'Invalid email or password',
+    newPass:'New password',confirmPass:'Confirm password',passNoMatch:'Passwords do not match',updatePass:'Update password',passUpdated:'Password updated ✓',
+    offerOld:'Legacy account',
   }
 };
 
@@ -493,15 +501,15 @@ const fmtDate=str=>{if(!str||str==='—')return'—';const m=str.match(/^(\d{4})
 const todayStr=()=>new Date().toISOString().split('T')[0];
 
 async function uploadReceipt(file){
-  if(!file)return null;
+  if(!file)return{url:null,error:null};
   try{
     const ext=file.name.split('.').pop().toLowerCase();
     const name=`${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
     const{error}=await sb.storage.from('receipts').upload(name,file,{cacheControl:'3600',upsert:false});
-    if(error)return null;
+    if(error)return{url:null,error};
     const{data}=sb.storage.from('receipts').getPublicUrl(name);
-    return data?.publicUrl??null;
-  }catch{return null;}
+    return{url:data?.publicUrl??null,error:null};
+  }catch(e){return{url:null,error:e};}
 }
 
 function LogoutConfirmModal({t,onConfirm,onClose}){
@@ -946,7 +954,13 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
     const clientName=nameOverride||f.name.trim();
     setSaving(true);
     let receiptUrl=null;
-    if(receiptFile){setReceiptUploading(true);receiptUrl=await uploadReceipt(receiptFile);setReceiptUploading(false);}
+    if(receiptFile){
+      setReceiptUploading(true);
+      const res=await uploadReceipt(receiptFile);
+      setReceiptUploading(false);
+      if(res?.error){setError('Ошибка загрузки чека. Создайте bucket «receipts» в Supabase Storage.');setSaving(false);return;}
+      receiptUrl=res?.url??null;
+    }
     const row={business_id:business.id,client_name:clientName,phone:f.phone.trim(),amount:+f.amount,date_issued:f.dateIssued,due_date:f.dueDate,category:f.cat,comment:f.comment.trim(),status:'active',paid_amount:0,debt_type:debtType};
     if(receiptUrl)row.receipt_url=receiptUrl;
     const{error:err}=await sb.from('debts').insert(row);
@@ -1061,9 +1075,14 @@ function PayModal({debt,onClose,onSaved,t}){
     const amt=Number(amount);
     if(!amt||amt<=0){setError(t.minPay);return;}
     if(amt>remaining+0.01){setError(t.maxPay+': '+fmt(remaining)+' '+t.sum);return;}
+    if(debt.date_issued&&actualDate<debt.date_issued){setError(t.dueDateError||'Дата оплаты не может быть раньше даты долга');return;}
     setSaving(true);
     let receiptUrl=null;
-    if(receiptFile)receiptUrl=await uploadReceipt(receiptFile);
+    if(receiptFile){
+      const res=await uploadReceipt(receiptFile);
+      if(res?.error){setError('Ошибка загрузки чека. Создайте bucket «receipts» в Supabase Storage.');setSaving(false);return;}
+      receiptUrl=res?.url??null;
+    }
     const payRow={debt_id:debt.id,amount:amt,paid_at:actualDate,expected_date:expectedDate,method,note};
     if(receiptUrl)payRow.receipt_url=receiptUrl;
     await sb.from('payments').insert(payRow);
@@ -1085,7 +1104,7 @@ function PayModal({debt,onClose,onSaved,t}){
           <label>{t.payAmount} *</label><input type="number" value={amount} onChange={e=>setAmount(e.target.value)} min="0.01" step="0.01" inputMode="decimal" autoFocus style={{fontSize:16}}/>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
             <div><label>{t.expectedDate}</label><input type="date" value={expectedDate} onChange={e=>setExpectedDate(e.target.value)}/></div>
-            <div><label>{t.actualDate}</label><input type="date" value={actualDate} onChange={e=>setActualDate(e.target.value)}/></div>
+            <div><label>{t.actualDate}</label><input type="date" value={actualDate} min={debt.date_issued||undefined} onChange={e=>setActualDate(e.target.value)}/></div>
           </div>
           <label>{t.payMethod}</label>
           <select value={method} onChange={e=>setMethod(e.target.value)}>{[t.cash,t.transfer,t.card,t.other].map(m=><option key={m}>{m}</option>)}</select>
@@ -1219,7 +1238,10 @@ function PayHistoryModal({debt,onClose,t}){
                   </div>
                 </div>
                 {p.note&&<div style={{fontSize:11,color:'var(--g500)',marginTop:6,padding:'5px 8px',background:'var(--g50)',borderRadius:6,fontStyle:'italic'}}>"{p.note}"</div>}
-                {p.receipt_url&&<a href={p.receipt_url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:6,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>}
+                {p.receipt_url&&(/\.(jpg|jpeg|png|gif|webp)/i.test(p.receipt_url)
+                  ?<img src={p.receipt_url} alt="receipt" onClick={()=>window.open(p.receipt_url,'_blank')} style={{marginTop:8,width:'100%',maxHeight:180,objectFit:'cover',borderRadius:8,cursor:'pointer',border:'1px solid var(--border)'}}/>
+                  :<a href={p.receipt_url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:6,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>
+                )}
               </div>
             </div>
           ))}
@@ -1267,7 +1289,10 @@ function DebtCard({d,t,onPay,onDelete,onHistory,isPayable}){
         <span>{d.category}</span>
       </div>
       {d.comment&&<div style={{fontSize:12,color:'var(--g400)',marginTop:4,fontStyle:'italic'}}>{d.comment}</div>}
-      {d.receipt_url&&<a href={d.receipt_url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:4,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>}
+      {d.receipt_url&&(/\.(jpg|jpeg|png|gif|webp)/i.test(d.receipt_url)
+        ?<img src={d.receipt_url} alt="receipt" onClick={()=>window.open(d.receipt_url,'_blank')} style={{marginTop:8,width:'100%',maxHeight:140,objectFit:'cover',borderRadius:8,cursor:'pointer',border:'1px solid var(--border)'}}/>
+        :<a href={d.receipt_url} target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:12,color:'var(--primary)',marginTop:4,textDecoration:'none',fontWeight:500}}>🧾 {t.viewReceipt||'Просмотреть чек'}</a>
+      )}
       <div className="debt-card-actions">
         {st!=='paid'&&<button className="btn btn-green" onClick={()=>onPay(d)}>💳 {t.confirmPay.replace('✓ ','')}</button>}
         <button className="btn btn-sm" onClick={()=>onHistory(d)}>📋</button>
@@ -1873,7 +1898,7 @@ function AdminPage({t}){
               <div style={{fontSize:12,color:'var(--g400)',marginTop:2}}>{b.type} · {b.created_at?.slice(0,10)}</div>
               {offerAt
                 ?<div style={{fontSize:11,color:'var(--green-t)',marginTop:2,fontWeight:600}}>✅ {t.offerConfirmed} · {offerAt.slice(0,10)}</div>
-                :<div style={{fontSize:11,color:'var(--red)',marginTop:2,fontWeight:600}}>⚠️ {t.offerNotConfirmed}</div>}
+                :<div style={{fontSize:11,color:'var(--g400)',marginTop:2,fontWeight:500}}>📅 {t.offerOld||'Старый аккаунт'}</div>}
             </div>
             <div style={{display:'flex',gap:12,alignItems:'center',flexShrink:0}}>
               <div style={{textAlign:'right'}}>
@@ -2017,7 +2042,6 @@ function MobileNav({page,setPage,overdueCount,t,isAdmin,business,onRefresh}){
     {id:'dashboard',icon:IC.dashboard,label:t.dashboard},
     {id:'debts',icon:IC.debts,label:t.debts,badge:overdueCount},
     {id:'clients',icon:IC.clients,label:t.clients},
-    {id:'overdueHistory',icon:IC.warning,label:t.overdueHistory},
     {id:'settings',icon:IC.settings,label:t.settingsTitle},
   ];
   function openAdd(type){setFabOpen(false);setAddType(type);setTimeout(()=>setAddOpen(true),120);}
@@ -2136,6 +2160,51 @@ function GlobalFAB({t,business,onRefresh}){
   );
 }
 
+function PasswordResetPage({t,lang,setLang,onDone}){
+  const [pass,setPass]=useState('');const [confirm,setConfirm]=useState('');
+  const [error,setError]=useState('');const [loading,setLoading]=useState(false);const [done,setDone]=useState(false);
+  const langs=[{k:'tg',l:'Тоҷ'},{k:'ru',l:'Рус'},{k:'uz',l:'Ўзб'},{k:'en',l:'Eng'}];
+  async function submit(e){
+    e.preventDefault();setError('');
+    if(pass.length<8){setError(t.passMin8||'Минимум 8 символов');return;}
+    if(pass!==confirm){setError(t.passNoMatch||'Пароли не совпадают');return;}
+    setLoading(true);
+    const{error:err}=await sb.auth.updateUser({password:pass});
+    if(err){setError(err.message);}else{setDone(true);setTimeout(onDone,2000);}
+    setLoading(false);
+  }
+  return(
+    <div style={{minHeight:'100vh',background:'var(--g900)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
+      <div style={{background:'#fff',borderRadius:'var(--r-xl)',padding:'32px 28px',width:'100%',maxWidth:380,boxShadow:'var(--shadow-lg)'}}>
+        <div style={{display:'flex',justifyContent:'center',gap:4,marginBottom:20}}>
+          {langs.map(l=><button key={l.k} onClick={()=>setLang(l.k)} style={{padding:'5px 10px',border:'1.5px solid',borderColor:lang===l.k?'var(--primary)':'var(--g200)',borderRadius:8,fontSize:11,fontWeight:700,cursor:'pointer',background:lang===l.k?'var(--primary)':'#fff',color:lang===l.k?'#fff':'var(--g400)'}}>{l.l}</button>)}
+        </div>
+        {done?(
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:48,marginBottom:12}}>✅</div>
+            <div style={{fontSize:17,fontWeight:800,color:'var(--g900)'}}>{t.passUpdated||'Пароль обновлён ✓'}</div>
+          </div>
+        ):(
+          <>
+            <div style={{textAlign:'center',marginBottom:20}}>
+              <div style={{fontSize:32,marginBottom:8}}>🔐</div>
+              <div style={{fontSize:18,fontWeight:800,color:'var(--g900)'}}>{t.updatePass||'Обновить пароль'}</div>
+            </div>
+            <form onSubmit={submit}>
+              <label>{t.newPass||'Новый пароль'}</label>
+              <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="min 8" minLength={8} autoFocus required/>
+              <label>{t.confirmPass||'Подтвердить пароль'}</label>
+              <input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="••••••••" required/>
+              {error&&<div className="alert alert-error" style={{marginTop:10}}>{error}</div>}
+              <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={loading}>{loading?'...':t.updatePass||'Обновить пароль'}</button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const PAGES={dashboard:Dashboard,debts:DebtsPage,clients:ClientsPage,overdueHistory:OverdueHistoryPage,settings:SettingsPage,admin:AdminPage};
 function App(){
   const [session,setSession]=useState(undefined);
@@ -2146,28 +2215,40 @@ function App(){
   const [toastState,setToast]=useState(null);
   const [overdueCount,setOverdueCount]=useState(0);
   const [isAdmin,setIsAdmin]=useState(false);
+  const [resetMode,setResetMode]=useState(false);
   _toast=setToast;const t=T[lang];
 
   useEffect(()=>{try{localStorage.setItem('appLang',lang);}catch{}},[lang]);
   useEffect(()=>{
     sb.auth.getSession().then(({data:{session}})=>setSession(session));
-    const{data:{subscription}}=sb.auth.onAuthStateChange((_,s)=>setSession(s));
+    const{data:{subscription}}=sb.auth.onAuthStateChange((event,s)=>{
+      if(event==='PASSWORD_RECOVERY')setResetMode(true);
+      setSession(s);
+    });
     return()=>subscription.unsubscribe();
   },[]);
   useEffect(()=>{
     if(!session){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);return;}
-    // Load ALL businesses for this user
-    sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true})
-      .then(({data})=>{
-        const list=data??[];
-        setAllBusinesses(list);
-        // Restore last selected business from localStorage
-        try{
-          const lastId=localStorage.getItem('lastBizId');
-          const found=list.find(b=>b.id===lastId);
-          setBusiness(found||list[0]||null);
-        }catch{setBusiness(list[0]||null);}
-      });
+    (async()=>{
+      const{data}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
+      let list=data??[];
+      if(list.length===0){
+        const meta=session.user.user_metadata||{};
+        const bizName=meta.biz_name||meta.full_name;
+        if(bizName){
+          const{data:newBiz}=await sb.from('businesses').insert({
+            owner_id:session.user.id,name:bizName,
+            type:meta.biz_type||'Бизнес',
+            offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
+            offer_accepted:true,is_active:true
+          }).select().single();
+          if(newBiz)list=[newBiz];
+        }
+      }
+      setAllBusinesses(list);
+      try{const lastId=localStorage.getItem('lastBizId');const found=list.find(b=>b.id===lastId);setBusiness(found||list[0]||null);}
+      catch{setBusiness(list[0]||null);}
+    })();
     sb.from('admins').select('email').eq('email',session.user.email).single()
       .then(({data})=>setIsAdmin(!!data));
   },[session]);
@@ -2188,6 +2269,7 @@ function App(){
 
   if(session===undefined)return<div className="loading-wrap" style={{minHeight:'100vh'}}><div className="spinner"/></div>;
   if(!session)return<AuthPage lang={lang} setLang={setLang}/>;
+  if(resetMode)return<PasswordResetPage t={t} lang={lang} setLang={setLang} onDone={()=>setResetMode(false)}/>;
   const Page=PAGES[page]??Dashboard;
   return(
     <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses}}>
