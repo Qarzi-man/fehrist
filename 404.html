@@ -1553,7 +1553,7 @@ function Dashboard({t}){
               return<tr key={d.id}>
                 <td>
                   <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:2}}>
-                    <span style={{fontSize:10,background:_pay?'var(--green-bg)':'var(--primary-bg)',color:_pay?'var(--green-t)':'var(--primary)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0,whiteSpace:'nowrap'}}>{_pay?t.iOwe:t.theyOwe}</span>
+                    <span style={{fontSize:10,background:_pay?'var(--green-bg)':'var(--primary-bg)',color:_pay?'var(--green-t)':'var(--primary)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0,whiteSpace:'nowrap'}}>{_pay?('📤 '+t.iOwe):('💰 '+t.theyOwe)}</span>
                     <div style={{fontWeight:600}}>{d.client_name}</div>
                   </div>
                   <div style={{fontSize:11,color:'var(--g400)'}}>{d.category}</div>
@@ -1868,8 +1868,15 @@ function OverdueHistoryPage({t}){
             <tbody>{overdue.map(d=>{
               const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
               const dPay=payments.filter(p=>p.debt_id===d.id);
+              const _pay=d.debt_type==='payable';
               return<tr key={d.id}>
-                <td><div style={{fontWeight:700}}>{d.client_name}</div>{d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}</td>
+                <td>
+                  <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:2}}>
+                    <span style={{fontSize:10,background:_pay?'var(--green-bg)':'var(--primary-bg)',color:_pay?'var(--green-t)':'var(--primary)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0,whiteSpace:'nowrap'}}>{_pay?('📤 '+t.iOwe):('💰 '+t.theyOwe)}</span>
+                    <div style={{fontWeight:700}}>{d.client_name}</div>
+                  </div>
+                  {d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}
+                </td>
                 <td style={{color:'var(--g500)'}}>{d.phone}</td>
                 <td style={{fontWeight:800,color:'var(--red)',fontSize:15}}>{fmt(rem)} {t.sum}</td>
                 <td><strong style={{color:'var(--red)',fontSize:14}}>{ov} {t.days}</strong></td>
@@ -1883,9 +1890,16 @@ function OverdueHistoryPage({t}){
             {overdue.map(d=>{
               const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
               const dPay=payments.filter(p=>p.debt_id===d.id);
+              const _payC=d.debt_type==='payable';
               return<div key={d.id} className="debt-card" style={{borderLeft:'3px solid var(--red)'}}>
                 <div className="debt-card-top">
-                  <div><div className="debt-card-name">{d.client_name}</div><div className="debt-card-phone">{d.phone}</div></div>
+                  <div>
+                    <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:3}}>
+                      <span style={{fontSize:10,background:_payC?'var(--green-bg)':'var(--primary-bg)',color:_payC?'var(--green-t)':'var(--primary)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0,whiteSpace:'nowrap'}}>{_payC?('📤 '+t.iOwe):('💰 '+t.theyOwe)}</span>
+                    </div>
+                    <div className="debt-card-name">{d.client_name}</div>
+                    <div className="debt-card-phone">{d.phone}</div>
+                  </div>
                   <div className="debt-card-amount">
                     <div className="debt-card-sum">{fmt(rem)}</div>
                     <div style={{fontSize:11,color:'var(--g400)'}}>{t.sum}</div>
