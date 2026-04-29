@@ -282,7 +282,7 @@ tr:hover td{background:#FAFBFF}
 <script type="text/babel">
 const {createClient}=supabase;
 const sb=createClient('https://fortxhggcnvbhrapkaul.supabase.co','sb_publishable_wpL9aGzMTm4GdKyv9TUe5A_UMmkQAqq');
-const {useState,useEffect,useMemo,createContext,useContext}=React;
+const {useState,useEffect,useMemo,createContext,useContext,useRef}=React;
 const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 let _toast=null;
@@ -811,7 +811,14 @@ function LoginForm({t,onSwitch}){
 // ── Оферта Modal ──
 function OfferModal({t,onAccept,onClose,initialLang}){
   const [scrolled,setScrolled]=useState(false);
+  const scrollRef=useRef(null);
   function onScroll(e){const el=e.target;if(el.scrollTop+el.clientHeight>=el.scrollHeight-20)setScrolled(true);}
+  useEffect(()=>{
+    const el=scrollRef.current;
+    if(!el)return;
+    // если контент помещается без скролла — сразу разблокировать кнопку
+    if(el.scrollHeight<=el.clientHeight+10)setScrolled(true);
+  },[]);
   const offerTexts={
     tg:[
       {n:'1. Мавзӯи шартнома',t:'Оферта-шартномаи мазкур тартиби истифодаи хидмати «Қарзи ман»-ро барои ҳисобдории қарзҳо (додашуда ва гирифташуда) муайян мекунад. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) дастрасиро ба хидмат мувофиқи шартҳои шартномаи мазкур таъмин мекунад.'},
@@ -867,9 +874,9 @@ function OfferModal({t,onAccept,onClose,initialLang}){
             </div>
           </div>
         </div>
-        <div onScroll={onScroll} style={{flex:1,overflowY:'auto',padding:'14px 16px',fontSize:13,lineHeight:1.7,color:'var(--g700)'}}>
+        <div ref={scrollRef} onScroll={onScroll} style={{flex:1,overflowY:'auto',padding:'14px 16px',fontSize:13,lineHeight:1.7,color:'var(--g700)'}}>
           {paragraphs.map((p,i)=><div key={i} style={{marginBottom:14}}><div style={{fontWeight:700,color:'var(--g800)',marginBottom:4}}>{p.n}</div><div style={{color:'var(--g600)'}}>{p.t}</div></div>)}
-          {!scrolled&&<div style={{textAlign:'center',color:'var(--g400)',fontSize:12,marginTop:8,padding:'8px',background:'var(--g50)',borderRadius:8}}>⬇️</div>}
+          {!scrolled&&<div style={{textAlign:'center',color:'var(--g400)',fontSize:12,marginTop:8,padding:'8px',background:'var(--g50)',borderRadius:8}}>⬇️ Прокрутите вниз</div>}
         </div>
         <div style={{padding:'12px 16px 28px',borderTop:'1px solid var(--border)',flexShrink:0,display:'flex',gap:8}}>
           <button className="btn" style={{flex:1,padding:'12px'}} onClick={onClose}>{(T[offerLang]||T.ru).offerBack}</button>
@@ -1354,8 +1361,8 @@ function Dashboard({t}){
           :<div>{debts.slice(0,6).map(d=>{const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);const isPayable=d.debt_type==='payable';
             return<div key={d.id} style={{display:'flex',alignItems:'center',padding:'11px 16px',borderBottom:'1px solid var(--border)',gap:12}}>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{display:'flex',alignItems:'center',gap:5}}>
-                  <span style={{fontSize:10,background:isPayable?'var(--green-bg)':'var(--primary-bg)',color:isPayable?'var(--green-t)':'var(--primary)',padding:'1px 5px',borderRadius:4,fontWeight:700,flexShrink:0}}>{isPayable?'📤':'💰'}</span>
+                <div style={{display:'flex',alignItems:'center',gap:5,flexWrap:'wrap'}}>
+                  <span style={{fontSize:10,background:isPayable?'var(--green-bg)':'var(--primary-bg)',color:isPayable?'var(--green-t)':'var(--primary)',padding:'2px 7px',borderRadius:4,fontWeight:700,flexShrink:0,whiteSpace:'nowrap'}}>{isPayable?t.iOwe:t.theyOwe}</span>
                   <div style={{fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.client_name}</div>
                 </div>
                 <div style={{fontSize:11,color:'var(--g400)',marginTop:1}}>{d.phone} · {fmtDate(d.due_date)}</div>
@@ -1570,6 +1577,7 @@ function ClientsPage({t}){
               <th style={{minWidth:140}}>{t.clientName}</th>
               <th style={{minWidth:110}}>{t.phone}</th>
               <th style={{width:50,textAlign:'center'}}>#</th>
+              <th style={{minWidth:110}}>{t.totalDebt}</th>
               <th style={{minWidth:110}}>{t.remaining}</th>
               <th style={{minWidth:100}}>{t.paidDebts}</th>
               <th style={{width:80,textAlign:'center'}}>{t.days}</th>
@@ -1577,6 +1585,7 @@ function ClientsPage({t}){
             </tr></thead>
             <tbody>{clients.map(c=>{
               const active=c.debts.filter(d=>getStatus(d)!=='paid');const paidD=c.debts.filter(d=>getStatus(d)==='paid');
+              const totalDebt=c.debts.reduce((s,d)=>s+Number(d.amount),0);
               const actSum=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);const paidSum=paidD.reduce((s,d)=>s+Number(d.amount),0);
               const hasOv=active.some(d=>getStatus(d)==='overdue');const maxOv=Math.max(0,...active.filter(d=>getStatus(d)==='overdue').map(d=>daysOverdue(d)));
               const cat=getOverdueCat(maxOv,t);const init=c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
@@ -1587,6 +1596,7 @@ function ClientsPage({t}){
                 </div></td>
                 <td style={{color:'var(--g500)',fontSize:11}}>{c.phone}</td>
                 <td style={{textAlign:'center',color:'var(--g500)'}}>{c.debts.length}</td>
+                <td style={{fontWeight:600,color:'var(--g700)',fontSize:12}}>{fmt(totalDebt)}</td>
                 <td style={{fontWeight:700,color:actSum>0?'var(--red)':'var(--g400)',fontSize:12}}>{fmt(actSum)}</td>
                 <td style={{color:'var(--green)',fontWeight:600,fontSize:12}}>{fmt(paidSum)}</td>
                 <td style={{textAlign:'center'}}>{maxOv>0&&cat?<span className={`pill ${cat.cls}`} style={{fontSize:10,padding:'2px 7px'}}>{maxOv}{t.days}</span>:<span style={{color:'var(--g300)'}}>—</span>}</td>
