@@ -542,7 +542,13 @@ function getOverdueCat(days,t){
   return{label:t.cat5,cls:'cat-5'};
 }
 function stLabel(st,t){return{active:t.active,due:t.dueSoon,overdue:t.overdue,paid:t.paid,partial:t.partial}[st]??st;}
-function formatPhone(v){return v.replace(/\D/g,'').slice(0,15);}
+function formatPhone(v){
+  let d=v.replace(/\D/g,'');
+  if(d.startsWith('992'))d=d.slice(0,12);
+  else if(d.startsWith('0'))d='992'+d.slice(1,10);
+  else d='992'+d.slice(0,9);
+  return d.length>=3?'+'+d:'+992';
+}
 function exportToExcel(debts,bizName,t){
   const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
   const headers=[t.clientName,t.phone,t.amount,t.paid,t.remaining,t.dateIssued,t.dueDate,t.category,t.comment];
@@ -976,7 +982,7 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
   async function submit(e){
     e.preventDefault();setError('');
     if(!f.name.trim()){setError(nameLabel+'!');return;}
-    if(!f.phone||f.phone.length<7){setError(t.phone+'!');return;}
+    if(!f.phone||!/^\+992\d{9}$/.test(f.phone)){setError(t.phone+' (+992XXXXXXXXX)');return;}
     if(!f.amount||+f.amount<=0){setError(t.amount+'!');return;}
     if(!f.dateIssued){setError(t.dateIssued+'!');return;}
     if(!f.dueDate){setError(t.dueDate+'!');return;}
@@ -1007,7 +1013,7 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
         )}
         <form onSubmit={submit}>
           <label>{nameLabel} *</label><input value={f.name} onChange={e=>set('name',e.target.value)} autoFocus style={{fontSize:16}}/>
-          <label>{t.phone} *</label><input type="tel" value={f.phone} onChange={e=>checkPhone(formatPhone(e.target.value))} placeholder="+992XXXXXXXXX" inputMode="numeric" maxLength={15} style={{fontSize:16}}/>
+          <label>{t.phone} *</label><input type="tel" value={f.phone} onChange={e=>checkPhone(formatPhone(e.target.value))} placeholder="+992901234567" inputMode="numeric" maxLength={13} style={{fontSize:16}}/>
           {dupClient&&(
             <div style={{background:'var(--amber-bg)',border:'1px solid #FDE68A',borderRadius:'var(--r)',padding:'10px 12px',marginTop:8,fontSize:13}}>
               <div style={{fontWeight:700,color:'var(--amber-t)',marginBottom:4}}>⚠️ {t.dupPhone}</div>
@@ -1277,7 +1283,10 @@ function QuickPayModal({debts,onClose,onPaid,t}){
             const st=getStatus(d);
             return<div key={d.id} onClick={()=>setSelected(d)} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 4px',borderBottom:'1px solid var(--border)',cursor:'pointer'}}>
               <div>
-                <div style={{fontWeight:700,fontSize:14}}>{d.client_name}</div>
+                <div style={{display:'flex',alignItems:'center',gap:5,flexWrap:'wrap',marginBottom:2}}>
+                  <span style={{fontSize:10,background:d.debt_type==='payable'?'var(--green-bg)':'var(--primary-bg)',color:d.debt_type==='payable'?'var(--green-t)':'var(--primary)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0,whiteSpace:'nowrap'}}>{d.debt_type==='payable'?t.iOwe:t.theyOwe}</span>
+                  <div style={{fontWeight:700,fontSize:14}}>{d.client_name}</div>
+                </div>
                 <div style={{fontSize:12,color:'var(--g400)'}}>{d.phone}</div>
               </div>
               <div style={{textAlign:'right'}}>
@@ -1383,9 +1392,15 @@ function Dashboard({t}){
           <div className="card-header"><div><div style={{display:"flex",alignItems:"center",gap:7}}><span style={{color:"var(--red)"}}>{IC.warning}</span><div className="card-title">{t.overdueDebts}</div></div><div className="card-sub">{overdue.length}</div></div><button className="btn btn-sm export-excel-btn" onClick={()=>exportToExcel(overdue,business?.name+'_ov',t)} style={{alignItems:'center',gap:5}}>{IC.excel}<span>{t.exportExcel.replace('📥 ','')}</span></button></div>
           <div className="table-wrap"><table>
             <thead><tr><th>{t.clientName}</th><th>{t.remaining}</th><th>{t.days}</th><th>{t.overdueClass}</th><th>{t.phone}</th><th></th></tr></thead>
-            <tbody>{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=>{const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);const rem=Number(d.amount)-Number(d.paid_amount??0);
+            <tbody>{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=>{const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);const rem=Number(d.amount)-Number(d.paid_amount??0);const _pay=d.debt_type==='payable';
               return<tr key={d.id}>
-                <td><div style={{fontWeight:600}}>{d.client_name}</div><div style={{fontSize:11,color:'var(--g400)'}}>{d.category}</div></td>
+                <td>
+                  <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:2}}>
+                    <span style={{fontSize:10,background:_pay?'var(--green-bg)':'var(--primary-bg)',color:_pay?'var(--green-t)':'var(--primary)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0,whiteSpace:'nowrap'}}>{_pay?t.iOwe:t.theyOwe}</span>
+                    <div style={{fontWeight:600}}>{d.client_name}</div>
+                  </div>
+                  <div style={{fontSize:11,color:'var(--g400)'}}>{d.category}</div>
+                </td>
                 <td style={{fontWeight:700,color:'var(--red)'}}>{fmt(rem)} {t.sum}</td>
                 <td><strong style={{color:'var(--red)'}}>{ov} {t.days}</strong></td>
                 <td>{cat&&<span className={`pill ${cat.cls}`}>{cat.label}</span>}</td>
