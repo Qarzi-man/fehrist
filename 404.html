@@ -1805,11 +1805,20 @@ function ClientsPage({t}){
           </table></div>
           <div className="debt-cards">{clients.map(c=>{
             const active=c.debts.filter(d=>getStatus(d)!=='paid');const actSum=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);const hasOv=active.some(d=>getStatus(d)==='overdue');const init=c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+            const hasRec=c.debts.some(d=>(d.debt_type||'receivable')==='receivable');
+            const hasPay=c.debts.some(d=>d.debt_type==='payable');
             return<div key={c.phone} className="debt-card">
               <div className="debt-card-top">
                 <div style={{display:'flex',alignItems:'center',gap:10}}>
                   <div style={{width:40,height:40,borderRadius:10,background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)',color:'var(--primary)',fontSize:14,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid var(--border)'}}>{init}</div>
-                  <div><div className="debt-card-name">{c.name}</div><div className="debt-card-phone">{c.phone}</div></div>
+                  <div>
+                    <div className="debt-card-name">{c.name}</div>
+                    <div className="debt-card-phone">{c.phone}</div>
+                    <div style={{display:'flex',gap:4,marginTop:3,flexWrap:'wrap'}}>
+                      {hasRec&&<span style={{fontSize:10,background:'var(--primary-bg)',color:'var(--primary)',padding:'1px 6px',borderRadius:4,fontWeight:700}}>💰 {t.theyOwe}</span>}
+                      {hasPay&&<span style={{fontSize:10,background:'var(--green-bg)',color:'var(--green-t)',padding:'1px 6px',borderRadius:4,fontWeight:700}}>📤 {t.iOwe}</span>}
+                    </div>
+                  </div>
                 </div>
                 <span className={`pill ${hasOv?'pill-overdue':active.length?'pill-active':'pill-paid'}`}><span className="pill-dot"/>{hasOv?t.overdue:active.length?t.active:t.paid}</span>
               </div>
