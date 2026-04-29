@@ -274,6 +274,51 @@ tr:hover td{background:#FAFBFF}
   .table-wrap{display:block!important}
   .debt-cards{display:none!important}
 }
+/* ── Promised pill ── */
+.pill-promised{background:#EDE9FE;color:#5B21B6}
+/* ── Reminder popup ── */
+.remind-wrap{position:relative;display:inline-block}
+.remind-popup{position:absolute;right:0;bottom:calc(100% + 6px);background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:5px;box-shadow:var(--shadow-lg);z-index:600;min-width:186px;animation:fadeIn .15s ease}
+.remind-item{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:500;color:var(--g700);transition:background .1s;border:none;background:none;width:100%;text-align:left}
+.remind-item:hover{background:var(--g50)}
+/* ── Dark mode ── */
+[data-theme="dark"]{--border:rgba(255,255,255,.08);--shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 10px 25px rgba(0,0,0,.5)}
+[data-theme="dark"] body{background:#0F172A;color:#F1F5F9}
+[data-theme="dark"] .card,[data-theme="dark"] .debt-card,[data-theme="dark"] .modal-box,[data-theme="dark"] .logout-confirm-box{background:#1E293B}
+[data-theme="dark"] .sidebar{background:#020617}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:#1E293B;color:#F1F5F9;border-color:#334155}
+[data-theme="dark"] .btn{background:#1E293B;color:#F1F5F9;border-color:#334155}
+[data-theme="dark"] .btn:hover{background:#334155}
+[data-theme="dark"] .btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+[data-theme="dark"] .btn-primary:hover{background:var(--primary-d)}
+[data-theme="dark"] .btn-green{background:var(--green);color:#fff;border-color:var(--green)}
+[data-theme="dark"] .btn-danger{color:var(--red);border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.1)}
+[data-theme="dark"] .mobile-nav-glass{background:rgba(15,23,42,.9);border-color:rgba(255,255,255,.1)}
+[data-theme="dark"] .mobile-header{background:#1E293B;border-color:#334155}
+[data-theme="dark"] .filter-bar{background:#1E293B}
+[data-theme="dark"] .remind-popup{background:#1E293B;border-color:#334155}
+[data-theme="dark"] .remind-item:hover{background:#334155}
+[data-theme="dark"] tr:hover td{background:rgba(255,255,255,.03)}
+[data-theme="dark"] th{background:#1E293B}
+[data-theme="dark"] .info-box{background:#0F172A;border-color:#334155}
+[data-theme="dark"] .stat-card{background:#1E293B}
+[data-theme="dark"] .auth-right{background:#1E293B}
+[data-theme="dark"] .mobile-header-title{color:#F1F5F9}
+[data-theme="dark"] td{border-color:#334155}
+[data-theme="dark"] .card-header{border-color:#334155}
+[data-theme="dark"] .debt-card-actions{border-color:#334155}
+[data-theme="dark"] .debt-card-row{color:#94A3B8}
+[data-theme="dark"] .sidebar-footer{border-color:rgba(255,255,255,.1)}
+/* ── Print ── */
+@media print{
+  .sidebar,.mobile-nav,.mobile-header,.fab-wrap,.page-actions,.filter-bar,.row-actions,.debt-card-actions,.btn,.modal-overlay>div:not(.modal-box){display:none!important}
+  body,html{overflow:visible!important;background:#fff!important}
+  .layout,.main{display:block!important;height:auto!important;overflow:visible!important;margin:0!important}
+  .main-inner{padding:8px!important}
+  .card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid}
+  .table-wrap{display:block!important}
+  .debt-cards{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -336,7 +381,7 @@ const T={
     contactDev:'Тамос бо сайтсоз',usersCount:'Корбарон',totalActiveSum:'Умумии фаъол',
     loginError:'Email ё рамз нодуруст аст',
     newPass:'Рамзи нав',confirmPass:'Тасдиқи рамз',passNoMatch:'Рамзҳо мувофиқ нестанд',updatePass:'Навсозии рамз',passUpdated:'Рамз навсозӣ шуд ✓',
-    offerOld:'Аккаунти кӯҳна',
+    offerOld:'Аккаунти кӯҳна',remind:'Эслатма',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Занг',remindCopy:'Нусхабардорӣ матн',copyPhoneOk:'Рақам нусхабардорӣ шуд ✓',editDebt:'Таҳрири қарз',printReport:'Чоп кардан',darkMode:'Тираи',promised:'Ваъда дод',promisedMark:'Ваъда қайд',dueSoon3:'3 рӯз',dueSoon7:'7 рӯз',dueSoon14:'14 рӯз',dueSoonFilter:'Ба зудӣ',
   },
   ru:{
     appName:'Мой долг',appSub:'Учёт задолженностей',
@@ -386,7 +431,7 @@ const T={
     contactDev:'Связаться с разработчиком',usersCount:'Пользователей',totalActiveSum:'Общая сумма',
     loginError:'Неверный email или пароль',
     newPass:'Новый пароль',confirmPass:'Подтвердить пароль',passNoMatch:'Пароли не совпадают',updatePass:'Обновить пароль',passUpdated:'Пароль обновлён ✓',
-    offerOld:'Старый аккаунт',
+    offerOld:'Старый аккаунт',remind:'Напомнить',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Позвонить',remindCopy:'Скопировать текст',copyPhoneOk:'Номер скопирован ✓',editDebt:'Изменить долг',printReport:'Распечатать',darkMode:'Тёмный режим',promised:'Обещал платить',promisedMark:'Отметить "обещал"',dueSoon3:'3 дня',dueSoon7:'7 дней',dueSoon14:'14 дней',dueSoonFilter:'Скоро срок',
   },
   uz:{
     appName:'Mening qarzim',appSub:'Qarz hisobi',
@@ -436,7 +481,7 @@ const T={
     contactDev:"Dasturchi bilan bog'lanish",usersCount:"Foydalanuvchilar",totalActiveSum:"Umumiy summa",
     loginError:"Email yoki parol noto'g'ri",
     newPass:"Yangi parol",confirmPass:"Parolni tasdiqlash",passNoMatch:"Parollar mos kelmadi",updatePass:"Parolni yangilash",passUpdated:"Parol yangilandi ✓",
-    offerOld:"Eski hisob",
+    offerOld:"Eski hisob",remind:"Eslatma",remindWA:"WhatsApp",remindTG:"Telegram",remindCall:"Qo'ng'iroq",remindCopy:"Matnni nusxalash",copyPhoneOk:"Raqam nusxalandi ✓",editDebt:"Qarzni tahrirlash",printReport:"Chop etish",darkMode:"Qorong'u rejim",promised:"To'lashga va'da berdi",promisedMark:"Va'da qildi",dueSoon3:"3 kun",dueSoon7:"7 kun",dueSoon14:"14 kun",dueSoonFilter:"Yaqin muddat",
   },
   en:{
     appName:'My Debt',appSub:'Debt management',
@@ -486,18 +531,19 @@ const T={
     contactDev:'Contact developer',usersCount:'Users',totalActiveSum:'Total active',
     loginError:'Invalid email or password',
     newPass:'New password',confirmPass:'Confirm password',passNoMatch:'Passwords do not match',updatePass:'Update password',passUpdated:'Password updated ✓',
-    offerOld:'Legacy account',
+    offerOld:'Legacy account',remind:'Remind',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Call',remindCopy:'Copy text',copyPhoneOk:'Phone copied ✓',editDebt:'Edit debt',printReport:'Print report',darkMode:'Dark mode',promised:'Promised to pay',promisedMark:'Mark as promised',dueSoon3:'3 days',dueSoon7:'7 days',dueSoon14:'14 days',dueSoonFilter:'Due soon',
   }
 };
 
 function getStatus(d){
   if(d.status==='paid')return 'paid';
+  if(d.status==='promised')return 'promised';
   const diff=Math.floor((new Date()-new Date(d.due_date))/86400000);
   if(diff>0)return 'overdue';
   if(diff>-7)return 'due';
   return 'active';
 }
-const statusClass=s=>({active:'pill-active',due:'pill-due',overdue:'pill-overdue',paid:'pill-paid',partial:'pill-due'}[s]??'');
+const statusClass=s=>({active:'pill-active',due:'pill-due',overdue:'pill-overdue',paid:'pill-paid',partial:'pill-due',promised:'pill-promised'}[s]??'');
 const daysOverdue=d=>Math.max(0,Math.floor((new Date()-new Date(d.due_date))/86400000));
 const fmt=n=>Number(n??0).toLocaleString('ru-RU',{maximumFractionDigits:2});
 const fmtDate=str=>{if(!str||str==='—')return'—';const m=str.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[3]}.${m[2]}.${m[1]}`:str;};
@@ -541,7 +587,7 @@ function getOverdueCat(days,t){
   if(days<=365)return{label:t.cat4,cls:'cat-4'};
   return{label:t.cat5,cls:'cat-5'};
 }
-function stLabel(st,t){return{active:t.active,due:t.dueSoon,overdue:t.overdue,paid:t.paid,partial:t.partial}[st]??st;}
+function stLabel(st,t){return{active:t.active,due:t.dueSoon,overdue:t.overdue,paid:t.paid,partial:t.partial,promised:t.promised||'Promised'}[st]??st;}
 function formatPhone(v){
   let d=v.replace(/\D/g,'');
   if(d.startsWith('992'))d=d.slice(0,12);
@@ -1220,9 +1266,13 @@ function PayHistoryModal({debt,onClose,t}){
   );
 }
 
-function DebtCard({d,t,onPay,onDelete,onHistory,isPayable}){
+function DebtCard({d,t,onPay,onDelete,onHistory,onRefresh,isPayable}){
   const st=getStatus(d);const rem=Number(d.amount)-Number(d.paid_amount??0);const ov=daysOverdue(d);const cat=getOverdueCat(ov,t);
   const _isPayable=isPayable||(d.debt_type==='payable');
+  const [showRemind,setShowRemind]=useState(false);
+  const [showEdit,setShowEdit]=useState(false);
+  const [showPromise,setShowPromise]=useState(false);
+  function copyPhone(){navigator.clipboard.writeText(d.phone).catch(()=>{});toast(t.copyPhoneOk||'✓');}
   return(
     <div className="debt-card">
       <div className="debt-card-top">
@@ -1231,7 +1281,7 @@ function DebtCard({d,t,onPay,onDelete,onHistory,isPayable}){
             {_isPayable&&<span style={{fontSize:11,background:'var(--green-bg)',color:'var(--green-t)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0}}>📤</span>}
             <div className="debt-card-name">{d.client_name}</div>
           </div>
-          <div className="debt-card-phone">{d.phone}</div>
+          <div className="debt-card-phone" style={{cursor:'pointer'}} onClick={copyPhone} title={t.copyPhoneOk}>{d.phone}</div>
         </div>
         <div className="debt-card-amount">
           <div className={`debt-card-sum${st==='paid'?' paid-sum':''}`} style={_isPayable&&st!=='paid'?{color:'var(--green)'}:undefined}>{fmt(rem)}</div>
@@ -1247,16 +1297,123 @@ function DebtCard({d,t,onPay,onDelete,onHistory,isPayable}){
         <span>{d.category}</span>
       </div>
       {d.comment&&<div style={{fontSize:12,color:'var(--g400)',marginTop:4,fontStyle:'italic'}}>{d.comment}</div>}
-      <div className="debt-card-actions">
+      <div className="debt-card-actions" style={{flexWrap:'wrap'}}>
         {st!=='paid'&&<button className="btn btn-green" onClick={()=>onPay(d)}>💳 {t.confirmPay.replace('✓ ','')}</button>}
+        <button className="btn btn-sm" onClick={()=>setShowRemind(true)} title={t.remind}>🔔</button>
+        <button className="btn btn-sm" onClick={()=>setShowEdit(true)} title={t.editDebt}>✏️</button>
+        {st!=='paid'&&st!=='promised'&&<button className="btn btn-sm" onClick={()=>setShowPromise(true)} title={t.promisedMark}>🤝</button>}
         <button className="btn btn-sm" onClick={()=>onHistory(d)}>📋</button>
         <button className="btn btn-danger btn-sm" onClick={()=>onDelete(d)}>✕</button>
       </div>
+      {showRemind&&<ReminderPopup d={d} t={t} onClose={()=>setShowRemind(false)}/>}
+      {showEdit&&<EditDebtModal d={d} t={t} onClose={()=>setShowEdit(false)} onSaved={()=>onRefresh&&onRefresh()}/>}
+      {showPromise&&<PromiseModal d={d} t={t} onClose={()=>setShowPromise(false)} onSaved={()=>onRefresh&&onRefresh()}/>}
     </div>
   );
 }
 
 
+
+// ── Reminder Popup (Feature 1) ──
+function ReminderPopup({d,t,onClose}){
+  const phone=d.phone.replace(/\D/g,'');
+  const rem=Number(d.amount)-Number(d.paid_amount??0);
+  const msgText=`${d.client_name}, ${t.remaining}: ${fmt(rem)} ${t.sum}. ${t.dueDate}: ${fmtDate(d.due_date)}.`;
+  const msg=encodeURIComponent(msgText);
+  function copyText(){navigator.clipboard.writeText(msgText).catch(()=>{});toast(t.remindCopy+' ✓');onClose();}
+  return(
+    <div style={{position:'fixed',inset:0,zIndex:1100,display:'flex',alignItems:'flex-end',justifyContent:'center',background:'rgba(15,23,42,.5)',backdropFilter:'blur(3px)'}} onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div style={{background:'var(--g50)',borderRadius:'20px 20px 0 0',padding:'20px 20px 32px',width:'100%',maxWidth:520,boxShadow:'0 -8px 32px rgba(0,0,0,.2)',animation:'slideUp .25s ease'}}>
+        <div style={{width:36,height:4,background:'var(--g200)',borderRadius:2,margin:'0 auto 16px'}}/>
+        <div style={{fontWeight:800,fontSize:16,color:'var(--g900)',marginBottom:4}}>🔔 {t.remind}</div>
+        <div style={{fontSize:13,color:'var(--g500)',marginBottom:16}}>{d.client_name} · {d.phone}</div>
+        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+          <a href={`https://wa.me/${phone}?text=${msg}`} target="_blank" rel="noopener noreferrer" onClick={onClose}
+            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'#DCFCE7',color:'#15803D',fontWeight:700,fontSize:14,textDecoration:'none'}}>
+            <span style={{fontSize:22}}>💬</span>{t.remindWA}
+          </a>
+          <a href={`https://t.me/+${phone}`} target="_blank" rel="noopener noreferrer" onClick={onClose}
+            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'#EFF6FF',color:'var(--primary)',fontWeight:700,fontSize:14,textDecoration:'none'}}>
+            <span style={{fontSize:22}}>✈️</span>{t.remindTG}
+          </a>
+          <a href={`tel:${d.phone}`} onClick={onClose}
+            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'var(--g100)',color:'var(--g700)',fontWeight:700,fontSize:14,textDecoration:'none'}}>
+            <span style={{fontSize:22}}>📞</span>{t.remindCall}
+          </a>
+          <button onClick={copyText}
+            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'var(--g100)',color:'var(--g700)',fontWeight:700,fontSize:14,border:'none',cursor:'pointer',width:'100%',fontFamily:'inherit'}}>
+            <span style={{fontSize:22}}>📋</span>{t.remindCopy}
+          </button>
+        </div>
+        <button className="btn btn-full" style={{marginTop:14}} onClick={onClose}>{t.cancel}</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Edit Debt Modal (Feature 2) ──
+function EditDebtModal({d,onClose,onSaved,t}){
+  const [f,setF]=useState({amount:String(d.amount),dateIssued:d.date_issued||'',dueDate:d.due_date||'',cat:d.category||t.cats[0],comment:d.comment||''});
+  const [error,setError]=useState('');const [saving,setSaving]=useState(false);
+  const set=(k,v)=>setF(p=>({...p,[k]:v}));
+  async function submit(e){
+    e.preventDefault();setError('');
+    if(!f.amount||+f.amount<=0){setError(t.amount+'!');return;}
+    if(!f.dueDate){setError(t.dueDate+'!');return;}
+    if(f.dueDate<f.dateIssued){setError(t.dueDateError);return;}
+    setSaving(true);
+    const{error:err}=await sb.from('debts').update({amount:+f.amount,date_issued:f.dateIssued,due_date:f.dueDate,category:f.cat,comment:f.comment.trim()}).eq('id',d.id);
+    setSaving(false);
+    if(err){setError(err.message);return;}
+    toast(t.savedOk);onSaved();onClose();
+  }
+  return(
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal-box">
+        <div className="modal-handle"/>
+        <div className="modal-title">✏️ {t.editDebt}</div>
+        <div style={{fontSize:13,color:'var(--g500)',marginBottom:4}}>{d.client_name} · {d.phone}</div>
+        <form onSubmit={submit}>
+          <label>{t.amount} *</label><input type="number" value={f.amount} onChange={e=>set('amount',e.target.value)} placeholder="0" min="0.01" step="0.01" inputMode="decimal" autoFocus style={{fontSize:16}}/>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div><label>{t.dateIssued}</label><input type="date" value={f.dateIssued} onChange={e=>{set('dateIssued',e.target.value);if(f.dueDate&&e.target.value>f.dueDate)set('dueDate','');}}/></div>
+            <div><label>{t.dueDate} *</label><input type="date" value={f.dueDate} min={f.dateIssued||undefined} onChange={e=>{if(e.target.value<f.dateIssued){setError(t.dueDateError);}else{setError('');}set('dueDate',e.target.value);}}/></div>
+          </div>
+          <label>{t.category}</label><select value={f.cat} onChange={e=>set('cat',e.target.value)}>{t.cats.map(c=><option key={c}>{c}</option>)}</select>
+          <label>{t.comment}</label><textarea value={f.comment} onChange={e=>set('comment',e.target.value)} rows={2}/>
+          {error&&<div className="alert alert-error">{error}</div>}
+          <div className="modal-footer">
+            <button type="button" className="btn" onClick={onClose}>{t.cancel}</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{saving?'...':t.save}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Promise Modal (Feature 8) ──
+function PromiseModal({d,onClose,onSaved,t}){
+  const [saving,setSaving]=useState(false);
+  async function mark(){
+    setSaving(true);
+    await sb.from('debts').update({status:'promised'}).eq('id',d.id);
+    setSaving(false);toast(t.savedOk);onSaved();onClose();
+  }
+  return(
+    <div className="logout-confirm-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="logout-confirm-box">
+        <div style={{fontSize:36,marginBottom:12}}>🤝</div>
+        <div style={{fontSize:17,fontWeight:800,color:'var(--g900)',marginBottom:6}}>{t.promisedMark}?</div>
+        <div style={{fontSize:13,color:'var(--g500)',marginBottom:20}}>{d.client_name} · {fmt(Number(d.amount)-Number(d.paid_amount??0))} {t.sum}</div>
+        <div style={{display:'flex',gap:8}}>
+          <button className="btn btn-full" onClick={onClose}>{t.cancel}</button>
+          <button className="btn btn-primary btn-full" onClick={mark} disabled={saving}>{saving?'...':'✓ '+t.promisedMark}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ── Quick Pay Modal (from FAB) ──
 function QuickPayModal({debts,onClose,onPaid,t}){
@@ -1424,8 +1581,8 @@ function DebtsPage({t}){
   const {business}=useApp();
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
   const [tab,setTab]=useState('receivable'); // receivable | payable
-  const [search,setSearch]=useState('');const [fStatus,setFStatus]=useState('');const [sort,setSort]=useState('date_desc');
-  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);const [deleteTarget,setDeleteTarget]=useState(null);
+  const [search,setSearch]=useState('');const [fStatus,setFStatus]=useState('');const [fDueSoon,setFDueSoon]=useState('');const [sort,setSort]=useState('date_desc');
+  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);const [deleteTarget,setDeleteTarget]=useState(null);const [editDebt,setEditDebt]=useState(null);const [remindDebt,setRemindDebt]=useState(null);const [promiseDebt,setPromiseDebt]=useState(null);
   async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
   useEffect(()=>{load();},[business]);
   async function confirmDelete(d){await sb.from('debts').delete().eq('id',d.id);toast(t.deletedOk,'error');setDeleteTarget(null);load();}
@@ -1435,11 +1592,14 @@ function DebtsPage({t}){
       const dtype=d.debt_type||'receivable';
       if(dtype!==tab)return false;
       const q=search.toLowerCase();
-      return(!q||d.client_name.toLowerCase().includes(q)||d.phone.includes(q))&&(!fStatus||getStatus(d)===fStatus);
+      if(!(!q||d.client_name.toLowerCase().includes(q)||d.phone.includes(q)))return false;
+      if(fStatus&&getStatus(d)!==fStatus)return false;
+      if(fDueSoon){const daysUntil=Math.ceil((new Date(d.due_date)-new Date())/86400000);if(daysUntil<0||daysUntil>Number(fDueSoon))return false;}
+      return true;
     });
     r.sort((a,b)=>{if(sort==='date_asc')return new Date(a.date_issued)-new Date(b.date_issued);if(sort==='amount_desc')return Number(b.amount)-Number(a.amount);if(sort==='overdue')return daysOverdue(b)-daysOverdue(a);return new Date(b.created_at)-new Date(a.created_at);});
     return r;
-  },[debts,search,fStatus,sort,tab]);
+  },[debts,search,fStatus,fDueSoon,sort,tab]);
   const recCount=debts.filter(d=>(d.debt_type||'receivable')==='receivable').length;
   const payCount=debts.filter(d=>d.debt_type==='payable').length;
   const isPayable=tab==='payable';
@@ -1462,7 +1622,8 @@ function DebtsPage({t}){
       <div className="card">
         <div className="filter-bar">
           <input placeholder={'🔍 '+t.search} value={search} onChange={e=>setSearch(e.target.value)}/>
-          <select value={fStatus} onChange={e=>setFStatus(e.target.value)}><option value="">{t.allStatus}</option><option value="active">{t.active}</option><option value="due">{t.dueSoon}</option><option value="overdue">{t.overdue}</option><option value="paid">{t.paid}</option></select>
+          <select value={fStatus} onChange={e=>setFStatus(e.target.value)}><option value="">{t.allStatus}</option><option value="active">{t.active}</option><option value="due">{t.dueSoon}</option><option value="overdue">{t.overdue}</option><option value="promised">{t.promised}</option><option value="paid">{t.paid}</option></select>
+          <select value={fDueSoon} onChange={e=>setFDueSoon(e.target.value)}><option value="">⏱ {t.dueSoonFilter}</option><option value="3">{t.dueSoon3}</option><option value="7">{t.dueSoon7}</option><option value="14">{t.dueSoon14}</option></select>
           <select value={sort} onChange={e=>setSort(e.target.value)}><option value="date_desc">{t.newest}</option><option value="date_asc">{t.oldest}</option><option value="amount_desc">{t.byAmount}</option><option value="overdue">{t.byOverdue}</option></select>
         </div>
         {loading?<div className="loading-wrap"><div className="spinner"/></div>
@@ -1478,23 +1639,26 @@ function DebtsPage({t}){
                     <div><div style={{fontWeight:600}}>{d.client_name}</div>{d.comment&&<div style={{fontSize:11,color:'var(--g400)'}}>{d.comment}</div>}</div>
                   </div>
                 </td>
-                <td style={{color:'var(--g500)'}}>{d.phone}</td>
+                <td style={{color:'var(--g500)',cursor:'pointer'}} onClick={()=>{navigator.clipboard.writeText(d.phone).catch(()=>{});toast(t.copyPhoneOk||'✓');}} title={t.copyPhoneOk}>{d.phone}</td>
                 <td style={{fontWeight:600}}>{fmt(d.amount)}</td>
                 <td style={{color:'var(--g400)'}}>{pa>0?fmt(pa):'—'}</td>
                 <td style={{fontWeight:700,color:rem>0?(isPayable?'var(--green)':'var(--red)'):'var(--g400)'}}>{fmt(rem)}</td>
                 <td style={{fontSize:12,color:'var(--g500)'}}>{fmtDate(d.due_date)}</td>
                 <td>{st==='overdue'&&cat?<span className={`pill ${cat.cls}`}>{cat.label}</span>:<span className={`pill ${statusClass(st)}`}><span className="pill-dot"/>{stLabel(st,t)}</span>}</td>
-                <td><div className="row-actions">{st!=='paid'&&<button className="btn btn-sm btn-green" onClick={()=>setPayDebt(d)} title={t.payTitle}>{IC.pay}</button>}<button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button><button className="btn btn-sm btn-danger" onClick={()=>del(d)} title={t.delete}>{IC.trash}</button></div></td>
+                <td><div className="row-actions">{st!=='paid'&&<button className="btn btn-sm btn-green" onClick={()=>setPayDebt(d)} title={t.payTitle}>{IC.pay}</button>}<button className="btn btn-sm" onClick={()=>setRemindDebt(d)} title={t.remind}>🔔</button><button className="btn btn-sm" onClick={()=>setEditDebt(d)} title={t.editDebt}>✏️</button>{st!=='paid'&&st!=='promised'&&<button className="btn btn-sm" onClick={()=>setPromiseDebt(d)} title={t.promisedMark}>🤝</button>}<button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button><button className="btn btn-sm btn-danger" onClick={()=>del(d)} title={t.delete}>{IC.trash}</button></div></td>
               </tr>;})}
             </tbody>
           </table></div>
-          <div className="debt-cards">{list.map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onDelete={del} onHistory={setHistDebt} isPayable={isPayable}/>)}</div>
+          <div className="debt-cards">{list.map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onDelete={del} onHistory={setHistDebt} onRefresh={load} isPayable={isPayable}/>)}</div>
         </>}
       </div>
       {addOpen&&<AddDebtModal business={business} initialType={tab} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast(t.addedOk);}} t={t}/>}
       {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast(t.paidOk);}} t={t}/>}
       {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
       {deleteTarget&&<DeleteConfirmModal t={t} onConfirm={()=>confirmDelete(deleteTarget)} onClose={()=>setDeleteTarget(null)}/>}
+      {editDebt&&<EditDebtModal d={editDebt} t={t} onClose={()=>setEditDebt(null)} onSaved={load}/>}
+      {remindDebt&&<ReminderPopup d={remindDebt} t={t} onClose={()=>setRemindDebt(null)}/>}
+      {promiseDebt&&<PromiseModal d={promiseDebt} t={t} onClose={()=>setPromiseDebt(null)} onSaved={load}/>}
     </>
   );
 }
@@ -1503,6 +1667,14 @@ function DebtsPage({t}){
 // ── Client History Modal ──
 function ClientHistoryModal({client,debts,onClose,t}){
   const [payments,setPayments]=useState([]);const [loading,setLoading]=useState(true);
+  function printReport(){
+    const totalDebt=debts.reduce((s,d)=>s+Number(d.amount),0);
+    const totalPaid=debts.reduce((s,d)=>s+Number(d.paid_amount??0),0);
+    const totalRem=totalDebt-totalPaid;
+    const w=window.open('','_blank');if(!w)return;
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${client.name}</title><style>body{font-family:Arial,sans-serif;padding:20px;font-size:13px;color:#1e293b}h1{font-size:18px;margin-bottom:4px}table{width:100%;border-collapse:collapse;margin-top:12px}th{background:#f1f5f9;text-align:left;padding:7px 10px;font-size:11px;border:1px solid #e2e8f0}td{padding:7px 10px;border:1px solid #e2e8f0;font-size:12px}.summary{display:flex;gap:16px;margin:12px 0}.sbox{border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;text-align:center;flex:1}.sval{font-size:16px;font-weight:700}</style></head><body><h1>${client.name}</h1><p style="color:#64748b;font-size:12px;margin:2px 0 12px">${client.phone}</p><div class="summary"><div class="sbox"><div style="font-size:10px;color:#64748b">${t.totalDebt}</div><div class="sval">${fmt(totalDebt)}</div><div style="font-size:10px;color:#64748b">${t.sum}</div></div><div class="sbox"><div style="font-size:10px;color:#64748b">${t.paid}</div><div class="sval" style="color:#059669">${fmt(totalPaid)}</div></div><div class="sbox"><div style="font-size:10px;color:#64748b">${t.remaining}</div><div class="sval" style="color:${totalRem>0?'#DC2626':'#059669'}">${fmt(totalRem)}</div></div></div><table><thead><tr><th>${t.dateIssued}</th><th>${t.dueDate}</th><th>${t.amount}</th><th>${t.paid}</th><th>${t.remaining}</th><th>${t.category}</th></tr></thead><tbody>${debts.map(d=>{const r=Number(d.amount)-Number(d.paid_amount??0);return`<tr><td>${fmtDate(d.date_issued)}</td><td>${fmtDate(d.due_date)}</td><td>${fmt(d.amount)}</td><td>${fmt(d.paid_amount??0)}</td><td>${fmt(r)}</td><td>${d.category||''}</td></tr>`;}).join('')}</tbody></table><p style="margin-top:14px;font-size:11px;color:#94a3b8">Qarziman · ${new Date().toLocaleDateString()}</p></body></html>`);
+    w.document.close();w.print();
+  }
   useEffect(()=>{
     const ids=debts.map(d=>d.id);
     if(!ids.length){setLoading(false);return;}
@@ -1521,10 +1693,11 @@ function ClientHistoryModal({client,debts,onClose,t}){
           <div style={{width:44,height:44,borderRadius:12,background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)',color:'var(--primary)',fontSize:16,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid var(--border)'}}>
             {client.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()}
           </div>
-          <div>
+          <div style={{flex:1}}>
             <div style={{fontWeight:800,fontSize:16,color:'var(--g900)'}}>{client.name}</div>
             <div style={{fontSize:13,color:'var(--g500)'}}>{client.phone}</div>
           </div>
+          <button className="btn btn-sm" onClick={printReport} title={t.printReport}>🖨️</button>
         </div>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:14}}>
           {[
@@ -1948,7 +2121,7 @@ function ShopSwitcher({t,collapsed}){
 }
 
 function Sidebar({page,setPage,lang,setLang,overdueCount,t,isAdmin}){
-  const {session,business}=useApp();
+  const {session,business,darkMode,setDarkMode}=useApp();
   const [showLogout,setShowLogout]=useState(false);
   const email=session?.user?.email??'';
   const initials=(business?.name??email).slice(0,2).toUpperCase();
@@ -1959,6 +2132,9 @@ function Sidebar({page,setPage,lang,setLang,overdueCount,t,isAdmin}){
       <div className="sidebar-logo"><div className="logo-wrap"><div className="logo-icon"><LogoSVG size={26}/></div><div><div className="logo-name">{t.appName}</div><div className="logo-tagline">{t.appSub}</div></div></div></div>
       <ShopSwitcher t={t} collapsed={false}/>
       <div className="lang-switcher">{langs.map(l=><button key={l.k} className={`lang-btn${lang===l.k?' active':''}`} onClick={()=>setLang(l.k)}>{l.l}</button>)}</div>
+      <button onClick={()=>setDarkMode(d=>!d)} style={{margin:'4px 12px 0',padding:'8px 12px',border:'1.5px solid rgba(255,255,255,.12)',borderRadius:'var(--r)',background:'transparent',color:'rgba(255,255,255,.6)',fontSize:12,fontWeight:600,cursor:'pointer',display:'flex',alignItems:'center',gap:7,width:'calc(100% - 24px)',fontFamily:'inherit'}}>
+        {darkMode?'☀️ ':'🌙 '}{t.darkMode||'Dark mode'}
+      </button>
       <nav className="nav">{nav.map(n=>(
         <button key={n.id} className={`nav-item${page===n.id?' active':''}`} onClick={()=>setPage(n.id)}>
           <div className="nav-iw">{n.icon}</div><span style={{flex:1}}>{n.label}</span>{n.badge>0&&<span className="nav-badge">{n.badge}</span>}
@@ -1971,7 +2147,7 @@ function Sidebar({page,setPage,lang,setLang,overdueCount,t,isAdmin}){
 }
 
 function MobileHeader({t,lang,setLang,page}){
-  const {business,allBusinesses,switchBusiness}=useApp();
+  const {business,allBusinesses,switchBusiness,darkMode,setDarkMode}=useApp();
   const langs=[{k:'tg',l:'Тоҷ'},{k:'ru',l:'Рус'},{k:'uz',l:'Ўзб'},{k:'en',l:'Eng'}];
   const titles={dashboard:t.dashboard,debts:t.debts,clients:t.clients,overdueHistory:t.overdueHistory,settings:t.settingsTitle,admin:t.admin};
   const [showShops,setShowShops]=useState(false);
@@ -1997,6 +2173,10 @@ function MobileHeader({t,lang,setLang,page}){
           <div className="mobile-lang">
             {langs.map(l=><button key={l.k} className={`mobile-lang-btn${lang===l.k?' active':''}`} onClick={()=>setLang(l.k)}>{l.l}</button>)}
           </div>
+          <button onClick={()=>setDarkMode(d=>!d)} title={t.darkMode}
+            style={{display:'flex',alignItems:'center',justifyContent:'center',width:34,height:34,borderRadius:9,border:'1.5px solid var(--g200)',background:'#fff',cursor:'pointer',fontSize:16,flexShrink:0}}>
+            {darkMode?'☀️':'🌙'}
+          </button>
           <button
             onClick={()=>setShowLogout(true)}
             title={t.logout}
@@ -2206,9 +2386,11 @@ function App(){
   const [isAdmin,setIsAdmin]=useState(false);
   const [resetMode,setResetMode]=useState(false);
   const [showOfferModal,setShowOfferModal]=useState(false);
+  const [darkMode,setDarkMode]=useState(()=>{try{return localStorage.getItem('darkMode')==='1';}catch{return false;}});
   _toast=setToast;const t=T[lang];
 
   useEffect(()=>{try{localStorage.setItem('appLang',lang);}catch{}},[lang]);
+  useEffect(()=>{document.documentElement.setAttribute('data-theme',darkMode?'dark':'');try{localStorage.setItem('darkMode',darkMode?'1':'0');}catch{}},[darkMode]);
   useEffect(()=>{
     sb.auth.getSession().then(({data:{session}})=>setSession(session));
     const{data:{subscription}}=sb.auth.onAuthStateChange((event,s)=>{
@@ -2269,7 +2451,7 @@ function App(){
   if(resetMode)return<PasswordResetPage t={t} lang={lang} setLang={setLang} onDone={()=>setResetMode(false)}/>;
   const Page=PAGES[page]??Dashboard;
   return(
-    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses,isAdmin}}>
+    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses,isAdmin,darkMode,setDarkMode}}>
       <div className="layout">
         <Sidebar page={page} setPage={setPage} lang={lang} setLang={setLang} overdueCount={overdueCount} t={t} isAdmin={isAdmin}/>
         <div className="main">
