@@ -1278,7 +1278,7 @@ function DebtCard({d,t,onPay,onDelete,onHistory,onRefresh,isPayable}){
       <div className="debt-card-top">
         <div>
           <div style={{display:'flex',alignItems:'center',gap:5}}>
-            {_isPayable&&<span style={{fontSize:11,background:'var(--green-bg)',color:'var(--green-t)',padding:'1px 6px',borderRadius:4,fontWeight:700,flexShrink:0}}>📤</span>}
+            <span style={{fontSize:11,background:_isPayable?'var(--green-bg)':'var(--primary-bg)',color:_isPayable?'var(--green-t)':'var(--primary)',padding:'1px 7px',borderRadius:4,fontWeight:700,flexShrink:0,whiteSpace:'nowrap'}}>{_isPayable?('📤 '+(t.iOwe||'Я должен')):('💰 '+(t.theyOwe||'Мне должны'))}</span>
             <div className="debt-card-name">{d.client_name}</div>
           </div>
           <div className="debt-card-phone" style={{cursor:'pointer'}} onClick={copyPhone} title={t.copyPhoneOk}>{d.phone}</div>
@@ -1720,6 +1720,7 @@ function ClientHistoryModal({client,debts,onClose,t}){
           return<div key={d.id} style={{border:'1px solid var(--border)',borderRadius:'var(--r)',marginBottom:10,overflow:'hidden'}}>
             <div style={{padding:'10px 12px',background:'var(--g50)',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div>
+                <div style={{marginBottom:4}}><span style={{fontSize:10,background:d.debt_type==='payable'?'var(--green-bg)':'var(--primary-bg)',color:d.debt_type==='payable'?'var(--green-t)':'var(--primary)',padding:'1px 7px',borderRadius:3,fontWeight:700}}>{d.debt_type==='payable'?('📤 '+(t.iOwe||'Я должен')):('💰 '+(t.theyOwe||'Мне должны'))}</span></div>
                 <div style={{fontSize:12,color:'var(--g500)'}}>{fmtDate(d.date_issued)} → {fmtDate(d.due_date)}</div>
                 <div style={{fontSize:12,color:'var(--g500)'}}>{d.category}</div>
               </div>
@@ -1776,10 +1777,18 @@ function ClientsPage({t}){
               const actSum=active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);const paidSum=paidD.reduce((s,d)=>s+Number(d.amount),0);
               const hasOv=active.some(d=>getStatus(d)==='overdue');const maxOv=Math.max(0,...active.filter(d=>getStatus(d)==='overdue').map(d=>daysOverdue(d)));
               const cat=getOverdueCat(maxOv,t);const init=c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+              const hasRec=c.debts.some(d=>(d.debt_type||'receivable')==='receivable');
+              const hasPay=c.debts.some(d=>d.debt_type==='payable');
               return<tr key={c.phone}>
                 <td><div style={{display:'flex',alignItems:'center',gap:7}}>
                   <div style={{width:30,height:30,borderRadius:8,background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)',color:'var(--primary)',fontSize:11,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid var(--border)'}}>{init}</div>
-                  <span style={{fontWeight:600,fontSize:12}}>{c.name}</span>
+                  <div>
+                    <div style={{fontWeight:600,fontSize:12}}>{c.name}</div>
+                    <div style={{display:'flex',gap:3,marginTop:2,flexWrap:'wrap'}}>
+                      {hasRec&&<span style={{fontSize:9,background:'var(--primary-bg)',color:'var(--primary)',padding:'1px 5px',borderRadius:3,fontWeight:700}}>💰 {t.theyOwe}</span>}
+                      {hasPay&&<span style={{fontSize:9,background:'var(--green-bg)',color:'var(--green-t)',padding:'1px 5px',borderRadius:3,fontWeight:700}}>📤 {t.iOwe}</span>}
+                    </div>
+                  </div>
                 </div></td>
                 <td style={{color:'var(--g500)',fontSize:11}}>{c.phone}</td>
                 <td style={{textAlign:'center',color:'var(--g500)'}}>{c.debts.length}</td>
