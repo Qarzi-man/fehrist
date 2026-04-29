@@ -9,13 +9,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Қарзи ман"/>
 <link rel="manifest" href="/manifest.json"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://*.supabase.co wss://*.supabase.co; img-src 'self' data: blob:; worker-src 'self';"/>
 <title>Қарзи ман</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1786,9 +1786,11 @@ function SettingsPage({t}){
 }
 
 function AdminPage({t}){
+  const {isAdmin}=useApp();
   const [stats,setStats]=useState(null);const [businesses,setBusinesses]=useState([]);const [loading,setLoading]=useState(true);
   const [selectedBiz,setSelectedBiz]=useState(null);const [bizDebts,setBizDebts]=useState([]);const [debtsLoading,setDebtsLoading]=useState(false);
   useEffect(()=>{
+    if(!isAdmin){setLoading(false);return;}
     async function load(){
       setLoading(true);
       const [{data:biz},{data:debts}]=await Promise.all([sb.from('businesses').select('*').order('created_at',{ascending:false}),sb.from('debts').select('*')]);
@@ -1806,6 +1808,7 @@ function AdminPage({t}){
     load();
   },[]);
   async function openBiz(biz){setSelectedBiz(biz);setDebtsLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',biz.id).order('created_at',{ascending:false});setBizDebts(data??[]);setDebtsLoading(false);}
+  if(!isAdmin)return(<div className="empty-state" style={{minHeight:220}}><div className="empty-icon">{IC.admin}</div><div className="empty-title">Нет доступа</div></div>);
   if(loading)return<div className="loading-wrap"><div className="spinner"/></div>;
   if(selectedBiz)return(
     <>
@@ -2242,7 +2245,7 @@ function App(){
   if(resetMode)return<PasswordResetPage t={t} lang={lang} setLang={setLang} onDone={()=>setResetMode(false)}/>;
   const Page=PAGES[page]??Dashboard;
   return(
-    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses}}>
+    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses,isAdmin}}>
       <div className="layout">
         <Sidebar page={page} setPage={setPage} lang={lang} setLang={setLang} overdueCount={overdueCount} t={t} isAdmin={isAdmin}/>
         <div className="main">

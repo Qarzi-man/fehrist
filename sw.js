@@ -1,17 +1,15 @@
-const CACHE = 'qarzimon-v9';
+const CACHE = 'qarzimon-v10';
 const STATIC = [
   '/',
   '/404.html',
   'https://unpkg.com/react@18/umd/react.production.min.js',
   'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
   'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
-  'https://unpkg.com/lucide@latest/dist/umd/lucide.js',
 ];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(STATIC.filter(u => !u.startsWith('https://unpkg.com/@babel'))))
-      .catch(() => {})
+    caches.open(CACHE).then(c => c.addAll(STATIC)).catch(() => {})
   );
   self.skipWaiting();
 });
