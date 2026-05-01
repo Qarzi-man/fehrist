@@ -17,6 +17,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX',{send_page_view:false});</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -334,6 +336,34 @@ const useApp=()=>useContext(AppCtx);
 let _toast=null;
 function toast(msg,type='success'){_toast?.({msg,type,id:Date.now()});}
 
+function track(event,params={}){try{if(typeof gtag==='function')gtag('event',event,{app:'daftarcha',...params});}catch{}}
+
+function requestNotifyPermission(){
+  if(!('Notification' in window)||Notification.permission!=='default')return;
+  Notification.requestPermission();
+}
+
+function showDebtNotifications(debts,bizName,t){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const todayStr=new Date().toISOString().split('T')[0];
+  const key='lastNotif_'+(bizName||'biz');
+  if(localStorage.getItem(key)===todayStr)return;
+  const overdue=debts.filter(d=>getStatus(d)==='overdue'&&(d.debt_type||'receivable')==='receivable');
+  const dueSoon=debts.filter(d=>{
+    if(d.status==='paid'||(d.debt_type||'receivable')==='payable')return false;
+    const diff=Math.ceil((new Date(d.due_date)-new Date())/86400000);
+    return diff>=0&&diff<=3;
+  });
+  if(!overdue.length&&!dueSoon.length)return;
+  const lines=[];
+  if(overdue.length)lines.push((t.notifOverdue||'{n} просроченных').replace('{n}',overdue.length));
+  if(dueSoon.length)lines.push((t.notifDueSoon||'{n} срок скоро').replace('{n}',dueSoon.length));
+  try{
+    new Notification(bizName||'Daftarcha',{body:lines.join(' · '),icon:'/icon-512.png',tag:'daftarcha-debts'});
+    localStorage.setItem(key,todayStr);
+  }catch{}
+}
+
 const T={
   tg:{
     appName:'Daftarcha',appSub:'Ҳисобдории қарз',
@@ -384,7 +414,7 @@ const T={
     contactDev:'Тамос бо сайтсоз',usersCount:'Корбарон',totalActiveSum:'Умумии фаъол',
     loginError:'Email ё рамз нодуруст аст',
     newPass:'Рамзи нав',confirmPass:'Тасдиқи рамз',passNoMatch:'Рамзҳо мувофиқ нестанд',updatePass:'Навсозии рамз',passUpdated:'Рамз навсозӣ шуд ✓',
-    offerOld:'Аккаунти кӯҳна',remind:'Хотиррасонӣ',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Занг',remindSMS:'SMS',remindCopy:'Нусхабардорӣ матни хотиррасонӣ',remindTemplate:'Шаблони паём',remindTplFriend:'Дӯстона',remindTplOfficial:'Расмӣ',remindTplCustom:'Дигар',tplFriend:'Салом! Ёдоварӣ мекунам, ки Шумо дар {bizName} {amount} {sum} қарз доред. Мо интизори пардохт ҳастем. Ташаккур!',tplOfficial:'Салом. Шумо аз {bizName} {amount} {sum} қарздор ҳастед, лутфан қарзатонро саривақт супоред. Сипос!',pickContact:'Аз контактҳо',copyPhoneOk:'Рақам нусхабардорӣ шуд ✓',editDebt:'Таҳрири қарз',printReport:'Чоп кардан',darkMode:'Торик',byDueDate:'Аввал наздиктарин',dueSoon3:'3 рӯз',dueSoon7:'7 рӯз',dueSoon14:'14 рӯз',dueSoonFilter:'Ба зудӣ',privacy:'Сиёсати махфият',
+    offerOld:'Аккаунти кӯҳна',remind:'Хотиррасонӣ',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Занг',remindSMS:'SMS',remindCopy:'Нусхабардорӣ матни хотиррасонӣ',remindTemplate:'Шаблони паём',remindTplFriend:'Дӯстона',remindTplOfficial:'Расмӣ',remindTplCustom:'Дигар',tplFriend:'Салом! Ёдоварӣ мекунам, ки Шумо дар {bizName} {amount} {sum} қарз доред. Мо интизори пардохт ҳастем. Ташаккур!',tplOfficial:'Салом. Шумо аз {bizName} {amount} {sum} қарздор ҳастед, лутфан қарзатонро саривақт супоред. Сипос!',pickContact:'Аз контактҳо',copyPhoneOk:'Рақам нусхабардорӣ шуд ✓',editDebt:'Таҳрири қарз',printReport:'Чоп кардан',darkMode:'Торик',byDueDate:'Аввал наздиктарин',dueSoon3:'3 рӯз',dueSoon7:'7 рӯз',dueSoon14:'14 рӯз',dueSoonFilter:'Ба зудӣ',privacy:'Сиёсати махфият',offline:'📡 Пайвандӣ нест — маълумот кӯҳна шуда метавонад',notifOverdue:'{n} қарзи мӯҳлатгузошта',notifDueSoon:'{n} қарз — мӯҳлат наздик аст',
   },
   ru:{
     appName:'Daftarcha',appSub:'Учёт задолженностей',
@@ -434,7 +464,7 @@ const T={
     contactDev:'Связаться с разработчиком',usersCount:'Пользователей',totalActiveSum:'Общая сумма',
     loginError:'Неверный email или пароль',
     newPass:'Новый пароль',confirmPass:'Подтвердить пароль',passNoMatch:'Пароли не совпадают',updatePass:'Обновить пароль',passUpdated:'Пароль обновлён ✓',
-    offerOld:'Старый аккаунт',remind:'Напоминание',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Позвонить',remindSMS:'SMS',remindCopy:'Скопировать текст напоминания',remindTemplate:'Шаблон сообщения',remindTplFriend:'Другу',remindTplOfficial:'Официальный',remindTplCustom:'Другой',tplFriend:'Здравствуйте! Напоминаем, что у Вас долг в {bizName} на сумму {amount} {sum}. Ждём оплаты. Спасибо!',tplOfficial:'Здравствуйте. Вы являетесь должником {bizName} на сумму {amount} {sum}. Пожалуйста, погасите долг своевременно. Благодарим!',pickContact:'Из контактов',copyPhoneOk:'Номер скопирован ✓',editDebt:'Изменить долг',printReport:'Распечатать',darkMode:'Тёмный режим',byDueDate:'Сначала ближайшие',dueSoon3:'3 дня',dueSoon7:'7 дней',dueSoon14:'14 дней',dueSoonFilter:'Скоро срок',privacy:'Конфиденциальность',
+    offerOld:'Старый аккаунт',remind:'Напоминание',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Позвонить',remindSMS:'SMS',remindCopy:'Скопировать текст напоминания',remindTemplate:'Шаблон сообщения',remindTplFriend:'Другу',remindTplOfficial:'Официальный',remindTplCustom:'Другой',tplFriend:'Здравствуйте! Напоминаем, что у Вас долг в {bizName} на сумму {amount} {sum}. Ждём оплаты. Спасибо!',tplOfficial:'Здравствуйте. Вы являетесь должником {bizName} на сумму {amount} {sum}. Пожалуйста, погасите долг своевременно. Благодарим!',pickContact:'Из контактов',copyPhoneOk:'Номер скопирован ✓',editDebt:'Изменить долг',printReport:'Распечатать',darkMode:'Тёмный режим',byDueDate:'Сначала ближайшие',dueSoon3:'3 дня',dueSoon7:'7 дней',dueSoon14:'14 дней',dueSoonFilter:'Скоро срок',privacy:'Конфиденциальность',offline:'📡 Нет соединения — данные могут быть устаревшими',notifOverdue:'{n} просроченных долгов',notifDueSoon:'{n} долгов — срок через 1-3 дня',
   },
   uz:{
     appName:'Daftarcha',appSub:'Qarz hisobi',
@@ -484,7 +514,7 @@ const T={
     contactDev:"Dasturchi bilan bog'lanish",usersCount:"Foydalanuvchilar",totalActiveSum:"Umumiy summa",
     loginError:"Email yoki parol noto'g'ri",
     newPass:"Yangi parol",confirmPass:"Parolni tasdiqlash",passNoMatch:"Parollar mos kelmadi",updatePass:"Parolni yangilash",passUpdated:"Parol yangilandi ✓",
-    offerOld:"Eski hisob",remind:"Eslatma",remindWA:"WhatsApp",remindTG:"Telegram",remindCall:"Qo'ng'iroq",remindSMS:"SMS",remindCopy:"Eslatma matnini nusxalash",remindTemplate:"Xabar shabloni",remindTplFriend:"Do'stona",remindTplOfficial:"Rasmiy",remindTplCustom:"Boshqa",tplFriend:"Salom! {bizName} da sizda {amount} {sum} qarz borligini eslatib o'tamiz. To'lovni kutamiz. Rahmat!",tplOfficial:"Salom. Siz {bizName} ga {amount} {sum} qarzdorsiz, iltimos qarzingizni o'z vaqtida to'lang. Rahmat!",pickContact:"Kontaktlardan",copyPhoneOk:"Raqam nusxalandi ✓",editDebt:"Qarzni tahrirlash",printReport:"Chop etish",darkMode:"Qorong'u rejim",byDueDate:"Avval yaqin",dueSoon3:"3 kun",dueSoon7:"7 kun",dueSoon14:"14 kun",dueSoonFilter:"Yaqin muddat",privacy:"Maxfiylik",
+    offerOld:"Eski hisob",remind:"Eslatma",remindWA:"WhatsApp",remindTG:"Telegram",remindCall:"Qo'ng'iroq",remindSMS:"SMS",remindCopy:"Eslatma matnini nusxalash",remindTemplate:"Xabar shabloni",remindTplFriend:"Do'stona",remindTplOfficial:"Rasmiy",remindTplCustom:"Boshqa",tplFriend:"Salom! {bizName} da sizda {amount} {sum} qarz borligini eslatib o'tamiz. To'lovni kutamiz. Rahmat!",tplOfficial:"Salom. Siz {bizName} ga {amount} {sum} qarzdorsiz, iltimos qarzingizni o'z vaqtida to'lang. Rahmat!",pickContact:"Kontaktlardan",copyPhoneOk:"Raqam nusxalandi ✓",editDebt:"Qarzni tahrirlash",printReport:"Chop etish",darkMode:"Qorong'u rejim",byDueDate:"Avval yaqin",dueSoon3:"3 kun",dueSoon7:"7 kun",dueSoon14:"14 kun",dueSoonFilter:"Yaqin muddat",privacy:"Maxfiylik",offline:"📡 Ulanish yo'q — ma'lumotlar eskirgan bo'lishi mumkin",notifOverdue:"{n} muddati o'tgan qarzlar",notifDueSoon:"{n} qarz — muddati 1-3 kunda",
   },
   en:{
     appName:'Daftarcha',appSub:'Debt management',
@@ -534,7 +564,7 @@ const T={
     contactDev:'Contact developer',usersCount:'Users',totalActiveSum:'Total active',
     loginError:'Invalid email or password',
     newPass:'New password',confirmPass:'Confirm password',passNoMatch:'Passwords do not match',updatePass:'Update password',passUpdated:'Password updated ✓',
-    offerOld:'Legacy account',remind:'Reminder',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Call',remindSMS:'SMS',remindCopy:'Copy reminder text',remindTemplate:'Message template',remindTplFriend:'Friendly',remindTplOfficial:'Official',remindTplCustom:'Other',tplFriend:'Hello! Reminding you that you have a debt of {amount} {sum} at {bizName}. We look forward to your payment. Thank you!',tplOfficial:'Hello. You have an outstanding debt of {amount} {sum} at {bizName}. Please repay on time. Thank you!',pickContact:'From contacts',copyPhoneOk:'Phone copied ✓',editDebt:'Edit debt',printReport:'Print report',darkMode:'Dark mode',byDueDate:'Nearest first',dueSoon3:'3 days',dueSoon7:'7 days',dueSoon14:'14 days',dueSoonFilter:'Due soon',privacy:'Privacy Policy',
+    offerOld:'Legacy account',remind:'Reminder',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Call',remindSMS:'SMS',remindCopy:'Copy reminder text',remindTemplate:'Message template',remindTplFriend:'Friendly',remindTplOfficial:'Official',remindTplCustom:'Other',tplFriend:'Hello! Reminding you that you have a debt of {amount} {sum} at {bizName}. We look forward to your payment. Thank you!',tplOfficial:'Hello. You have an outstanding debt of {amount} {sum} at {bizName}. Please repay on time. Thank you!',pickContact:'From contacts',copyPhoneOk:'Phone copied ✓',editDebt:'Edit debt',printReport:'Print report',darkMode:'Dark mode',byDueDate:'Nearest first',dueSoon3:'3 days',dueSoon7:'7 days',dueSoon14:'14 days',dueSoonFilter:'Due soon',privacy:'Privacy Policy',offline:'📡 No connection — data may be outdated',notifOverdue:'{n} overdue debts',notifDueSoon:'{n} debts due in 1-3 days',
   }
 };
 
@@ -1090,6 +1120,7 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
     const{error:err}=await sb.from('debts').insert(row);
     setSaving(false);
     if(err){setError(err.message);return;}
+    track('debt_added',{debt_type:debtType});
     onSaved();onClose();
   }
 
@@ -1189,6 +1220,7 @@ function PayModal({debt,onClose,onSaved,t}){
     const newPaid=Number(debt.paid_amount??0)+amt;
     const newStatus=newPaid>=Number(debt.amount)-0.01?'paid':'partial';
     await sb.from('debts').update({paid_amount:newPaid,status:newStatus}).eq('id',debt.id);
+    track('payment_recorded',{amount:amt});
     setSaving(false);onSaved();
   }
   return(
@@ -1560,7 +1592,7 @@ function Dashboard({t}){
   const {business,setPage}=useApp();
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
   const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);
-  async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
+  async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);showDebtNotifications(data??[],business.name,t);}
   useEffect(()=>{load();},[business]);
   const active=debts.filter(d=>getStatus(d)!=='paid');
   const overdue=debts.filter(d=>getStatus(d)==='overdue');
@@ -2526,7 +2558,15 @@ function App(){
   const [resetMode,setResetMode]=useState(false);
   const [showOfferModal,setShowOfferModal]=useState(false);
   const [darkMode,setDarkMode]=useState(()=>{try{return localStorage.getItem('darkMode')==='1';}catch{return false;}});
+  const [isOnline,setIsOnline]=useState(typeof navigator!=='undefined'?navigator.onLine:true);
   _toast=setToast;const t=T[lang];
+  useEffect(()=>{
+    const on=()=>setIsOnline(true);
+    const off=()=>setIsOnline(false);
+    window.addEventListener('online',on);
+    window.addEventListener('offline',off);
+    return()=>{window.removeEventListener('online',on);window.removeEventListener('offline',off);};
+  },[]);
 
   useEffect(()=>{try{localStorage.setItem('appLang',lang);}catch{}},[lang]);
   useEffect(()=>{document.documentElement.setAttribute('data-theme',darkMode?'dark':'');try{localStorage.setItem('darkMode',darkMode?'1':'0');}catch{}},[darkMode]);
@@ -2562,11 +2602,14 @@ function App(){
     })();
     sb.from('admins').select('email').eq('email',session.user.email).single()
       .then(({data})=>setIsAdmin(!!data));
+    track('login');
   },[session]);
   useEffect(()=>{
     if(!business)return;
     try{localStorage.setItem('lastBizId',business.id);}catch{}
     if(!business.offer_accepted_at)setShowOfferModal(true);
+    setTimeout(requestNotifyPermission,4000);
+    track('app_open',{biz_id:business.id});
     sb.from('debts').select('status,due_date').eq('business_id',business.id).neq('status','paid')
       .then(({data})=>setOverdueCount((data??[]).filter(d=>getStatus(d)==='overdue').length));
   },[business?.id]);
@@ -2600,7 +2643,8 @@ function App(){
         <MobileNav page={page} setPage={setPage} overdueCount={overdueCount} t={t} isAdmin={isAdmin} business={business} onRefresh={()=>setPage(p=>p)}/>
         <GlobalFAB t={t} business={business} onRefresh={()=>setPage(p=>p)}/>
       </div>
-      {toastState&&<div key={toastState.id} className={`toast toast-${toastState.type}`}>{toastState.type==='success'?'✅':'❌'} {toastState.msg}</div>}
+      {!isOnline&&<div style={{position:'fixed',top:0,left:0,right:0,zIndex:9998,background:'#DC2626',color:'#fff',padding:'9px 16px',textAlign:'center',fontSize:13,fontWeight:600,display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>{t.offline}</div>}
+      {toastState&&<div key={toastState.id} className={`toast toast-${toastState.type}`} style={{top:isOnline?undefined:40}}>{toastState.type==='success'?'✅':'❌'} {toastState.msg}</div>}
       {showOfferModal&&business&&<OfferModal t={t} onAccept={acceptOfferForExisting} onClose={()=>setShowOfferModal(false)} initialLang={lang}/>}
     </AppCtx.Provider>
   );
