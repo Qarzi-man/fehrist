@@ -134,7 +134,7 @@ tr:hover td{background:#FAFBFF}
 .filter-bar{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--g50)}
 .filter-bar input{flex:1;min-width:140px;font-size:14px}
 .filter-bar select{width:auto;min-width:120px;font-size:14px}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:var(--r-lg);font-size:13px;font-weight:600;z-index:9999;max-width:320px;width:calc(100% - 32px);box-shadow:var(--shadow-lg);color:#fff;display:flex;align-items:center;gap:10px;animation:slideUp .2s ease;justify-content:center}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:var(--r-lg);font-size:13px;font-weight:600;z-index:9999;max-width:320px;width:calc(100% - 32px);box-shadow:var(--shadow-lg);color:#fff;display:flex;align-items:center;gap:10px;animation:toastIn .2s ease forwards;justify-content:center}
 .toast-success{background:#065F46}.toast-error{background:var(--red)}
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;padding:0 12px calc(12px + env(safe-area-inset-bottom)) 12px}
 .mobile-nav-glass{
@@ -207,6 +207,8 @@ tr:hover td{background:#FAFBFF}
 .admin-biz-row:hover{background:var(--g50)}
 .admin-biz-row:last-child{border-bottom:none}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes toastIn{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+@keyframes fabUpCenter{from{opacity:0;transform:translateX(-50%) translateY(16px) scale(.92)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
 .export-excel-btn{display:flex}
 @media(max-width:768px){.export-excel-btn{display:none!important}}
 .contact-link{display:inline-flex;align-items:center;gap:6px;color:var(--primary);text-decoration:none;font-size:13px;font-weight:500}
@@ -364,7 +366,8 @@ const T={
     recentDebts:'Қарзҳои охирин',seeAll:'Ҳама →',
     maxPay:'Аз ҳад зиёд',minPay:'Ҳадди ақал 0.01',
     emailConfirmHint:'Барои тасдиқи почта ба inbox нигаред ва пайвандро клик кунед, сипас дубора ворид шавед.',payHistory:'Таърихи пардохт',clientHistory:'Таърихи мизоҷ',offerTitle:'Шартнома-оферта',offerAccept:'Қабул мекунам',offerBack:'Бозгашт',offerMust:'Шумо бояд бо оферта розӣ шавед',debtorClients:'Бадҳисоб',noPayments:'Пардохт нест',noPaymentsHint:'Пардохт пас аз қайд намудан пайдо мешавад',dupPhone:'Ин рақами телефон аллакай мавҷуд аст',dupPhoneClient:'Мизоҷ:',dupPhoneAdd:'Барои мизоҷи мавҷуд қарз илова кардан?',dupPhoneConfirm:'Ҳа, илова кун',dupPhoneCancel:'Бекор кун',offerConfirmed:'Оферта тасдиқшуд',offerNotConfirmed:'Оферта тасдиқ нашудааст',forgotPass:'Рамзро фаромӯш кардед?',forgotTitle:'Барқарор кардани рамз',forgotSub:'Почтаи электрониро ворид кунед',
-    forgotSent:'Хат фиристода шуд!',forgotCheck:'Хатро тафтиш кунед',forgotSend:'Фиристодан',forgotBack:'← Бозгашт',forgotLogin:'← Даромадан',
+    forgotSub:'Почтаи электрониро ворид кунед — пайванд мефиристем',
+    forgotSent:'Хат фиристода шуд!',forgotCheck:'Хатро тафтиш кунед',forgotSend:'Фиристодан',forgotBack:'← Бозгашт',forgotLogin:'← Даромадан',forgotSpam:'📌 Папкаи Спамро ҳам тафтиш кунед',
     adminPanel:'Панели маъмур',allShops:'Ҳама мағозаҳо',shopDebts:'Қарзҳои мағоза',back:'← Бозгашт',
     types:['Дорухона','Мағозаи хӯрокворӣ','Мағозаи сохтмон','Мағозаи либос','Мағозаи мебел','Ресторан/Кафе','Мағозаи электроника','Дигар'],
     cats:['Дору','Хӯрокворӣ','Маводи сохтмон','Либос','Мебел','Электроника','Дигар'],
@@ -414,7 +417,7 @@ const T={
     recentDebts:'Последние долги',seeAll:'Все →',
     maxPay:'Превышает остаток',minPay:'Минимум 0.01',
     emailConfirmHint:'Проверьте входящие письма, нажмите ссылку подтверждения и войдите снова.',payHistory:'История оплат',clientHistory:'История клиента',offerTitle:'Договор-оферта',offerAccept:'Принимаю',offerBack:'Назад',offerMust:'Необходимо принять оферту',debtorClients:'Должников',noPayments:'Оплат пока нет',noPaymentsHint:'Платежи появятся после записи оплаты',dupPhone:'Этот номер уже существует',dupPhoneClient:'Клиент:',dupPhoneAdd:'Добавить долг существующему клиенту?',dupPhoneConfirm:'Да, добавить',dupPhoneCancel:'Отмена',offerConfirmed:'Оферта принята',offerNotConfirmed:'Оферта не принята',forgotPass:'Забыли пароль?',forgotTitle:'Сброс пароля',forgotSub:'Введите email — пришлём ссылку',
-    forgotSent:'Письмо отправлено!',forgotCheck:'Проверьте почту и нажмите ссылку',forgotSend:'Отправить ссылку',forgotBack:'← Назад',forgotLogin:'← Войти',
+    forgotSent:'Письмо отправлено!',forgotCheck:'Проверьте почту и нажмите ссылку',forgotSend:'Отправить ссылку',forgotBack:'← Назад',forgotLogin:'← Войти',forgotSpam:'📌 Также проверьте папку «Спам»',
     adminPanel:'Админ-панель',allShops:'Все магазины',shopDebts:'Долги магазина',back:'← Назад',
     types:['Аптека','Продуктовый магазин','Строительный магазин','Магазин одежды','Магазин мебели','Ресторан/Кафе','Магазин электроники','Другое'],
     cats:['Лекарства','Продукты','Стройматериалы','Одежда','Мебель','Электроника','Другое'],
@@ -464,7 +467,7 @@ const T={
     recentDebts:'Oxirgi qarzlar',seeAll:'Barchasi →',
     maxPay:'Qoldiqdan oshdi',minPay:'Minimum 0.01',
     emailConfirmHint:'Kiruvchi xatlarga qarang, tasdiqlash havolasini bosing va qayta kiring.',payHistory:"To'lovlar tarixi",clientHistory:'Mijoz tarixi',offerTitle:'Oferta shartnomasi',offerAccept:'Qabul qilaman',offerBack:'Orqaga',offerMust:'Ofertani qabul qilish shart',debtorClients:'Qarzdorlar',noPayments:"To'lovlar yo'q",noPaymentsHint:"To'lovlar qayd etilgandan so'ng ko'rinadi",dupPhone:'Bu raqam allaqachon mavjud',dupPhoneClient:'Mijoz:',dupPhoneAdd:'Mavjud mijozga qarz qo\'shish?',dupPhoneConfirm:'Ha, qo\'shish',dupPhoneCancel:'Bekor qilish',offerConfirmed:'Oferta qabul qilindi',offerNotConfirmed:'Oferta qabul qilinmagan',forgotPass:'Parolni unutdingizmi?',forgotTitle:'Parolni tiklash',forgotSub:'Email kiriting — havola yuboramiz',
-    forgotSent:'Xat yuborildi!',forgotCheck:'Pochtangizni tekshiring',forgotSend:'Havola yuborish',forgotBack:'← Orqaga',forgotLogin:'← Kirish',
+    forgotSent:'Xat yuborildi!',forgotCheck:'Pochtangizni tekshiring',forgotSend:'Havola yuborish',forgotBack:'← Orqaga',forgotLogin:'← Kirish',forgotSpam:"📌 Spam papkasini ham tekshiring",
     adminPanel:'Admin paneli',allShops:"Barcha do'konlar",shopDebts:"Do'kon qarzlari",back:'← Orqaga',
     types:["Dorixona","Oziq-ovqat do'koni","Qurilish do'koni","Kiyim do'koni","Mebel do'koni","Restoran/Kafe","Elektronika do'koni","Boshqa"],
     cats:["Dori","Oziq-ovqat","Qurilish materiallari","Kiyim","Mebel","Elektronika","Boshqa"],
@@ -514,7 +517,7 @@ const T={
     recentDebts:'Recent debts',seeAll:'All →',
     maxPay:'Exceeds remaining',minPay:'Minimum 0.01',
     emailConfirmHint:'Check your inbox for a confirmation email, click the link, then sign in again.',payHistory:'Payment history',clientHistory:'Client history',offerTitle:'Public offer agreement',offerAccept:'I accept',offerBack:'Back',offerMust:'You must accept the offer',debtorClients:'Debtors',noPayments:'No payments yet',noPaymentsHint:'Payments will appear after recording',dupPhone:'This phone number already exists',dupPhoneClient:'Client:',dupPhoneAdd:'Add debt to existing client?',dupPhoneConfirm:'Yes, add',dupPhoneCancel:'Cancel',offerConfirmed:'Offer accepted',offerNotConfirmed:'Offer not accepted',forgotPass:'Forgot password?',forgotTitle:'Reset password',forgotSub:'Enter your email — we will send a link',
-    forgotSent:'Email sent!',forgotCheck:'Check your inbox and click the link',forgotSend:'Send link',forgotBack:'← Back',forgotLogin:'← Sign in',
+    forgotSent:'Email sent!',forgotCheck:'Check your inbox and click the link',forgotSend:'Send link',forgotBack:'← Back',forgotLogin:'← Sign in',forgotSpam:'📌 Also check your Spam folder',
     adminPanel:'Admin panel',allShops:'All shops',shopDebts:'Shop debts',back:'← Back',
     types:['Pharmacy','Grocery store','Hardware store','Clothing store','Furniture store','Restaurant/Cafe','Electronics store','Other'],
     cats:['Medicine','Groceries','Construction','Clothing','Furniture','Electronics','Other'],
@@ -799,7 +802,7 @@ function LoginForm({t,onSwitch}){
   const [forgotMode,setForgotMode]=useState(false);
   const [fEmail,setFEmail]=useState('');const [fSent,setFSent]=useState(false);const [fLoad,setFLoad]=useState(false);const [fError,setFError]=useState('');
   async function submit(e){e.preventDefault();setError('');setLoading(true);const{error}=await sb.auth.signInWithPassword({email,password:pass});if(error)setError(t.loginError||'Неверный email или пароль');setLoading(false);}
-  async function sendReset(e){e.preventDefault();setFError('');setFLoad(true);const{error}=await sb.auth.resetPasswordForEmail(fEmail,{redirectTo:window.location.origin});setFLoad(false);if(error){setFError(error.message);return;}setFSent(true);}
+  async function sendReset(e){e.preventDefault();setFError('');setFLoad(true);const{error}=await sb.auth.resetPasswordForEmail(fEmail,{redirectTo:'https://daftarcha.tj'});setFLoad(false);if(error){setFError(error.message);return;}setFSent(true);}
   if(forgotMode)return(
     <>
       <div className="auth-title">🔑 {t.forgotTitle}</div>
@@ -809,7 +812,7 @@ function LoginForm({t,onSwitch}){
           <div style={{textAlign:'center',fontSize:48,margin:'14px 0'}}>📧</div>
           <div style={{textAlign:'center',color:'var(--green)',fontWeight:700,marginBottom:6}}>{t.forgotSent}</div>
           <div style={{textAlign:'center',fontSize:13,color:'var(--g400)',marginBottom:6}}>{t.forgotCheck}: <strong>{fEmail}</strong></div>
-          <div style={{textAlign:'center',fontSize:12,color:'var(--g500)',marginBottom:18,padding:'8px 12px',background:'var(--g50)',borderRadius:'var(--r)'}}>📌 Спам папкасини ҳам тафтиш кунед · Проверьте папку Спам</div>
+          <div style={{textAlign:'center',fontSize:12,color:'var(--g500)',marginBottom:18,padding:'8px 12px',background:'var(--g50)',borderRadius:'var(--r)'}}>{t.forgotSpam}</div>
           <button className="btn btn-primary btn-full" onClick={()=>{setForgotMode(false);setFSent(false);}}>{t.forgotLogin}</button>
         </>
       ):(
@@ -988,7 +991,7 @@ function PrivacyPolicyModal({onClose,initialLang}){
   const texts={
     tg:{title:'Сиёсати махфият',body:[
       'Барномаи Daftarcha ба муҳофизати маълумоти шахсии корбарон аҳамияти ниҳоят зиёд медиҳад. Ин ҳуҷҷат тавзеҳ медиҳад, ки мо чӣ намуд маълумотро ҷамъ мекунем ва чӣ тавр онро истифода мебарем.',
-      'Маълумоте, ки мо ҷамъ мекунем: суроғаи почтаи электронӣ, номи корхона, номи муштариён, рақамҳои телефон, маблағҳои қарз ва саналаҳо. Ин маълумот танҳо барои кори барнома зарур аст.',
+      'Маълумоте, ки мо ҷамъ мекунем: суроғаи почтаи электронӣ, номи корхона, номи муштариён, рақамҳои телефон, маблағҳои қарз ва санаҳо. Ин маълумот танҳо барои кори барнома зарур аст.',
       'Истифодаи маълумот: маълумоти шумо танҳо барои нигоҳ доштани сабтҳои қарзи шумо истифода мешавад. Мо маълумотро ба ҳеҷ тарафи сеюм намефурӯшем ва намесупорем.',
       'Нигоҳдории маълумот: маълумоти шумо дар серверҳои бехатари Supabase нигоҳ дошта мешавад. Дастрасӣ ба маълумот танҳо тавассути рамзи шумо имконпазир аст.',
       'Ҳуқуқҳои шумо: шумо метавонед дархост кунед, ки маълумоти шумо пурра нест карда шавад. Барои ин бо мо тамос гиред: niyatorzuzoda@gmail.com',
@@ -1037,7 +1040,7 @@ function PrivacyPolicyModal({onClose,initialLang}){
             <button key={l} onClick={()=>setPl(l)}
               style={{padding:'4px 12px',borderRadius:20,fontSize:12,fontWeight:700,border:'none',cursor:'pointer',
                 background:pl===l?'var(--primary)':'var(--g100)',color:pl===l?'#fff':'var(--g600)'}}>
-              {l.toUpperCase()}
+              {l==='tg'?'TJ':l.toUpperCase()}
             </button>
           ))}
         </div>
@@ -1442,12 +1445,12 @@ function ReminderPopup({d,t,onClose}){
               <svg width="22" height="22" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             </span>{t.remindWA}
           </a>
-          <a href={`tg://msg?to=%2B${phone}&text=${msg}`} target="_blank" rel="noopener noreferrer" onClick={onClose}
-            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'#EFF6FF',color:'#0088CC',fontWeight:700,fontSize:14,textDecoration:'none'}}>
+          <button onClick={()=>{navigator.clipboard.writeText(msgText).catch(()=>{});window.open(`https://t.me/+${phone}`,'_blank');toast((t.remindCopy||'Текст скопирован')+' ✓');onClose();}}
+            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'#EFF6FF',color:'#0088CC',fontWeight:700,fontSize:14,border:'none',cursor:'pointer',width:'100%',fontFamily:'inherit'}}>
             <span style={{fontSize:24,lineHeight:1}}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="#0088CC"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
             </span>{t.remindTG}
-          </a>
+          </button>
           <a href={`tel:${d.phone}`} onClick={onClose}
             style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'var(--g100)',color:'var(--g700)',fontWeight:700,fontSize:14,textDecoration:'none'}}>
             <span style={{fontSize:24,lineHeight:1}}>📞</span>{t.remindCall}
@@ -2363,7 +2366,7 @@ function MobileNav({page,setPage,overdueCount,t,isAdmin,business,onRefresh}){
     <>
       {fabOpen&&<div style={{position:'fixed',inset:0,zIndex:199,background:'rgba(15,23,42,.4)',backdropFilter:'blur(4px)'}} onClick={()=>setFabOpen(false)}/>}
       {fabOpen&&(
-        <div style={{position:'fixed',bottom:78,left:'50%',transform:'translateX(-50%)',zIndex:200,display:'flex',flexDirection:'column',alignItems:'center',gap:10,animation:'fabUp .22s cubic-bezier(.34,1.56,.64,1)'}}>
+        <div style={{position:'fixed',bottom:78,left:'50%',transform:'translateX(-50%)',zIndex:200,display:'flex',flexDirection:'column',alignItems:'center',gap:10,animation:'fabUpCenter .22s cubic-bezier(.34,1.56,.64,1) forwards'}}>
           <button className="fab-action-btn add" onClick={()=>openAdd('receivable')}>
             <div className="fab-action-inner">
               <div className="fab-action-icon">{IC.debts}</div>
