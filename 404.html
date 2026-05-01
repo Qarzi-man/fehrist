@@ -7,9 +7,10 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Қарзи ман"/>
+<meta name="apple-mobile-web-app-title" content="Daftarcha"/>
 <link rel="manifest" href="/manifest.json"/>
-<title>Қарзи ман</title>
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='180' y2='180'%3E%3Cstop stop-color='%232563EB'/%3E%3Cstop offset='1' stop-color='%237C3AED'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M45 62h90M45 90h53M45 118h66' stroke='white' stroke-width='13' stroke-linecap='round'/%3E%3Ccircle cx='132' cy='118' r='26' fill='white' fill-opacity='.18' stroke='white' stroke-width='6.5'/%3E%3Cpath d='M122 118l8.5 8.5 14-17' stroke='white' stroke-width='8.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"/>
+<title>Daftarcha</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin="anonymous"></script>
@@ -212,8 +213,8 @@ tr:hover td{background:#FAFBFF}
 .contact-link:hover{text-decoration:underline}
 
 
-.fab-wrap{display:none;position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:150;align-items:center;flex-direction:column}
-.fab-actions{position:absolute;bottom:76px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:12px;animation:fabUp .22s cubic-bezier(.34,1.56,.64,1)}
+.fab-wrap{display:none;position:fixed;bottom:28px;right:28px;left:auto;transform:none;z-index:150;align-items:flex-end;flex-direction:column}
+.fab-actions{position:absolute;bottom:66px;right:0;left:auto;transform:none;display:flex;flex-direction:column;align-items:flex-end;gap:12px;animation:fabUp .22s cubic-bezier(.34,1.56,.64,1)}
 .fab-action-btn{display:flex;align-items:center;gap:12px;border:none;cursor:pointer;border-radius:24px;padding:0;-webkit-tap-highlight-color:transparent;transition:transform .15s;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 .fab-action-btn:active{transform:scale(.94)}
 .fab-action-inner{display:flex;align-items:center;gap:12px;padding:13px 22px 13px 16px;border-radius:24px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
@@ -232,7 +233,8 @@ tr:hover td{background:#FAFBFF}
 .fab-btn.open{box-shadow:0 4px 16px rgba(37,99,235,.4)}
 .fab-btn.open::after{animation:none;opacity:0}
 .fab-backdrop{position:fixed;inset:0;z-index:149;background:rgba(15,23,42,.35);backdrop-filter:blur(3px);animation:fadeIn .2s ease}
-@keyframes fabUp{from{opacity:0;transform:translateX(-50%) translateY(16px) scale(.92)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+@keyframes fabUp{from{opacity:0;transform:translateY(16px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes initPulse{0%,100%{opacity:.55}50%{opacity:.9}}
 @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.3)}50%{box-shadow:0 0 0 6px rgba(220,38,38,0)}} @keyframes fabPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:.2;transform:scale(1.15)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @media(max-width:768px){.fab-wrap{display:none!important}}
@@ -274,8 +276,6 @@ tr:hover td{background:#FAFBFF}
   .table-wrap{display:block!important}
   .debt-cards{display:none!important}
 }
-/* ── Promised pill ── */
-.pill-promised{background:#EDE9FE;color:#5B21B6}
 /* ── Reminder popup ── */
 .remind-wrap{position:relative;display:inline-block}
 .remind-popup{position:absolute;right:0;bottom:calc(100% + 6px);background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:5px;box-shadow:var(--shadow-lg);z-index:600;min-width:186px;animation:fadeIn .15s ease}
@@ -322,7 +322,7 @@ tr:hover td{background:#FAFBFF}
 </style>
 </head>
 <body>
-<div id="root"><div id="init-loader" style="position:fixed;inset:0;background:#0F172A;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:9999"><div class="spinner" style="border-color:rgba(37,99,235,.25);border-top-color:#2563EB;width:40px;height:40px;border-width:3px"></div><div style="color:rgba(255,255,255,.45);font-size:14px;font-weight:700;font-family:Inter,-apple-system,sans-serif;letter-spacing:.06em">QARZIMAN</div></div></div>
+<div id="root"><div id="init-loader" style="position:fixed;inset:0;background:#0F172A;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:9999"><div class="spinner" style="border-color:rgba(37,99,235,.25);border-top-color:#2563EB;width:40px;height:40px;border-width:3px"></div><div style="color:rgba(255,255,255,.55);font-size:15px;font-weight:800;font-family:Inter,-apple-system,sans-serif;letter-spacing:.1em;animation:initPulse 1.6s ease-in-out infinite">DAFTARCHA</div></div></div>
 <script type="text/babel">
 const {createClient}=supabase;
 const sb=createClient('https://fortxhggcnvbhrapkaul.supabase.co','sb_publishable_wpL9aGzMTm4GdKyv9TUe5A_UMmkQAqq');
@@ -334,7 +334,7 @@ function toast(msg,type='success'){_toast?.({msg,type,id:Date.now()});}
 
 const T={
   tg:{
-    appName:'Қарзи ман',appSub:'Ҳисобдории қарз',
+    appName:'Daftarcha',appSub:'Ҳисобдории қарз',
     login:'Даромадан',register:'Бақайдгирӣ',logout:'Баромадан',
     email:'Почтаи электронӣ',password:'Рамз',
     bizName:'Номи тиҷорат',bizType:'Намуди тиҷорат',
@@ -381,10 +381,10 @@ const T={
     contactDev:'Тамос бо сайтсоз',usersCount:'Корбарон',totalActiveSum:'Умумии фаъол',
     loginError:'Email ё рамз нодуруст аст',
     newPass:'Рамзи нав',confirmPass:'Тасдиқи рамз',passNoMatch:'Рамзҳо мувофиқ нестанд',updatePass:'Навсозии рамз',passUpdated:'Рамз навсозӣ шуд ✓',
-    offerOld:'Аккаунти кӯҳна',remind:'Эслатма',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Занг',remindCopy:'Нусхабардорӣ матн',copyPhoneOk:'Рақам нусхабардорӣ шуд ✓',editDebt:'Таҳрири қарз',printReport:'Чоп кардан',darkMode:'Тираи',promised:'Ваъда дод',promisedMark:'Ваъда қайд',dueSoon3:'3 рӯз',dueSoon7:'7 рӯз',dueSoon14:'14 рӯз',dueSoonFilter:'Ба зудӣ',
+    offerOld:'Аккаунти кӯҳна',remind:'Огоҳнома',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Занг',remindSMS:'SMS',remindCopy:'Нусхабардорӣ матни огоҳнома',remindTemplate:'Шаблони паём',remindTplFriend:'Дӯст',remindTplOfficial:'Расмӣ',remindTplPartner:'Шарик',remindTplCustom:'Дигар',tplFriend:'{name}, салом! Қарзи боқимонда {amount} {sum}, мӯҳлат {date}. Фаромӯш накун 😊',tplOfficial:'{name}, ҳурматан! Боқии қарз: {amount} {sum}. Мӯҳлати пардохт: {date}. Хоҳишмандем ба вақт пардохт кунед.',tplPartner:'{name}, боқии ҳисоб: {amount} {sum}. Мӯҳлат: {date}. Лутфан пардохт кунед.',pickContact:'Аз контактҳо',copyPhoneOk:'Рақам нусхабардорӣ шуд ✓',editDebt:'Таҳрири қарз',printReport:'Чоп кардан',darkMode:'Режими торик',dueSoon3:'3 рӯз',dueSoon7:'7 рӯз',dueSoon14:'14 рӯз',dueSoonFilter:'Ба зудӣ',
   },
   ru:{
-    appName:'Мой долг',appSub:'Учёт задолженностей',
+    appName:'Daftarcha',appSub:'Учёт задолженностей',
     login:'Войти',register:'Регистрация',logout:'Выйти',
     email:'Email',password:'Пароль',
     bizName:'Название бизнеса',bizType:'Тип бизнеса',
@@ -431,10 +431,10 @@ const T={
     contactDev:'Связаться с разработчиком',usersCount:'Пользователей',totalActiveSum:'Общая сумма',
     loginError:'Неверный email или пароль',
     newPass:'Новый пароль',confirmPass:'Подтвердить пароль',passNoMatch:'Пароли не совпадают',updatePass:'Обновить пароль',passUpdated:'Пароль обновлён ✓',
-    offerOld:'Старый аккаунт',remind:'Напомнить',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Позвонить',remindCopy:'Скопировать текст',copyPhoneOk:'Номер скопирован ✓',editDebt:'Изменить долг',printReport:'Распечатать',darkMode:'Тёмный режим',promised:'Обещал платить',promisedMark:'Отметить "обещал"',dueSoon3:'3 дня',dueSoon7:'7 дней',dueSoon14:'14 дней',dueSoonFilter:'Скоро срок',
+    offerOld:'Старый аккаунт',remind:'Напоминание',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Позвонить',remindSMS:'SMS',remindCopy:'Скопировать текст напоминания',remindTemplate:'Шаблон сообщения',remindTplFriend:'Другу',remindTplOfficial:'Официальный',remindTplPartner:'Партнёру',remindTplCustom:'Другой',tplFriend:'{name}, привет! Остаток долга {amount} {sum}, срок {date}. Не забудь 😊',tplOfficial:'Уважаемый(ая) {name}, напоминаем о задолженности: {amount} {sum}. Срок погашения: {date}.',tplPartner:'{name}, остаток по счёту: {amount} {sum}. Срок: {date}. Пожалуйста, оплатите.',pickContact:'Из контактов',copyPhoneOk:'Номер скопирован ✓',editDebt:'Изменить долг',printReport:'Распечатать',darkMode:'Тёмный режим',dueSoon3:'3 дня',dueSoon7:'7 дней',dueSoon14:'14 дней',dueSoonFilter:'Скоро срок',
   },
   uz:{
-    appName:'Mening qarzim',appSub:'Qarz hisobi',
+    appName:'Daftarcha',appSub:'Qarz hisobi',
     login:'Kirish',register:"Ro'yxatdan o'tish",logout:'Chiqish',
     email:'Email',password:'Parol',
     bizName:'Biznes nomi',bizType:'Biznes turi',
@@ -481,10 +481,10 @@ const T={
     contactDev:"Dasturchi bilan bog'lanish",usersCount:"Foydalanuvchilar",totalActiveSum:"Umumiy summa",
     loginError:"Email yoki parol noto'g'ri",
     newPass:"Yangi parol",confirmPass:"Parolni tasdiqlash",passNoMatch:"Parollar mos kelmadi",updatePass:"Parolni yangilash",passUpdated:"Parol yangilandi ✓",
-    offerOld:"Eski hisob",remind:"Eslatma",remindWA:"WhatsApp",remindTG:"Telegram",remindCall:"Qo'ng'iroq",remindCopy:"Matnni nusxalash",copyPhoneOk:"Raqam nusxalandi ✓",editDebt:"Qarzni tahrirlash",printReport:"Chop etish",darkMode:"Qorong'u rejim",promised:"To'lashga va'da berdi",promisedMark:"Va'da qildi",dueSoon3:"3 kun",dueSoon7:"7 kun",dueSoon14:"14 kun",dueSoonFilter:"Yaqin muddat",
+    offerOld:"Eski hisob",remind:"Eslatma",remindWA:"WhatsApp",remindTG:"Telegram",remindCall:"Qo'ng'iroq",remindSMS:"SMS",remindCopy:"Eslatma matnini nusxalash",remindTemplate:"Xabar shabloni",remindTplFriend:"Do'stga",remindTplOfficial:"Rasmiy",remindTplPartner:"Hamkorga",remindTplCustom:"Boshqa",tplFriend:"{name}, salom! Qarz qoldig'i {amount} {sum}, muddat {date}. Unutma 😊",tplOfficial:"{name}, hurmatli! Qarz qoldig'i: {amount} {sum}. To'lov muddati: {date}.",tplPartner:"{name}, hisob qoldig'i: {amount} {sum}. Muddat: {date}. Iltimos, to'lang.",pickContact:"Kontaktlardan",copyPhoneOk:"Raqam nusxalandi ✓",editDebt:"Qarzni tahrirlash",printReport:"Chop etish",darkMode:"Qorong'u rejim",dueSoon3:"3 kun",dueSoon7:"7 kun",dueSoon14:"14 kun",dueSoonFilter:"Yaqin muddat",
   },
   en:{
-    appName:'My Debt',appSub:'Debt management',
+    appName:'Daftarcha',appSub:'Debt management',
     login:'Sign In',register:'Sign Up',logout:'Sign Out',
     email:'Email',password:'Password',
     bizName:'Business name',bizType:'Business type',
@@ -531,19 +531,18 @@ const T={
     contactDev:'Contact developer',usersCount:'Users',totalActiveSum:'Total active',
     loginError:'Invalid email or password',
     newPass:'New password',confirmPass:'Confirm password',passNoMatch:'Passwords do not match',updatePass:'Update password',passUpdated:'Password updated ✓',
-    offerOld:'Legacy account',remind:'Remind',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Call',remindCopy:'Copy text',copyPhoneOk:'Phone copied ✓',editDebt:'Edit debt',printReport:'Print report',darkMode:'Dark mode',promised:'Promised to pay',promisedMark:'Mark as promised',dueSoon3:'3 days',dueSoon7:'7 days',dueSoon14:'14 days',dueSoonFilter:'Due soon',
+    offerOld:'Legacy account',remind:'Reminder',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Call',remindSMS:'SMS',remindCopy:'Copy reminder text',remindTemplate:'Message template',remindTplFriend:'Friend',remindTplOfficial:'Official',remindTplPartner:'Partner',remindTplCustom:'Other',tplFriend:'Hey {name}! Debt balance {amount} {sum}, due {date}. Don\'t forget 😊',tplOfficial:'Dear {name}, this is a reminder of your outstanding balance: {amount} {sum}. Due date: {date}.',tplPartner:'{name}, account balance: {amount} {sum}. Due: {date}. Please arrange payment.',pickContact:'From contacts',copyPhoneOk:'Phone copied ✓',editDebt:'Edit debt',printReport:'Print report',darkMode:'Dark mode',dueSoon3:'3 days',dueSoon7:'7 days',dueSoon14:'14 days',dueSoonFilter:'Due soon',
   }
 };
 
 function getStatus(d){
   if(d.status==='paid')return 'paid';
-  if(d.status==='promised')return 'promised';
   const diff=Math.floor((new Date()-new Date(d.due_date))/86400000);
   if(diff>0)return 'overdue';
   if(diff>-7)return 'due';
   return 'active';
 }
-const statusClass=s=>({active:'pill-active',due:'pill-due',overdue:'pill-overdue',paid:'pill-paid',partial:'pill-due',promised:'pill-promised'}[s]??'');
+const statusClass=s=>({active:'pill-active',due:'pill-due',overdue:'pill-overdue',paid:'pill-paid',partial:'pill-due'}[s]??'');
 const daysOverdue=d=>Math.max(0,Math.floor((new Date()-new Date(d.due_date))/86400000));
 const fmt=n=>Number(n??0).toLocaleString('ru-RU',{maximumFractionDigits:2});
 const fmtDate=str=>{if(!str||str==='—')return'—';const m=str.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[3]}.${m[2]}.${m[1]}`:str;};
@@ -565,20 +564,6 @@ function LogoutConfirmModal({t,onConfirm,onClose}){
     </div>
   );
 }
-function DeleteConfirmModal({t,onConfirm,onClose}){
-  return(
-    <div className="logout-confirm-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="logout-confirm-box">
-        <div style={{fontSize:36,marginBottom:12}}>🗑️</div>
-        <div style={{fontSize:17,fontWeight:800,color:'var(--g900)',marginBottom:6}}>{t.deleteConfirm}</div>
-        <div style={{display:'flex',gap:8,marginTop:4}}>
-          <button className="btn btn-full" onClick={onClose}>{t.logoutNo}</button>
-          <button className="btn btn-danger btn-full" onClick={onConfirm}>{t.deleteYes||t.delete}</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 function getOverdueCat(days,t){
   if(days<=0)return null;
   if(days<=30)return{label:t.cat1,cls:'cat-1'};
@@ -587,7 +572,7 @@ function getOverdueCat(days,t){
   if(days<=365)return{label:t.cat4,cls:'cat-4'};
   return{label:t.cat5,cls:'cat-5'};
 }
-function stLabel(st,t){return{active:t.active,due:t.dueSoon,overdue:t.overdue,paid:t.paid,partial:t.partial,promised:t.promised||'Promised'}[st]??st;}
+function stLabel(st,t){return{active:t.active,due:t.dueSoon,overdue:t.overdue,paid:t.paid,partial:t.partial}[st]??st;}
 function formatPhone(v){
   let d=v.replace(/\D/g,'');
   if(d.startsWith('992'))d=d.slice(0,12);
@@ -872,7 +857,7 @@ function OfferModal({t,onAccept,onClose,initialLang}){
   },[]);
   const offerTexts={
     tg:[
-      {n:'1. Мавзӯи шартнома',t:'Оферта-шартномаи мазкур тартиби истифодаи хидмати «Қарзи ман»-ро барои ҳисобдории қарзҳо (додашуда ва гирифташуда) муайян мекунад. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) дастрасиро ба хидмат мувофиқи шартҳои шартномаи мазкур таъмин мекунад.'},
+      {n:'1. Мавзӯи шартнома',t:'Оферта-шартномаи мазкур тартиби истифодаи хидмати «Daftarcha»-ро барои ҳисобдории қарзҳо (додашуда ва гирифташуда) муайян мекунад. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) дастрасиро ба хидмат мувофиқи шартҳои шартномаи мазкур таъмин мекунад.'},
       {n:'2. Шартҳои истифода',t:'Корбар ӯҳдадор аст хидматро танҳо барои мақсадҳои қонунӣ истифода барад. Додани дастрасӣ ба шахсони сеюм, бор кардани маълумоти нодуруст ва кӯшишҳои дастрасии ғайриқонунӣ манъ аст.'},
       {n:'3. Махфият',t:'Ҳамаи маълумоте, ки корбар ворид мекунад, махфӣ мебошанд. Оператор маълумоти шахсиро бидуни розигии корбар ба шахсони сеюм намедиҳад.'},
       {n:'4. Масъулият',t:'Оператор барои зарарҳое, ки дар натиҷаи истифодаи нодурусти хидмат ба вуҷуд меоянд, ҷавобгар нест. Корбар барои дурустии маълумоти ворид кардааш масъул аст.'},
@@ -881,7 +866,7 @@ function OfferModal({t,onAccept,onClose,initialLang}){
       {n:'7. Реквизитҳо',t:'ИП Исмонов Ғафурҷон Фарҳодҷонович · ЕИН: 0331564805 · Ҷумҳурии Тоҷикистон'},
     ],
     ru:[
-      {n:'1. Предмет договора',t:'Настоящая публичная оферта регулирует использование веб-сервиса «Қарзи ман» для учёта долгов — как выданных, так и полученных. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) предоставляет доступ к сервису на условиях настоящего Договора.'},
+      {n:'1. Предмет договора',t:'Настоящая публичная оферта регулирует использование веб-сервиса «Daftarcha» для учёта долгов — как выданных, так и полученных. ИП Исмонов Ғафурҷон Фарҳодҷонович (ЕИН: 0331564805) предоставляет доступ к сервису на условиях настоящего Договора.'},
       {n:'2. Условия использования',t:'Пользователь обязуется использовать сервис только в законных целях. Запрещается передача доступа третьим лицам, загрузка недостоверных данных, попытки взлома системы.'},
       {n:'3. Конфиденциальность',t:'Все данные пользователя конфиденциальны. Оператор не передаёт персональные данные третьим лицам без согласия пользователя.'},
       {n:'4. Ответственность',t:'Оператор не несёт ответственности за убытки от некорректного использования. Пользователь отвечает за достоверность вводимых данных.'},
@@ -899,7 +884,7 @@ function OfferModal({t,onAccept,onClose,initialLang}){
       {n:"7. Rekvizitlar",t:"YaT Ismonov Gafurjon Farhodjonovich · EIN: 0331564805 · Tojikiston Respublikasi"},
     ],
     en:[
-      {n:'1. Subject of Agreement',t:'This public offer governs the use of the «My Debt» web service for tracking debts — both given and received. IE Ismonov Ghafurjon Farhodjonovich (EIN: 0331564805) provides access to the service under these terms.'},
+      {n:'1. Subject of Agreement',t:'This public offer governs the use of the «Daftarcha» web service for tracking debts — both given and received. IE Ismonov Ghafurjon Farhodjonovich (EIN: 0331564805) provides access to the service under these terms.'},
       {n:'2. Terms of Use',t:'The user agrees to use the service only for lawful purposes. Transferring access to third parties, uploading false data, and unauthorized access attempts are prohibited.'},
       {n:'3. Confidentiality',t:'All user data is confidential. The operator does not share personal data with third parties without user consent.'},
       {n:'4. Liability',t:'The operator is not liable for losses caused by improper use of the service. The user is responsible for the accuracy of the data entered.'},
@@ -1007,6 +992,16 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
   const isPayable=debtType==='payable';
   const nameLabel=isPayable?(t.creditorName||'Кредитор'):(t.clientName);
+  const hasContactsAPI=typeof navigator!=='undefined'&&navigator.contacts&&typeof navigator.contacts.select==='function';
+  async function pickContact(){
+    try{
+      const contacts=await navigator.contacts.select(['name','tel'],{multiple:false});
+      if(!contacts||contacts.length===0)return;
+      const c=contacts[0];
+      if(c.name&&c.name[0])set('name',c.name[0]);
+      if(c.tel&&c.tel[0]){const raw=c.tel[0].replace(/\D/g,'');checkPhone(formatPhone(raw.startsWith('992')?'+'+raw:raw));}
+    }catch(e){console.error(e);}
+  }
 
   async function checkPhone(phone){
     set('phone',phone);
@@ -1058,7 +1053,11 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
           </div>
         )}
         <form onSubmit={submit}>
-          <label>{nameLabel} *</label><input value={f.name} onChange={e=>set('name',e.target.value)} autoFocus style={{fontSize:16}}/>
+          <div style={{display:'flex',alignItems:'center',gap:7,marginTop:14,marginBottom:5}}>
+            <label style={{margin:0,flex:1}}>{nameLabel} *</label>
+            {hasContactsAPI&&<button type="button" className="btn btn-sm" onClick={pickContact} style={{fontSize:11,padding:'3px 9px',flexShrink:0}}>📱 {t.pickContact||'Контакт'}</button>}
+          </div>
+          <input value={f.name} onChange={e=>set('name',e.target.value)} autoFocus style={{fontSize:16,marginTop:0}}/>
           <label>{t.phone} *</label><input type="tel" value={f.phone} onChange={e=>checkPhone(formatPhone(e.target.value))} placeholder="+992901234567" inputMode="numeric" maxLength={13} style={{fontSize:16}}/>
           {dupClient&&(
             <div style={{background:'var(--amber-bg)',border:'1px solid #FDE68A',borderRadius:'var(--r)',padding:'10px 12px',marginTop:8,fontSize:13}}>
@@ -1126,6 +1125,7 @@ function PayModal({debt,onClose,onSaved,t}){
         <div style={{display:"flex",alignItems:"center",gap:9}}><span style={{color:"var(--green)"}}>{IC.pay}</span><div className="modal-title">{t.payTitle}</div></div>
         <div className="info-box" style={{marginTop:12}}>
           <div style={{fontWeight:700,fontSize:15}}>{debt.client_name}</div>
+          <div style={{color:'var(--g500)',marginTop:4,fontSize:13}}>{t.dateIssued}: <strong>{fmtDate(debt.date_issued)}</strong> &nbsp;·&nbsp; {t.dueDate}: <strong>{fmtDate(debt.due_date)}</strong></div>
           <div style={{color:'var(--g500)',marginTop:4,fontSize:13}}>{t.totalDebt}: <strong>{fmt(debt.amount)}</strong> {t.sum} &nbsp;·&nbsp; {t.remaining}: <strong style={{color:'var(--red)'}}>{fmt(remaining)}</strong> {t.sum}</div>
         </div>
         <form onSubmit={submit}>
@@ -1271,7 +1271,6 @@ function DebtCard({d,t,onPay,onDelete,onHistory,onRefresh,isPayable}){
   const _isPayable=isPayable||(d.debt_type==='payable');
   const [showRemind,setShowRemind]=useState(false);
   const [showEdit,setShowEdit]=useState(false);
-  const [showPromise,setShowPromise]=useState(false);
   function copyPhone(){navigator.clipboard.writeText(d.phone).catch(()=>{});toast(t.copyPhoneOk||'✓');}
   return(
     <div className="debt-card">
@@ -1301,48 +1300,94 @@ function DebtCard({d,t,onPay,onDelete,onHistory,onRefresh,isPayable}){
         {st!=='paid'&&<button className="btn btn-green" onClick={()=>onPay(d)}>💳 {t.confirmPay.replace('✓ ','')}</button>}
         <button className="btn btn-sm" onClick={()=>setShowRemind(true)} title={t.remind}>🔔</button>
         <button className="btn btn-sm" onClick={()=>setShowEdit(true)} title={t.editDebt}>✏️</button>
-        {st!=='paid'&&st!=='promised'&&<button className="btn btn-sm" onClick={()=>setShowPromise(true)} title={t.promisedMark}>🤝</button>}
         <button className="btn btn-sm" onClick={()=>onHistory(d)}>📋</button>
-        <button className="btn btn-danger btn-sm" onClick={()=>onDelete(d)}>✕</button>
       </div>
       {showRemind&&<ReminderPopup d={d} t={t} onClose={()=>setShowRemind(false)}/>}
       {showEdit&&<EditDebtModal d={d} t={t} onClose={()=>setShowEdit(false)} onSaved={()=>onRefresh&&onRefresh()}/>}
-      {showPromise&&<PromiseModal d={d} t={t} onClose={()=>setShowPromise(false)} onSaved={()=>onRefresh&&onRefresh()}/>}
     </div>
   );
 }
 
 
 
-// ── Reminder Popup (Feature 1) ──
+// ── Reminder Popup ──
 function ReminderPopup({d,t,onClose}){
   const phone=d.phone.replace(/\D/g,'');
   const rem=Number(d.amount)-Number(d.paid_amount??0);
-  const msgText=`${d.client_name}, ${t.remaining}: ${fmt(rem)} ${t.sum}. ${t.dueDate}: ${fmtDate(d.due_date)}.`;
+  const [tplType,setTplType]=useState('friend');
+  const [customMsg,setCustomMsg]=useState('');
+  function buildMsg(type){
+    const name=d.client_name,amount=fmt(rem),sum=t.sum,date=fmtDate(d.due_date);
+    if(type==='custom')return customMsg;
+    const key='tpl'+type.charAt(0).toUpperCase()+type.slice(1);
+    return (t[key]||'{name} · {amount} {sum} · {date}')
+      .replace('{name}',name).replace('{amount}',amount).replace('{sum}',sum).replace('{date}',date);
+  }
+  const msgText=buildMsg(tplType);
   const msg=encodeURIComponent(msgText);
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  const smsHref=`sms:${d.phone}${isIOS?'&':'?'}body=${msg}`;
   function copyText(){navigator.clipboard.writeText(msgText).catch(()=>{});toast(t.remindCopy+' ✓');onClose();}
+  const templates=[
+    {key:'friend',label:t.remindTplFriend||'Другу'},
+    {key:'official',label:t.remindTplOfficial||'Офиц.'},
+    {key:'partner',label:t.remindTplPartner||'Партнёру'},
+    {key:'custom',label:t.remindTplCustom||'Другой'},
+  ];
   return(
     <div style={{position:'fixed',inset:0,zIndex:1100,display:'flex',alignItems:'flex-end',justifyContent:'center',background:'rgba(15,23,42,.5)',backdropFilter:'blur(3px)'}} onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div style={{background:'var(--g50)',borderRadius:'20px 20px 0 0',padding:'20px 20px 32px',width:'100%',maxWidth:520,boxShadow:'0 -8px 32px rgba(0,0,0,.2)',animation:'slideUp .25s ease'}}>
+      <div style={{background:'var(--g50)',borderRadius:'20px 20px 0 0',padding:'20px 20px 32px',width:'100%',maxWidth:520,boxShadow:'0 -8px 32px rgba(0,0,0,.2)',animation:'slideUp .25s ease',maxHeight:'92vh',overflowY:'auto'}}>
         <div style={{width:36,height:4,background:'var(--g200)',borderRadius:2,margin:'0 auto 16px'}}/>
         <div style={{fontWeight:800,fontSize:16,color:'var(--g900)',marginBottom:4}}>🔔 {t.remind}</div>
-        <div style={{fontSize:13,color:'var(--g500)',marginBottom:16}}>{d.client_name} · {d.phone}</div>
+        <div style={{fontSize:13,color:'var(--g500)',marginBottom:14}}>{d.client_name} · {d.phone}</div>
+        {/* Template selector */}
+        <div style={{marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:700,color:'var(--g500)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:7}}>{t.remindTemplate||'Шаблон'}</div>
+          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+            {templates.map(tpl=>(
+              <button key={tpl.key} type="button" onClick={()=>setTplType(tpl.key)}
+                style={{padding:'5px 13px',borderRadius:20,border:'1.5px solid',borderColor:tplType===tpl.key?'var(--primary)':'var(--g200)',background:tplType===tpl.key?'var(--primary-bg)':'#fff',color:tplType===tpl.key?'var(--primary)':'var(--g600)',fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'inherit',transition:'all .15s'}}>
+                {tpl.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Message preview / custom textarea */}
+        <div style={{marginBottom:14}}>
+          {tplType==='custom'?(
+            <textarea value={customMsg} onChange={e=>setCustomMsg(e.target.value)}
+              placeholder={t.remindTplCustom||'Напишите сообщение...'}
+              rows={3}
+              style={{width:'100%',padding:'10px 13px',border:'1.5px solid var(--g200)',borderRadius:'var(--r)',fontSize:13,fontFamily:'inherit',color:'var(--g700)',background:'#fff',resize:'vertical',outline:'none'}}/>
+          ):(
+            <div style={{background:'#fff',border:'1px solid var(--g200)',borderRadius:'var(--r)',padding:'10px 13px',fontSize:13,color:'var(--g700)',lineHeight:1.65}}>{msgText}</div>
+          )}
+        </div>
+        {/* Action buttons */}
         <div style={{display:'flex',flexDirection:'column',gap:8}}>
           <a href={`https://wa.me/${phone}?text=${msg}`} target="_blank" rel="noopener noreferrer" onClick={onClose}
             style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'#DCFCE7',color:'#15803D',fontWeight:700,fontSize:14,textDecoration:'none'}}>
-            <span style={{fontSize:22}}>💬</span>{t.remindWA}
+            <span style={{fontSize:24,lineHeight:1}}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </span>{t.remindWA}
           </a>
           <a href={`https://t.me/+${phone}`} target="_blank" rel="noopener noreferrer" onClick={onClose}
-            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'#EFF6FF',color:'var(--primary)',fontWeight:700,fontSize:14,textDecoration:'none'}}>
-            <span style={{fontSize:22}}>✈️</span>{t.remindTG}
+            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'#EFF6FF',color:'#0088CC',fontWeight:700,fontSize:14,textDecoration:'none'}}>
+            <span style={{fontSize:24,lineHeight:1}}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#0088CC"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            </span>{t.remindTG}
           </a>
           <a href={`tel:${d.phone}`} onClick={onClose}
             style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'var(--g100)',color:'var(--g700)',fontWeight:700,fontSize:14,textDecoration:'none'}}>
-            <span style={{fontSize:22}}>📞</span>{t.remindCall}
+            <span style={{fontSize:24,lineHeight:1}}>📞</span>{t.remindCall}
+          </a>
+          <a href={smsHref} onClick={onClose}
+            style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'#F0FDF4',color:'#166534',fontWeight:700,fontSize:14,textDecoration:'none'}}>
+            <span style={{fontSize:24,lineHeight:1}}>✉️</span>{t.remindSMS||'SMS'}
           </a>
           <button onClick={copyText}
             style={{display:'flex',alignItems:'center',gap:12,padding:'12px 16px',borderRadius:'var(--r)',background:'var(--g100)',color:'var(--g700)',fontWeight:700,fontSize:14,border:'none',cursor:'pointer',width:'100%',fontFamily:'inherit'}}>
-            <span style={{fontSize:22}}>📋</span>{t.remindCopy}
+            <span style={{fontSize:24,lineHeight:1}}>📋</span>{t.remindCopy}
           </button>
         </div>
         <button className="btn btn-full" style={{marginTop:14}} onClick={onClose}>{t.cancel}</button>
@@ -1392,28 +1437,6 @@ function EditDebtModal({d,onClose,onSaved,t}){
   );
 }
 
-// ── Promise Modal (Feature 8) ──
-function PromiseModal({d,onClose,onSaved,t}){
-  const [saving,setSaving]=useState(false);
-  async function mark(){
-    setSaving(true);
-    await sb.from('debts').update({status:'promised'}).eq('id',d.id);
-    setSaving(false);toast(t.savedOk);onSaved();onClose();
-  }
-  return(
-    <div className="logout-confirm-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="logout-confirm-box">
-        <div style={{fontSize:36,marginBottom:12}}>🤝</div>
-        <div style={{fontSize:17,fontWeight:800,color:'var(--g900)',marginBottom:6}}>{t.promisedMark}?</div>
-        <div style={{fontSize:13,color:'var(--g500)',marginBottom:20}}>{d.client_name} · {fmt(Number(d.amount)-Number(d.paid_amount??0))} {t.sum}</div>
-        <div style={{display:'flex',gap:8}}>
-          <button className="btn btn-full" onClick={onClose}>{t.cancel}</button>
-          <button className="btn btn-primary btn-full" onClick={mark} disabled={saving}>{saving?'...':'✓ '+t.promisedMark}</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── Quick Pay Modal (from FAB) ──
 function QuickPayModal({debts,onClose,onPaid,t}){
@@ -1462,9 +1485,8 @@ function QuickPayModal({debts,onClose,onPaid,t}){
 function Dashboard({t}){
   const {business,setPage}=useApp();
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
-  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);const [deleteTarget,setDeleteTarget]=useState(null);
+  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);
   async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
-  async function confirmDelete(d){await sb.from('debts').delete().eq('id',d.id);setDeleteTarget(null);load();}
   useEffect(()=>{load();},[business]);
   const active=debts.filter(d=>getStatus(d)!=='paid');
   const overdue=debts.filter(d=>getStatus(d)==='overdue');
@@ -1566,13 +1588,12 @@ function Dashboard({t}){
               </tr>;})}
             </tbody>
           </table></div>
-          <div className="debt-cards">{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onDelete={dd=>setDeleteTarget(dd)} onHistory={setHistDebt}/>)}</div>
+          <div className="debt-cards">{overdue.sort((a,b)=>daysOverdue(b)-daysOverdue(a)).map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onHistory={setHistDebt}/>)}</div>
         </div>
       )}
       {addOpen&&<AddDebtModal business={business} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast(t.addedOk);}} t={t}/>}
       {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast(t.paidOk);}} t={t}/>}
       {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
-      {deleteTarget&&<DeleteConfirmModal t={t} onConfirm={()=>confirmDelete(deleteTarget)} onClose={()=>setDeleteTarget(null)}/>}
     </>
   );
 }
@@ -1582,11 +1603,9 @@ function DebtsPage({t}){
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
   const [tab,setTab]=useState('receivable'); // receivable | payable
   const [search,setSearch]=useState('');const [fStatus,setFStatus]=useState('');const [fDueSoon,setFDueSoon]=useState('');const [sort,setSort]=useState('date_desc');
-  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);const [deleteTarget,setDeleteTarget]=useState(null);const [editDebt,setEditDebt]=useState(null);const [remindDebt,setRemindDebt]=useState(null);const [promiseDebt,setPromiseDebt]=useState(null);
+  const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);const [editDebt,setEditDebt]=useState(null);const [remindDebt,setRemindDebt]=useState(null);
   async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
   useEffect(()=>{load();},[business]);
-  async function confirmDelete(d){await sb.from('debts').delete().eq('id',d.id);toast(t.deletedOk,'error');setDeleteTarget(null);load();}
-  async function del(d){setDeleteTarget(d);}
   const list=useMemo(()=>{
     let r=debts.filter(d=>{
       const dtype=d.debt_type||'receivable';
@@ -1622,7 +1641,7 @@ function DebtsPage({t}){
       <div className="card">
         <div className="filter-bar">
           <input placeholder={'🔍 '+t.search} value={search} onChange={e=>setSearch(e.target.value)}/>
-          <select value={fStatus} onChange={e=>setFStatus(e.target.value)}><option value="">{t.allStatus}</option><option value="active">{t.active}</option><option value="due">{t.dueSoon}</option><option value="overdue">{t.overdue}</option><option value="promised">{t.promised}</option><option value="paid">{t.paid}</option></select>
+          <select value={fStatus} onChange={e=>setFStatus(e.target.value)}><option value="">{t.allStatus}</option><option value="active">{t.active}</option><option value="due">{t.dueSoon}</option><option value="overdue">{t.overdue}</option><option value="paid">{t.paid}</option></select>
           <select value={fDueSoon} onChange={e=>setFDueSoon(e.target.value)}><option value="">⏱ {t.dueSoonFilter}</option><option value="3">{t.dueSoon3}</option><option value="7">{t.dueSoon7}</option><option value="14">{t.dueSoon14}</option></select>
           <select value={sort} onChange={e=>setSort(e.target.value)}><option value="date_desc">{t.newest}</option><option value="date_asc">{t.oldest}</option><option value="amount_desc">{t.byAmount}</option><option value="overdue">{t.byOverdue}</option></select>
         </div>
@@ -1645,20 +1664,18 @@ function DebtsPage({t}){
                 <td style={{fontWeight:700,color:rem>0?(isPayable?'var(--green)':'var(--red)'):'var(--g400)'}}>{fmt(rem)}</td>
                 <td style={{fontSize:12,color:'var(--g500)'}}>{fmtDate(d.due_date)}</td>
                 <td>{st==='overdue'&&cat?<span className={`pill ${cat.cls}`}>{cat.label}</span>:<span className={`pill ${statusClass(st)}`}><span className="pill-dot"/>{stLabel(st,t)}</span>}</td>
-                <td><div className="row-actions">{st!=='paid'&&<button className="btn btn-sm btn-green" onClick={()=>setPayDebt(d)} title={t.payTitle}>{IC.pay}</button>}<button className="btn btn-sm" onClick={()=>setRemindDebt(d)} title={t.remind}>🔔</button><button className="btn btn-sm" onClick={()=>setEditDebt(d)} title={t.editDebt}>✏️</button>{st!=='paid'&&st!=='promised'&&<button className="btn btn-sm" onClick={()=>setPromiseDebt(d)} title={t.promisedMark}>🤝</button>}<button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button><button className="btn btn-sm btn-danger" onClick={()=>del(d)} title={t.delete}>{IC.trash}</button></div></td>
+                <td><div className="row-actions">{st!=='paid'&&<button className="btn btn-sm btn-green" onClick={()=>setPayDebt(d)} title={t.payTitle}>{IC.pay}</button>}<button className="btn btn-sm" onClick={()=>setRemindDebt(d)} title={t.remind}>🔔</button><button className="btn btn-sm" onClick={()=>setEditDebt(d)} title={t.editDebt}>✏️</button><button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button></div></td>
               </tr>;})}
             </tbody>
           </table></div>
-          <div className="debt-cards">{list.map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onDelete={del} onHistory={setHistDebt} onRefresh={load} isPayable={isPayable}/>)}</div>
+          <div className="debt-cards">{list.map(d=><DebtCard key={d.id} d={d} t={t} onPay={setPayDebt} onHistory={setHistDebt} onRefresh={load} isPayable={isPayable}/>)}</div>
         </>}
       </div>
       {addOpen&&<AddDebtModal business={business} initialType={tab} onClose={()=>setAddOpen(false)} onSaved={()=>{load();toast(t.addedOk);}} t={t}/>}
       {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{load();setPayDebt(null);toast(t.paidOk);}} t={t}/>}
       {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
-      {deleteTarget&&<DeleteConfirmModal t={t} onConfirm={()=>confirmDelete(deleteTarget)} onClose={()=>setDeleteTarget(null)}/>}
       {editDebt&&<EditDebtModal d={editDebt} t={t} onClose={()=>setEditDebt(null)} onSaved={load}/>}
       {remindDebt&&<ReminderPopup d={remindDebt} t={t} onClose={()=>setRemindDebt(null)}/>}
-      {promiseDebt&&<PromiseModal d={promiseDebt} t={t} onClose={()=>setPromiseDebt(null)} onSaved={load}/>}
     </>
   );
 }
@@ -1672,7 +1689,7 @@ function ClientHistoryModal({client,debts,onClose,t}){
     const totalPaid=debts.reduce((s,d)=>s+Number(d.paid_amount??0),0);
     const totalRem=totalDebt-totalPaid;
     const w=window.open('','_blank');if(!w)return;
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${client.name}</title><style>body{font-family:Arial,sans-serif;padding:20px;font-size:13px;color:#1e293b}h1{font-size:18px;margin-bottom:4px}table{width:100%;border-collapse:collapse;margin-top:12px}th{background:#f1f5f9;text-align:left;padding:7px 10px;font-size:11px;border:1px solid #e2e8f0}td{padding:7px 10px;border:1px solid #e2e8f0;font-size:12px}.summary{display:flex;gap:16px;margin:12px 0}.sbox{border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;text-align:center;flex:1}.sval{font-size:16px;font-weight:700}</style></head><body><h1>${client.name}</h1><p style="color:#64748b;font-size:12px;margin:2px 0 12px">${client.phone}</p><div class="summary"><div class="sbox"><div style="font-size:10px;color:#64748b">${t.totalDebt}</div><div class="sval">${fmt(totalDebt)}</div><div style="font-size:10px;color:#64748b">${t.sum}</div></div><div class="sbox"><div style="font-size:10px;color:#64748b">${t.paid}</div><div class="sval" style="color:#059669">${fmt(totalPaid)}</div></div><div class="sbox"><div style="font-size:10px;color:#64748b">${t.remaining}</div><div class="sval" style="color:${totalRem>0?'#DC2626':'#059669'}">${fmt(totalRem)}</div></div></div><table><thead><tr><th>${t.dateIssued}</th><th>${t.dueDate}</th><th>${t.amount}</th><th>${t.paid}</th><th>${t.remaining}</th><th>${t.category}</th></tr></thead><tbody>${debts.map(d=>{const r=Number(d.amount)-Number(d.paid_amount??0);return`<tr><td>${fmtDate(d.date_issued)}</td><td>${fmtDate(d.due_date)}</td><td>${fmt(d.amount)}</td><td>${fmt(d.paid_amount??0)}</td><td>${fmt(r)}</td><td>${d.category||''}</td></tr>`;}).join('')}</tbody></table><p style="margin-top:14px;font-size:11px;color:#94a3b8">Qarziman · ${new Date().toLocaleDateString()}</p></body></html>`);
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${client.name}</title><style>body{font-family:Arial,sans-serif;padding:20px;font-size:13px;color:#1e293b}h1{font-size:18px;margin-bottom:4px}table{width:100%;border-collapse:collapse;margin-top:12px}th{background:#f1f5f9;text-align:left;padding:7px 10px;font-size:11px;border:1px solid #e2e8f0}td{padding:7px 10px;border:1px solid #e2e8f0;font-size:12px}.summary{display:flex;gap:16px;margin:12px 0}.sbox{border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;text-align:center;flex:1}.sval{font-size:16px;font-weight:700}</style></head><body><h1>${client.name}</h1><p style="color:#64748b;font-size:12px;margin:2px 0 12px">${client.phone}</p><div class="summary"><div class="sbox"><div style="font-size:10px;color:#64748b">${t.totalDebt}</div><div class="sval">${fmt(totalDebt)}</div><div style="font-size:10px;color:#64748b">${t.sum}</div></div><div class="sbox"><div style="font-size:10px;color:#64748b">${t.paid}</div><div class="sval" style="color:#059669">${fmt(totalPaid)}</div></div><div class="sbox"><div style="font-size:10px;color:#64748b">${t.remaining}</div><div class="sval" style="color:${totalRem>0?'#DC2626':'#059669'}">${fmt(totalRem)}</div></div></div><table><thead><tr><th>${t.dateIssued}</th><th>${t.dueDate}</th><th>${t.amount}</th><th>${t.paid}</th><th>${t.remaining}</th><th>${t.category}</th></tr></thead><tbody>${debts.map(d=>{const r=Number(d.amount)-Number(d.paid_amount??0);return`<tr><td>${fmtDate(d.date_issued)}</td><td>${fmtDate(d.due_date)}</td><td>${fmt(d.amount)}</td><td>${fmt(d.paid_amount??0)}</td><td>${fmt(r)}</td><td>${d.category||''}</td></tr>`;}).join('')}</tbody></table><p style="margin-top:14px;font-size:11px;color:#94a3b8">Daftarcha · ${new Date().toLocaleDateString()}</p></body></html>`);
     w.document.close();w.print();
   }
   useEffect(()=>{
@@ -1746,7 +1763,8 @@ function ClientHistoryModal({client,debts,onClose,t}){
 
 function ClientsPage({t}){
   const {business}=useApp();
-  const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);const [search,setSearch]=useState('');const [histClient,setHistClient]=useState(null);
+  const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);const [search,setSearch]=useState('');const [histClient,setHistClient]=useState(null);const [payDebt,setPayDebt]=useState(null);
+  async function reload(){if(!business)return;const{data}=await sb.from('debts').select('*').eq('business_id',business.id);setDebts(data??[]);}
   useEffect(()=>{if(!business)return;setLoading(true);sb.from('debts').select('*').eq('business_id',business.id).then(({data})=>{setDebts(data??[]);setLoading(false);});},[business]);
   const clients=useMemo(()=>{
     const map={};debts.forEach(d=>{if(!map[d.phone])map[d.phone]={name:d.client_name,phone:d.phone,debts:[]};map[d.phone].debts.push(d);});
@@ -1764,12 +1782,12 @@ function ClientsPage({t}){
             <thead><tr>
               <th style={{minWidth:140}}>{t.clientName}</th>
               <th style={{minWidth:110}}>{t.phone}</th>
-              <th style={{width:50,textAlign:'center'}}>#</th>
+              <th style={{width:50,textAlign:'center'}}>№</th>
               <th style={{minWidth:110}}>{t.totalDebt}</th>
               <th style={{minWidth:110}}>{t.remaining}</th>
               <th style={{minWidth:100}}>{t.paidDebts}</th>
               <th style={{width:80,textAlign:'center'}}>{t.days}</th>
-              <th style={{width:90}}></th>
+              <th style={{width:110}}></th>
             </tr></thead>
             <tbody>{clients.map(c=>{
               const active=c.debts.filter(d=>getStatus(d)!=='paid');const paidD=c.debts.filter(d=>getStatus(d)==='paid');
@@ -1796,8 +1814,9 @@ function ClientsPage({t}){
                 <td style={{fontWeight:700,color:actSum>0?'var(--red)':'var(--g400)',fontSize:12}}>{fmt(actSum)}</td>
                 <td style={{color:'var(--green)',fontWeight:600,fontSize:12}}>{fmt(paidSum)}</td>
                 <td style={{textAlign:'center'}}>{maxOv>0&&cat?<span className={`pill ${cat.cls}`} style={{fontSize:10,padding:'2px 7px'}}>{maxOv}{t.days}</span>:<span style={{color:'var(--g300)'}}>—</span>}</td>
-                <td><div style={{display:'flex',gap:4,alignItems:'center'}}>
+                <td><div style={{display:'flex',gap:4,alignItems:'center',flexWrap:'wrap'}}>
                   <span className={`pill ${hasOv?'pill-overdue':active.length?'pill-active':'pill-paid'}`} style={{fontSize:10,padding:'2px 8px'}}><span className="pill-dot"/>{hasOv?t.overdue:active.length?t.active:t.paid}</span>
+                  {active.length>0&&<button className="btn btn-sm btn-green" style={{padding:'3px 7px',fontSize:11}} onClick={()=>setPayDebt(active[0])} title={t.payTitle}>{IC.pay}</button>}
                   <button className="btn btn-sm" style={{padding:'3px 6px',fontSize:11}} onClick={()=>setHistClient({name:c.name,phone:c.phone,debts:c.debts})}>📋</button>
                 </div></td>
               </tr>;})}
@@ -1823,12 +1842,16 @@ function ClientsPage({t}){
                 <span className={`pill ${hasOv?'pill-overdue':active.length?'pill-active':'pill-paid'}`}><span className="pill-dot"/>{hasOv?t.overdue:active.length?t.active:t.paid}</span>
               </div>
               <div className="debt-card-row"><span>{t.debts}: <strong>{c.debts.length}</strong></span><span style={{fontWeight:700,color:actSum>0?'var(--red)':'var(--g400)'}}>{fmt(actSum)} {t.sum}</span></div>
-              <div style={{marginTop:10,paddingTop:10,borderTop:'1px solid var(--border)'}}><button className="btn btn-sm btn-full" onClick={()=>setHistClient({name:c.name,phone:c.phone,debts:c.debts})}>📋 {t.clientHistory}</button></div>
+              <div style={{marginTop:10,paddingTop:10,borderTop:'1px solid var(--border)',display:'flex',gap:8}}>
+                {active.length>0&&<button className="btn btn-green btn-sm" style={{flex:1}} onClick={()=>setPayDebt(active[0])}>💳 {t.payTitle}</button>}
+                <button className="btn btn-sm" style={{flex:1}} onClick={()=>setHistClient({name:c.name,phone:c.phone,debts:c.debts})}>📋 {t.clientHistory}</button>
+              </div>
             </div>;})}
           </div>
         </>}
       </div>
       {histClient&&<ClientHistoryModal client={histClient} debts={histClient.debts} onClose={()=>setHistClient(null)} t={t}/>}
+      {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{setPayDebt(null);toast(t.paidOk);reload();}} t={t}/>}
     </>
   );
 }
@@ -1838,16 +1861,18 @@ function ClientsPage({t}){
 function OverdueHistoryPage({t}){
   const {business}=useApp();
   const [debts,setDebts]=useState([]);const [payments,setPayments]=useState([]);const [loading,setLoading]=useState(true);
-  const [search,setSearch]=useState('');const [sort,setSort]=useState('overdue');const [histDebt,setHistDebt]=useState(null);
-  useEffect(()=>{
+  const [search,setSearch]=useState('');const [sort,setSort]=useState('overdue');const [histDebt,setHistDebt]=useState(null);const [payDebt,setPayDebt]=useState(null);
+  async function load(){
     if(!business)return;
     setLoading(true);
-    (async()=>{
-      const{data:d}=await sb.from('debts').select('*').eq('business_id',business.id).neq('status','paid');
-      const debtIds=(d??[]).map(x=>x.id);
-      const{data:p}=debtIds.length?await sb.from('payments').select('*').in('debt_id',debtIds):{data:[]};
-      setDebts(d??[]);setPayments(p??[]);setLoading(false);
-    })();
+    const{data:d}=await sb.from('debts').select('*').eq('business_id',business.id).neq('status','paid');
+    const debtIds=(d??[]).map(x=>x.id);
+    const{data:p}=debtIds.length?await sb.from('payments').select('*').in('debt_id',debtIds):{data:[]};
+    setDebts(d??[]);setPayments(p??[]);setLoading(false);
+  }
+  useEffect(()=>{
+    if(!business)return;
+    load();
   },[business]);
   const overdue=useMemo(()=>{
     let r=debts.filter(d=>getStatus(d)==='overdue');
@@ -1891,7 +1916,7 @@ function OverdueHistoryPage({t}){
                 <td><strong style={{color:'var(--red)',fontSize:14}}>{ov} {t.days}</strong></td>
                 <td>{cat&&<span className={`pill ${cat.cls}`}>{cat.label}</span>}</td>
                 <td style={{fontSize:12,color:'var(--g500)'}}>{fmtDate(d.due_date)}</td>
-                <td><button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button></td>
+                <td><div style={{display:'flex',gap:4}}><button className="btn btn-sm btn-green" onClick={()=>setPayDebt(d)} title={t.payTitle}>{IC.pay}</button><button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button></div></td>
               </tr>;
             })}</tbody>
           </table></div>
@@ -1924,7 +1949,8 @@ function OverdueHistoryPage({t}){
                 </div>}
                 {d.comment&&<div style={{fontSize:12,color:'var(--g400)',marginTop:4,fontStyle:'italic'}}>{d.comment}</div>}
                 <div className="debt-card-actions">
-                  <button className="btn btn-sm btn-full" onClick={()=>setHistDebt(d)}>📋 {t.payHistory}</button>
+                  <button className="btn btn-green btn-sm" style={{flex:1}} onClick={()=>setPayDebt(d)}>💳 {t.payTitle}</button>
+                  <button className="btn btn-sm" onClick={()=>setHistDebt(d)}>📋</button>
                 </div>
               </div>;
             })}
@@ -1932,6 +1958,7 @@ function OverdueHistoryPage({t}){
         </>}
       </div>
       {histDebt&&<PayHistoryModal debt={histDebt} onClose={()=>setHistDebt(null)} t={t}/>}
+      {payDebt&&<PayModal debt={payDebt} onClose={()=>setPayDebt(null)} onSaved={()=>{setPayDebt(null);toast(t.paidOk);load();}} t={t}/>}
     </>
   );
 }

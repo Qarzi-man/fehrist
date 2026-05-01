@@ -1,6 +1,6 @@
 {
-  "name": "Қарзи ман",
-  "short_name": "Qarziman",
+  "name": "Daftarcha",
+  "short_name": "Daftarcha",
   "description": "Учёт долгов — быстро, удобно, надёжно",
   "start_url": "/",
   "display": "standalone",
