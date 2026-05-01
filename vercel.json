@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "fehrist-black.vercel.app"
+        }
+      ],
+      "destination": "https://daftarcha.tj/$1",
+      "permanent": true
+    }
+  ]
+}
