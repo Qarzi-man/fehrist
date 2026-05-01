@@ -2569,6 +2569,13 @@ function App(){
   },[]);
 
   useEffect(()=>{try{localStorage.setItem('appLang',lang);}catch{}},[lang]);
+  useEffect(()=>{
+    const auth=!session||resetMode;
+    document.documentElement.style.overflow=auth?'auto':'';
+    document.documentElement.style.height=auth?'auto':'';
+    document.body.style.overflow=auth?'auto':'';
+    document.body.style.height=auth?'auto':'';
+  },[session,resetMode]);
   useEffect(()=>{document.documentElement.setAttribute('data-theme',darkMode?'dark':'');try{localStorage.setItem('darkMode',darkMode?'1':'0');}catch{}},[darkMode]);
   useEffect(()=>{
     sb.auth.getSession().then(({data:{session}})=>setSession(session));
