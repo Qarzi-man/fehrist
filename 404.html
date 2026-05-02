@@ -2621,7 +2621,6 @@ function App(){
   const [toastState,setToast]=useState(null);
   const [overdueCount,setOverdueCount]=useState(0);
   const [isAdmin,setIsAdmin]=useState(false);
-  const [userRole,setUserRole]=useState('owner');
   const [resetMode,setResetMode]=useState(false);
   const [showOfferModal,setShowOfferModal]=useState(false);
   const [darkMode,setDarkMode]=useState(()=>{try{return localStorage.getItem('darkMode')==='1';}catch{return false;}});
@@ -2653,20 +2652,10 @@ function App(){
     return()=>subscription.unsubscribe();
   },[]);
   useEffect(()=>{
-    if(!session){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);setUserRole('owner');return;}
+    if(!session){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);return;}
     (async()=>{
-      // Load owned businesses (core, must always work)
-      const{data:ownedData}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
-      const owned=(ownedData??[]).map(b=>({...b,_role:'owner'}));
-      // Team feature: accept pending invites + load member businesses (safe, won't break core)
-      let memberBiz=[];
-      try{
-        await sb.from('business_members').update({user_id:session.user.id,status:'active'}).eq('invited_email',session.user.email).eq('status','pending');
-        const{data:memberData}=await sb.from('business_members').select('role,businesses(*)').eq('user_id',session.user.id).eq('status','active');
-        memberBiz=(memberData??[]).filter(m=>m.businesses).map(m=>({...m.businesses,_role:m.role}));
-      }catch(_){}
-      let list=[...owned,...memberBiz.filter(m=>!owned.find(o=>o.id===m.id))];
-      // First-time user: no owned, no member — create a business
+      const{data}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
+      let list=data??[];
       if(list.length===0){
         const meta=session.user.user_metadata||{};
         const bizName=meta.biz_name||meta.full_name;
@@ -2677,25 +2666,37 @@ function App(){
             offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
             offer_accepted:true,is_active:true
           }).select().single();
-          if(newBiz)list=[{...newBiz,_role:'owner'}];
+          if(newBiz)list=[newBiz];
         }
       }
       setAllBusinesses(list);
-      try{
-        const lastId=localStorage.getItem('lastBizId');
-        const found=list.find(b=>b.id===lastId);
-        const active=found||list[0]||null;
-        setBusiness(active);
-        setUserRole(active?._role||'owner');
-      }catch{
-        setBusiness(list[0]||null);
-        setUserRole(list[0]?._role||'owner');
-      }
+      try{const lastId=localStorage.getItem('lastBizId');const found=list.find(b=>b.id===lastId);setBusiness(found||list[0]||null);}
+      catch{setBusiness(list[0]||null);}
     })();
     sb.from('admins').select('email').eq('email',session.user.email).single()
       .then(({data})=>setIsAdmin(!!data));
     track('login');
   },[session]);
+  useEffect(()=>{
+    if(!session||!business)return;
+    sb.from('business_members').update({user_id:session.user.id,status:'active'}).eq('invited_email',session.user.email).eq('status','pending')
+      .then(()=>{
+        sb.from('business_members').select('businesses(*)').eq('user_id',session.user.id).eq('status','active')
+          .then(({data})=>{
+            if(!data||!data.length)return;
+            const memberBiz=data.filter(m=>m.businesses).map(m=>m.businesses);
+            setAllBusinesses(prev=>{
+              const ids=prev.map(b=>b.id);
+              const added=memberBiz.filter(m=>!ids.includes(m.id));
+              return added.length?[...prev,...added]:prev;
+            });
+            setBusiness(biz=>{
+              if(biz)return biz;
+              return memberBiz[0]||null;
+            });
+          }).catch(()=>{});
+      }).catch(()=>{});
+  },[session?.user?.id]);
   useEffect(()=>{
     if(!business)return;
     try{localStorage.setItem('lastBizId',business.id);}catch{}
@@ -2707,19 +2708,11 @@ function App(){
   },[business?.id]);
   useEffect(()=>{if(!toastState)return;const timer=setTimeout(()=>setToast(null),3200);return()=>clearTimeout(timer);},[toastState]);
 
-  function switchBusiness(biz){setBusiness(biz);setUserRole(biz._role||'owner');setPage('dashboard');}
+  function switchBusiness(biz){setBusiness(biz);setPage('dashboard');}
   function refreshBusinesses(){
     if(!session)return;
-    (async()=>{
-      const{data:ownedData}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
-      const owned=(ownedData??[]).map(b=>({...b,_role:'owner'}));
-      let memberBiz=[];
-      try{
-        const{data:memberData}=await sb.from('business_members').select('role,businesses(*)').eq('user_id',session.user.id).eq('status','active');
-        memberBiz=(memberData??[]).filter(m=>m.businesses).map(m=>({...m.businesses,_role:m.role}));
-      }catch(_){}
-      setAllBusinesses([...owned,...memberBiz.filter(m=>!owned.find(o=>o.id===m.id))]);
-    })();
+    sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true})
+      .then(({data})=>setAllBusinesses(data??[]));
   }
 
   async function acceptOfferForExisting(){
@@ -2733,7 +2726,7 @@ function App(){
   if(resetMode)return<PasswordResetPage t={t} lang={lang} setLang={setLang} onDone={()=>setResetMode(false)}/>;
   const Page=PAGES[page]??Dashboard;
   return(
-    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses,isAdmin,darkMode,setDarkMode,userRole}}>
+    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses,isAdmin,darkMode,setDarkMode,userRole:(business&&session&&business.owner_id!==session.user.id)?'staff':'owner'}}>
       <div className="layout">
         <Sidebar page={page} setPage={setPage} lang={lang} setLang={setLang} overdueCount={overdueCount} t={t} isAdmin={isAdmin}/>
         <div className="main">
