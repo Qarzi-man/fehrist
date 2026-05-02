@@ -2073,59 +2073,6 @@ function OverdueHistoryPage({t}){
   );
 }
 
-function TeamSection({t,business,session}){
-  const [members,setMembers]=useState([]);
-  const [email,setEmail]=useState('');
-  const [saving,setSaving]=useState(false);
-  const [err,setErr]=useState('');
-  async function load(){
-    const{data}=await sb.from('business_members').select('*').eq('business_id',business.id).order('created_at',{ascending:true});
-    setMembers(data??[]);
-  }
-  useEffect(()=>{if(business)load();},[business?.id]);
-  async function invite(e){
-    e.preventDefault();
-    const em=email.trim().toLowerCase();
-    if(!em)return;
-    if(em===session.user.email){setErr(t.inviteSelfError);return;}
-    setSaving(true);setErr('');
-    const{data:ex}=await sb.from('business_members').select('id').eq('business_id',business.id).eq('invited_email',em).limit(1);
-    if(ex&&ex.length>0){setErr(t.inviteAlreadyError);setSaving(false);return;}
-    const{error:e2}=await sb.from('business_members').insert({business_id:business.id,invited_email:em,role:'staff',status:'pending'});
-    setSaving(false);
-    if(e2){setErr(e2.message);return;}
-    setEmail('');load();toast(t.inviteOk);
-  }
-  async function remove(id){await sb.from('business_members').delete().eq('id',id);load();}
-  return(
-    <div>
-      <form onSubmit={invite} style={{padding:'14px 18px',borderBottom:'1px solid var(--border)'}}>
-        <div style={{display:'flex',gap:8}}>
-          <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder={t.inviteEmailPlaceholder} required style={{flex:1}}/>
-          <button type="submit" className="btn btn-primary" disabled={saving} style={{whiteSpace:'nowrap',flexShrink:0}}>{saving?'...':t.invite}</button>
-        </div>
-        {err&&<div className="alert alert-error">{err}</div>}
-        <div style={{fontSize:11,color:'var(--g400)',marginTop:6}}>{t.inviteHint}</div>
-      </form>
-      <div>
-        {members.length===0
-          ?<div style={{padding:'20px 18px',color:'var(--g400)',fontSize:13,textAlign:'center'}}>{t.noMembers}</div>
-          :members.map(m=>(
-            <div key={m.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 18px',borderBottom:'1px solid var(--border)'}}>
-              <div style={{width:34,height:34,borderRadius:9,background:'var(--primary-bg)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,color:'var(--primary)',fontWeight:700,fontSize:14}}>👤</div>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontWeight:600,fontSize:13,color:'var(--g900)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{m.invited_email}</div>
-                <div style={{fontSize:11,fontWeight:600,marginTop:1,color:m.status==='active'?'var(--green)':'var(--amber)'}}>{m.status==='active'?t.activeInvite:t.pendingInvite}</div>
-              </div>
-              <span style={{fontSize:11,background:'var(--g100)',color:'var(--g600)',padding:'3px 9px',borderRadius:100,fontWeight:700,flexShrink:0}}>{t.roleStaff}</span>
-              <button className="btn btn-sm btn-danger" onClick={()=>remove(m.id)} style={{padding:'4px 10px',fontSize:12,flexShrink:0}}>✕</button>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-  );
-}
 
 function SettingsPage({t}){
   const {business,setBusiness,session,allBusinesses,switchBusiness,userRole}=useApp();
@@ -2185,12 +2132,7 @@ function SettingsPage({t}){
           </div>
         </div>
       )}
-      {userRole==='owner'&&business&&(
-        <div className="card" style={{maxWidth:460,marginBottom:16}}>
-          <div className="card-header"><span className="card-title">👥 {t.teamTitle}</span></div>
-          <TeamSection t={t} business={business} session={session}/>
-        </div>
-      )}
+
       <div className="card" style={{maxWidth:460}}>
         <div className="card-header"><span className="card-title">{t.contactDev||'Связаться с разработчиком'}</span></div>
         <div style={{padding:'16px 18px'}}>

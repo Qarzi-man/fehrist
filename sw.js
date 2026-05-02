@@ -1,4 +1,4 @@
-const CACHE = 'daftarcha-v15';
+const CACHE = 'daftarcha-v16';
 const STATIC = [
   '/',
   '/404.html',
