@@ -2655,14 +2655,16 @@ function App(){
   useEffect(()=>{
     if(!session){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);setUserRole('owner');return;}
     (async()=>{
-      // Accept pending invites for this email
-      await sb.from('business_members').update({user_id:session.user.id,status:'active'}).eq('invited_email',session.user.email).eq('status','pending');
-      // Load owned businesses
+      // Load owned businesses (core, must always work)
       const{data:ownedData}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
       const owned=(ownedData??[]).map(b=>({...b,_role:'owner'}));
-      // Load businesses where user is a member (staff)
-      const{data:memberData}=await sb.from('business_members').select('role,businesses(*)').eq('user_id',session.user.id).eq('status','active');
-      const memberBiz=(memberData??[]).filter(m=>m.businesses).map(m=>({...m.businesses,_role:m.role}));
+      // Team feature: accept pending invites + load member businesses (safe, won't break core)
+      let memberBiz=[];
+      try{
+        await sb.from('business_members').update({user_id:session.user.id,status:'active'}).eq('invited_email',session.user.email).eq('status','pending');
+        const{data:memberData}=await sb.from('business_members').select('role,businesses(*)').eq('user_id',session.user.id).eq('status','active');
+        memberBiz=(memberData??[]).filter(m=>m.businesses).map(m=>({...m.businesses,_role:m.role}));
+      }catch(_){}
       let list=[...owned,...memberBiz.filter(m=>!owned.find(o=>o.id===m.id))];
       // First-time user: no owned, no member — create a business
       if(list.length===0){
@@ -2711,8 +2713,11 @@ function App(){
     (async()=>{
       const{data:ownedData}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
       const owned=(ownedData??[]).map(b=>({...b,_role:'owner'}));
-      const{data:memberData}=await sb.from('business_members').select('role,businesses(*)').eq('user_id',session.user.id).eq('status','active');
-      const memberBiz=(memberData??[]).filter(m=>m.businesses).map(m=>({...m.businesses,_role:m.role}));
+      let memberBiz=[];
+      try{
+        const{data:memberData}=await sb.from('business_members').select('role,businesses(*)').eq('user_id',session.user.id).eq('status','active');
+        memberBiz=(memberData??[]).filter(m=>m.businesses).map(m=>({...m.businesses,_role:m.role}));
+      }catch(_){}
       setAllBusinesses([...owned,...memberBiz.filter(m=>!owned.find(o=>o.id===m.id))]);
     })();
   }
