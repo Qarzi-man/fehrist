@@ -2074,7 +2074,7 @@ function OverdueHistoryPage({t}){
 
 
 function SettingsPage({t}){
-  const {business,setBusiness,session,allBusinesses,switchBusiness,userRole}=useApp();
+  const {business,setBusiness,session,allBusinesses,switchBusiness}=useApp();
   const [name,setName]=useState('');const [type,setType]=useState('');const [saving,setSaving]=useState(false);const [editMode,setEditMode]=useState(false);const [showPrivacy,setShowPrivacy]=useState(false);
   useEffect(()=>{if(business){setName(business.name);setType(business.type);};},[business]);
   async function save(e){e.preventDefault();setSaving(true);const{data}=await sb.from('businesses').update({name,type}).eq('id',business.id).select().single();if(data){setBusiness(data);toast(t.savedOk);setEditMode(false);}setSaving(false);}
@@ -2085,7 +2085,7 @@ function SettingsPage({t}){
       <div className="card" style={{maxWidth:460,marginBottom:16}}>
         <div className="card-header">
           <span className="card-title">{t.profileTitle}</span>
-          {!editMode&&userRole==='owner'&&<button className="btn btn-sm" onClick={()=>setEditMode(true)}>✏️ {t.edit||'Изменить'}</button>}
+          {!editMode&&<button className="btn btn-sm" onClick={()=>setEditMode(true)}>✏️ {t.edit||'Изменить'}</button>}
         </div>
         {editMode?(
           <form onSubmit={save} style={{padding:18}}>
@@ -2101,8 +2101,6 @@ function SettingsPage({t}){
             <div style={{fontSize:15,fontWeight:700,color:'var(--g900)'}}>{business?.name}</div>
             <div style={{fontSize:13,color:'var(--g400)',marginTop:3}}>{business?.type}</div>
             <div style={{marginTop:12,fontSize:12,color:'var(--g500)',padding:'8px 10px',background:'var(--g50)',borderRadius:'var(--r)'}}>📧 {session?.user?.email}</div>
-            {userRole==='staff'&&<div style={{marginTop:8,fontSize:12,fontWeight:700,color:'var(--amber-t)',background:'var(--amber-bg)',padding:'6px 10px',borderRadius:'var(--r)',display:'flex',alignItems:'center',gap:6}}>👤 {t.roleStaff}</div>}
-            {userRole==='owner'&&<div style={{marginTop:8,fontSize:12,fontWeight:700,color:'var(--green-t)',background:'var(--green-bg)',padding:'6px 10px',borderRadius:'var(--r)',display:'flex',alignItems:'center',gap:6}}>👑 {t.roleOwner}</div>}
           </div>
         )}
       </div>
@@ -2625,26 +2623,6 @@ function App(){
     track('login');
   },[session]);
   useEffect(()=>{
-    if(!session||!business)return;
-    sb.from('business_members').update({user_id:session.user.id,status:'active'}).eq('invited_email',session.user.email).eq('status','pending')
-      .then(()=>{
-        sb.from('business_members').select('businesses(*)').eq('user_id',session.user.id).eq('status','active')
-          .then(({data})=>{
-            if(!data||!data.length)return;
-            const memberBiz=data.filter(m=>m.businesses).map(m=>m.businesses);
-            setAllBusinesses(prev=>{
-              const ids=prev.map(b=>b.id);
-              const added=memberBiz.filter(m=>!ids.includes(m.id));
-              return added.length?[...prev,...added]:prev;
-            });
-            setBusiness(biz=>{
-              if(biz)return biz;
-              return memberBiz[0]||null;
-            });
-          }).catch(()=>{});
-      }).catch(()=>{});
-  },[session?.user?.id]);
-  useEffect(()=>{
     if(!business)return;
     try{localStorage.setItem('lastBizId',business.id);}catch{}
     if(!business.offer_accepted_at)setShowOfferModal(true);
@@ -2673,7 +2651,7 @@ function App(){
   if(resetMode)return<PasswordResetPage t={t} lang={lang} setLang={setLang} onDone={()=>setResetMode(false)}/>;
   const Page=PAGES[page]??Dashboard;
   return(
-    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses,isAdmin,darkMode,setDarkMode,userRole:(business&&session&&business.owner_id!==session.user.id)?'staff':'owner'}}>
+    <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses,isAdmin,darkMode,setDarkMode}}>
       <div className="layout">
         <Sidebar page={page} setPage={setPage} lang={lang} setLang={setLang} overdueCount={overdueCount} t={t} isAdmin={isAdmin}/>
         <div className="main">
