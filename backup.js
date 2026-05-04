@@ -1,18 +1,31 @@
 /**
  * Daftarcha — Supabase backup script
  * Запуск: node backup.js
- * Требует: Node 18+ (встроенный fetch)
+ * Requires: Node 18+
  *
- * Нужен SERVICE ROLE KEY (не anon key) — он в Supabase Dashboard:
- * Project Settings → API → service_role (secret)
+ * Ключ берётся из файла .env (SUPABASE_SERVICE_KEY=...)
+ * Получить: Supabase Dashboard → Project Settings → API → service_role
  */
 
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dir = dirname(fileURLToPath(import.meta.url));
+
+// читаем .env без сторонних пакетов
+async function loadEnv() {
+  try {
+    const text = await readFile(join(__dir, '.env'), 'utf8');
+    for (const line of text.split('\n')) {
+      const m = line.match(/^\s*([A-Z_]+)\s*=\s*(.+?)\s*$/);
+      if (m) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+    }
+  } catch {}
+}
+
 const SUPABASE_URL = 'https://fortxhggcnvbhrapkaul.supabase.co';
-const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY || '';
-
 const TABLES = ['businesses', 'debts', 'payments', 'admins'];
-
-// ─── helpers ────────────────────────────────────────────────────────────────
 
 function timestamp() {
   const d = new Date();
@@ -20,63 +33,56 @@ function timestamp() {
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}`;
 }
 
-async function fetchTable(table) {
+async function fetchTable(table, key) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, {
     headers: {
-      'apikey': SERVICE_KEY,
-      'Authorization': `Bearer ${SERVICE_KEY}`,
+      'apikey': key,
+      'Authorization': `Bearer ${key}`,
       'Accept': 'application/json',
     },
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`[${table}] HTTP ${res.status}: ${text}`);
-  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
   return res.json();
 }
 
 function toCSV(rows) {
   if (!rows.length) return '';
   const cols = Object.keys(rows[0]);
-  const escape = v => {
-    if (v === null || v === undefined) return '';
+  const esc = v => {
+    if (v == null) return '';
     const s = String(v);
     return s.includes(',') || s.includes('"') || s.includes('\n')
       ? `"${s.replace(/"/g, '""')}"` : s;
   };
-  return [
-    cols.join(','),
-    ...rows.map(r => cols.map(c => escape(r[c])).join(',')),
-  ].join('\n');
+  return [cols.join(','), ...rows.map(r => cols.map(c => esc(r[c])).join(','))].join('\n');
 }
 
-// ─── main ────────────────────────────────────────────────────────────────────
-
-import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-
 (async () => {
-  if (!SERVICE_KEY) {
-    console.error('❌  Укажи SERVICE KEY:\n   SUPABASE_SERVICE_KEY=your_key node backup.js');
+  await loadEnv();
+  const KEY = process.env.SUPABASE_SERVICE_KEY || '';
+
+  if (!KEY) {
+    console.error('❌  Не найден ключ. Создай файл .env:\n   SUPABASE_SERVICE_KEY=твой_service_role_ключ');
     process.exit(1);
   }
 
-  const dir = join(process.cwd(), 'backups', timestamp());
+  const ts  = timestamp();
+  const dir = join(__dir, 'backups', ts);
   await mkdir(dir, { recursive: true });
-  console.log(`📁  Папка: ${dir}\n`);
+  console.log(`\n📦  Daftarcha Backup — ${ts}\n📁  ${dir}\n`);
 
   let ok = 0;
   for (const table of TABLES) {
     try {
-      const rows = await fetchTable(table);
-      await writeFile(join(dir, `${table}.json`), JSON.stringify(rows, null, 2));
-      await writeFile(join(dir, `${table}.csv`),  toCSV(rows));
-      console.log(`✅  ${table.padEnd(15)} ${rows.length} строк`);
+      const rows = await fetchTable(table, KEY);
+      await writeFile(join(dir, `${table}.json`), JSON.stringify(rows, null, 2), 'utf8');
+      await writeFile(join(dir, `${table}.csv`),  toCSV(rows), 'utf8');
+      console.log(`  ✅  ${table.padEnd(14)} ${rows.length} строк`);
       ok++;
     } catch (e) {
-      console.error(`❌  ${table.padEnd(15)} ${e.message}`);
+      console.error(`  ❌  ${table.padEnd(14)} ${e.message}`);
     }
   }
 
-  console.log(`\n${ok}/${TABLES.length} таблиц сохранено → backups/${timestamp().slice(0,10)}`);
+  console.log(`\n✔  ${ok}/${TABLES.length} таблиц сохранено\n`);
 })();
