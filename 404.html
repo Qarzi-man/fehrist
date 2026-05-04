@@ -1596,7 +1596,7 @@ function Dashboard({t}){
   const {business,setPage}=useApp();
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
   const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);
-  async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);showDebtNotifications(data??[],business.name,t);}
+  async function load(){if(!business){setLoading(false);return;}setLoading(true);try{const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);showDebtNotifications(data??[],business.name,t);}finally{setLoading(false);}}
   useEffect(()=>{load();},[business]);
   const active=debts.filter(d=>getStatus(d)!=='paid');
   const overdue=debts.filter(d=>getStatus(d)==='overdue');
@@ -1714,7 +1714,7 @@ function DebtsPage({t}){
   const [tab,setTab]=useState('receivable'); // receivable | payable
   const [search,setSearch]=useState('');const [fStatus,setFStatus]=useState('');const [fDueSoon,setFDueSoon]=useState('');const [sort,setSort]=useState('due_asc');
   const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);const [editDebt,setEditDebt]=useState(null);const [remindDebt,setRemindDebt]=useState(null);
-  async function load(){if(!business)return;setLoading(true);const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);setLoading(false);}
+  async function load(){if(!business){setLoading(false);return;}setLoading(true);try{const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);}finally{setLoading(false);}}
   useEffect(()=>{load();},[business]);
   const list=useMemo(()=>{
     let r=debts.filter(d=>{
@@ -1875,7 +1875,7 @@ function ClientsPage({t}){
   const {business}=useApp();
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);const [search,setSearch]=useState('');const [histClient,setHistClient]=useState(null);const [payDebt,setPayDebt]=useState(null);
   async function reload(){if(!business)return;const{data}=await sb.from('debts').select('*').eq('business_id',business.id);setDebts(data??[]);}
-  useEffect(()=>{if(!business)return;setLoading(true);sb.from('debts').select('*').eq('business_id',business.id).then(({data})=>{setDebts(data??[]);setLoading(false);});},[business]);
+  useEffect(()=>{if(!business){setLoading(false);return;}setLoading(true);sb.from('debts').select('*').eq('business_id',business.id).then(({data})=>{setDebts(data??[]);setLoading(false);}).catch(()=>setLoading(false));},[business]);
   const clients=useMemo(()=>{
     const map={};debts.forEach(d=>{if(!map[d.phone])map[d.phone]={name:d.client_name,phone:d.phone,debts:[]};map[d.phone].debts.push(d);});
     return Object.values(map).filter(c=>{const q=search.toLowerCase();return!q||c.name.toLowerCase().includes(q)||c.phone.includes(q);}).sort((a,b)=>b.debts.some(d=>getStatus(d)==='overdue')-a.debts.some(d=>getStatus(d)==='overdue'));
@@ -1973,17 +1973,16 @@ function OverdueHistoryPage({t}){
   const [debts,setDebts]=useState([]);const [payments,setPayments]=useState([]);const [loading,setLoading]=useState(true);
   const [search,setSearch]=useState('');const [sort,setSort]=useState('overdue');const [histDebt,setHistDebt]=useState(null);const [payDebt,setPayDebt]=useState(null);
   async function load(){
-    if(!business)return;
+    if(!business){setLoading(false);return;}
     setLoading(true);
-    const{data:d}=await sb.from('debts').select('*').eq('business_id',business.id).neq('status','paid');
-    const debtIds=(d??[]).map(x=>x.id);
-    const{data:p}=debtIds.length?await sb.from('payments').select('*').in('debt_id',debtIds):{data:[]};
-    setDebts(d??[]);setPayments(p??[]);setLoading(false);
+    try{
+      const{data:d}=await sb.from('debts').select('*').eq('business_id',business.id).neq('status','paid');
+      const debtIds=(d??[]).map(x=>x.id);
+      const{data:p}=debtIds.length?await sb.from('payments').select('*').in('debt_id',debtIds):{data:[]};
+      setDebts(d??[]);setPayments(p??[]);
+    }finally{setLoading(false);}
   }
-  useEffect(()=>{
-    if(!business)return;
-    load();
-  },[business]);
+  useEffect(()=>{load();},[business]);
   const overdue=useMemo(()=>{
     let r=debts.filter(d=>getStatus(d)==='overdue');
     if(search){const q=search.toLowerCase();r=r.filter(d=>d.client_name.toLowerCase().includes(q)||d.phone.includes(q));}
@@ -2169,17 +2168,18 @@ function AdminPage({t}){
     if(!isAdmin){setLoading(false);return;}
     async function load(){
       setLoading(true);
-      const [{data:biz},{data:debts}]=await Promise.all([sb.from('businesses').select('*').order('created_at',{ascending:false}),sb.from('debts').select('*')]);
-      const bizList=biz??[];const debtList=debts??[];
-      const activeDebts=debtList.filter(d=>getStatus(d)!=='paid');
-      const overdue=debtList.filter(d=>getStatus(d)==='overdue');
-      const totalPaid=debtList.reduce((s,d)=>s+Number(d.paid_amount??0),0);
-      const totalReceivableSum=activeDebts.filter(d=>(d.debt_type||'receivable')==='receivable').reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
-      const totalPayableSum=activeDebts.filter(d=>d.debt_type==='payable').reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
-      const uniqueClients=new Set(debtList.map(d=>d.phone)).size;
-      setStats({bizCount:bizList.length,debtCount:activeDebts.length,totalPaid,overdueCount:overdue.length,totalOverdue:overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),totalReceivable:totalReceivableSum,totalPayable:totalPayableSum,uniqueClients});
-      setBusinesses(bizList.map(b=>{const bd=debtList.filter(d=>d.business_id===b.id);const active=bd.filter(d=>getStatus(d)!=='paid');const ov=bd.filter(d=>getStatus(d)==='overdue');return{...b,debtCount:bd.length,activeSum:active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),overdueCount:ov.length,overdueSum:ov.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),owner_offer_at:b.offer_accepted_at};}));
-      setLoading(false);
+      try{
+        const [{data:biz},{data:debts}]=await Promise.all([sb.from('businesses').select('*').order('created_at',{ascending:false}),sb.from('debts').select('*')]);
+        const bizList=biz??[];const debtList=debts??[];
+        const activeDebts=debtList.filter(d=>getStatus(d)!=='paid');
+        const overdue=debtList.filter(d=>getStatus(d)==='overdue');
+        const totalPaid=debtList.reduce((s,d)=>s+Number(d.paid_amount??0),0);
+        const totalReceivableSum=activeDebts.filter(d=>(d.debt_type||'receivable')==='receivable').reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+        const totalPayableSum=activeDebts.filter(d=>d.debt_type==='payable').reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0);
+        const uniqueClients=new Set(debtList.map(d=>d.phone)).size;
+        setStats({bizCount:bizList.length,debtCount:activeDebts.length,totalPaid,overdueCount:overdue.length,totalOverdue:overdue.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),totalReceivable:totalReceivableSum,totalPayable:totalPayableSum,uniqueClients});
+        setBusinesses(bizList.map(b=>{const bd=debtList.filter(d=>d.business_id===b.id);const active=bd.filter(d=>getStatus(d)!=='paid');const ov=bd.filter(d=>getStatus(d)==='overdue');return{...b,debtCount:bd.length,activeSum:active.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),overdueCount:ov.length,overdueSum:ov.reduce((s,d)=>s+Number(d.amount)-Number(d.paid_amount??0),0),owner_offer_at:b.offer_accepted_at};}));
+      }finally{setLoading(false);}
     }
     load();
   },[]);
@@ -2586,34 +2586,39 @@ function App(){
   },[session,resetMode]);
   useEffect(()=>{document.documentElement.setAttribute('data-theme',darkMode?'dark':'');try{localStorage.setItem('darkMode',darkMode?'1':'0');}catch{}},[darkMode]);
   useEffect(()=>{
-    sb.auth.getSession().then(({data:{session}})=>setSession(session));
+    let done=false;
+    const timer=setTimeout(()=>{if(!done){done=true;setSession(null);}},10000);
+    sb.auth.getSession().then(({data:{session}})=>{if(!done){done=true;clearTimeout(timer);}setSession(session);}).catch(()=>{if(!done){done=true;clearTimeout(timer);}setSession(null);});
     const{data:{subscription}}=sb.auth.onAuthStateChange((event,s)=>{
+      if(!done){done=true;clearTimeout(timer);}
       if(event==='PASSWORD_RECOVERY')setResetMode(true);
       setSession(s);
     });
-    return()=>subscription.unsubscribe();
+    return()=>{done=true;clearTimeout(timer);subscription.unsubscribe();};
   },[]);
   useEffect(()=>{
     if(!session){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);return;}
     (async()=>{
-      const{data}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
-      let list=data??[];
-      if(list.length===0){
-        const meta=session.user.user_metadata||{};
-        const bizName=meta.biz_name||meta.full_name;
-        if(bizName){
-          const{data:newBiz}=await sb.from('businesses').insert({
-            owner_id:session.user.id,name:bizName,
-            type:meta.biz_type||'Бизнес',
-            offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
-            offer_accepted:true,is_active:true
-          }).select().single();
-          if(newBiz)list=[newBiz];
+      try{
+        const{data}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
+        let list=data??[];
+        if(list.length===0){
+          const meta=session.user.user_metadata||{};
+          const bizName=meta.biz_name||meta.full_name;
+          if(bizName){
+            const{data:newBiz}=await sb.from('businesses').insert({
+              owner_id:session.user.id,name:bizName,
+              type:meta.biz_type||'Бизнес',
+              offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
+              offer_accepted:true,is_active:true
+            }).select().single();
+            if(newBiz)list=[newBiz];
+          }
         }
-      }
-      setAllBusinesses(list);
-      try{const lastId=localStorage.getItem('lastBizId');const found=list.find(b=>b.id===lastId);setBusiness(found||list[0]||null);}
-      catch{setBusiness(list[0]||null);}
+        setAllBusinesses(list);
+        try{const lastId=localStorage.getItem('lastBizId');const found=list.find(b=>b.id===lastId);setBusiness(found||list[0]||null);}
+        catch{setBusiness(list[0]||null);}
+      }catch{setBusiness(null);}
     })();
     sb.from('admins').select('email').eq('email',session.user.email).single()
       .then(({data})=>setIsAdmin(!!data));
