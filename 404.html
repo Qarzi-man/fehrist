@@ -27,6 +27,7 @@
   --red:#DC2626;--red-bg:#FEF2F2;--red-t:#7F1D1D;
   --amber:#D97706;--amber-bg:#FFFBEB;--amber-t:#78350F;
   --g50:#F8FAFC;--g100:#F1F5F9;--g200:#E2E8F0;--g300:#CBD5E1;--g400:#94A3B8;--g500:#64748B;--g600:#475569;--g700:#334155;--g800:#1E293B;--g900:#0F172A;
+  --card:#ffffff;--text:#0F172A;
   --border:rgba(0,0,0,.07);--r:10px;--r-lg:14px;--r-xl:20px;
   --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --shadow-lg:0 10px 25px rgba(0,0,0,.1);
@@ -290,7 +291,7 @@ tr:hover td{background:#FAFBFF}
 .remind-item{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:500;color:var(--g700);transition:background .1s;border:none;background:none;width:100%;text-align:left}
 .remind-item:hover{background:var(--g50)}
 /* ── Dark mode ── */
-[data-theme="dark"]{--border:rgba(255,255,255,.08);--shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 10px 25px rgba(0,0,0,.5)}
+[data-theme="dark"]{--border:rgba(255,255,255,.08);--shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 10px 25px rgba(0,0,0,.5);--card:#1E293B;--text:#F1F5F9}
 [data-theme="dark"] body{background:#0F172A;color:#F1F5F9}
 [data-theme="dark"] .card,[data-theme="dark"] .debt-card,[data-theme="dark"] .modal-box,[data-theme="dark"] .logout-confirm-box{background:#1E293B}
 [data-theme="dark"] .sidebar{background:#020617}
@@ -1066,7 +1067,7 @@ function PrivacyPolicyModal({onClose,initialLang}){
       onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
       <div style={{background:'var(--card)',borderRadius:'20px 20px 0 0',width:'100%',maxWidth:600,maxHeight:'85vh',display:'flex',flexDirection:'column',overflow:'hidden'}}>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'18px 18px 12px',borderBottom:'1px solid var(--border)',flexShrink:0}}>
-          <span style={{fontWeight:800,fontSize:17,color:'var(--g900)'}}>🔒 {d.title}</span>
+          <span style={{fontWeight:800,fontSize:17,color:'var(--text)'}}>🔒 {d.title}</span>
           <button onClick={onClose} style={{background:'none',border:'none',fontSize:26,cursor:'pointer',color:'var(--g400)',lineHeight:1,padding:'0 4px'}}>×</button>
         </div>
         <div style={{display:'flex',gap:6,padding:'10px 18px 0',flexShrink:0}}>
@@ -1080,7 +1081,7 @@ function PrivacyPolicyModal({onClose,initialLang}){
         </div>
         <div style={{padding:18,overflowY:'auto',flex:1}}>
           {d.body.map((p,i)=>(
-            <p key={i} style={{fontSize:15,color:'var(--g900)',lineHeight:1.8,marginBottom:16}}>{p}</p>
+            <p key={i} style={{fontSize:15,color:'var(--text)',lineHeight:1.8,marginBottom:16}}>{p}</p>
           ))}
         </div>
         <div style={{padding:'12px 18px',borderTop:'1px solid var(--border)',flexShrink:0}}>
