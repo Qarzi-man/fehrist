@@ -2595,29 +2595,32 @@ function App(){
     });
     return()=>{done=true;clearTimeout(timer);subscription.unsubscribe();};
   },[]);
+  const [bizError,setBizError]=useState('');
   async function loadBusinesses(sess){
     if(!sess){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);setBizLoading(false);return;}
-    setBizLoading(true);
+    setBizLoading(true);setBizError('');
     try{
-      const{data}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
+      const{data,error:selErr}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
+      if(selErr)throw selErr;
       let list=data??[];
       if(list.length===0){
         const meta=sess.user.user_metadata||{};
         const bizName=meta.biz_name||meta.full_name;
         if(bizName){
-          const{data:newBiz}=await sb.from('businesses').insert({
+          const{data:newBiz,error:insErr}=await sb.from('businesses').insert({
             owner_id:sess.user.id,name:bizName,
             type:meta.biz_type||'Бизнес',
             offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
             offer_accepted:true,is_active:true
           }).select().single();
+          if(insErr)setBizError('INSERT: '+insErr.message);
           if(newBiz)list=[newBiz];
-        }
+        }else{setBizError('no_biz_name uid='+sess.user.id);}
       }
       setAllBusinesses(list);
       try{const lastId=localStorage.getItem('lastBizId');const found=list.find(b=>b.id===lastId);setBusiness(found||list[0]||null);}
       catch{setBusiness(list[0]||null);}
-    }catch{setBusiness(null);}
+    }catch(e){setBusiness(null);setBizError(e?.message||JSON.stringify(e));}
     finally{setBizLoading(false);}
   }
   useEffect(()=>{
@@ -2655,11 +2658,13 @@ function App(){
   if(!session)return<AuthPage lang={lang} setLang={setLang}/>;
   if(resetMode)return<PasswordResetPage t={t} lang={lang} setLang={setLang} onDone={()=>setResetMode(false)}/>;
   if(!business&&!bizLoading)return(
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16,padding:24,background:'var(--g50)'}}>
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:12,padding:24,background:'var(--g50)'}}>
       <div style={{fontSize:48}}>⚠️</div>
       <div style={{fontSize:18,fontWeight:800,color:'var(--g900)',textAlign:'center'}}>Не удалось загрузить данные</div>
-      <div style={{fontSize:14,color:'var(--g500)',textAlign:'center',maxWidth:300}}>Проверьте интернет-соединение и попробуйте снова.</div>
-      <button className="btn btn-primary" style={{minWidth:180}} onClick={()=>loadBusinesses(session)}>🔄 Повторить</button>
+      <div style={{fontSize:13,color:'var(--g400)',textAlign:'center'}}>📧 {session?.user?.email}</div>
+      <div style={{fontSize:13,color:'var(--g400)',textAlign:'center'}}>🆔 {session?.user?.id?.slice(0,8)}...</div>
+      {bizError&&<div style={{fontSize:11,color:'var(--red)',background:'var(--red-bg)',border:'1px solid rgba(220,38,38,.2)',borderRadius:'var(--r)',padding:'8px 12px',maxWidth:340,wordBreak:'break-all',textAlign:'left'}}>⚡ {bizError}</div>}
+      <button className="btn btn-primary" style={{minWidth:180,marginTop:4}} onClick={()=>loadBusinesses(session)}>🔄 Повторить</button>
       <button className="btn" onClick={()=>sb.auth.signOut()}>Выйти</button>
     </div>
   );
