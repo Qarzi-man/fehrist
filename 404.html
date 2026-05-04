@@ -2555,6 +2555,7 @@ const PAGES={dashboard:Dashboard,debts:DebtsPage,clients:ClientsPage,overdueHist
 function App(){
   const [session,setSession]=useState(undefined);
   const [business,setBusiness]=useState(null);
+  const [bizLoading,setBizLoading]=useState(false);
   const [allBusinesses,setAllBusinesses]=useState([]);
   const [page,setPage]=useState('dashboard');
   const [lang,setLang]=useState(()=>{try{return localStorage.getItem('appLang')||'tg';}catch{return 'tg';}});
@@ -2594,30 +2595,34 @@ function App(){
     });
     return()=>{done=true;clearTimeout(timer);subscription.unsubscribe();};
   },[]);
-  useEffect(()=>{
-    if(!session){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);return;}
-    (async()=>{
-      try{
-        const{data}=await sb.from('businesses').select('*').eq('owner_id',session.user.id).order('created_at',{ascending:true});
-        let list=data??[];
-        if(list.length===0){
-          const meta=session.user.user_metadata||{};
-          const bizName=meta.biz_name||meta.full_name;
-          if(bizName){
-            const{data:newBiz}=await sb.from('businesses').insert({
-              owner_id:session.user.id,name:bizName,
-              type:meta.biz_type||'Бизнес',
-              offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
-              offer_accepted:true,is_active:true
-            }).select().single();
-            if(newBiz)list=[newBiz];
-          }
+  async function loadBusinesses(sess){
+    if(!sess){setBusiness(null);setAllBusinesses([]);setIsAdmin(false);setBizLoading(false);return;}
+    setBizLoading(true);
+    try{
+      const{data}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
+      let list=data??[];
+      if(list.length===0){
+        const meta=sess.user.user_metadata||{};
+        const bizName=meta.biz_name||meta.full_name;
+        if(bizName){
+          const{data:newBiz}=await sb.from('businesses').insert({
+            owner_id:sess.user.id,name:bizName,
+            type:meta.biz_type||'Бизнес',
+            offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
+            offer_accepted:true,is_active:true
+          }).select().single();
+          if(newBiz)list=[newBiz];
         }
-        setAllBusinesses(list);
-        try{const lastId=localStorage.getItem('lastBizId');const found=list.find(b=>b.id===lastId);setBusiness(found||list[0]||null);}
-        catch{setBusiness(list[0]||null);}
-      }catch{setBusiness(null);}
-    })();
+      }
+      setAllBusinesses(list);
+      try{const lastId=localStorage.getItem('lastBizId');const found=list.find(b=>b.id===lastId);setBusiness(found||list[0]||null);}
+      catch{setBusiness(list[0]||null);}
+    }catch{setBusiness(null);}
+    finally{setBizLoading(false);}
+  }
+  useEffect(()=>{
+    loadBusinesses(session);
+    if(!session)return;
     sb.from('admins').select('email').eq('email',session.user.email).single()
       .then(({data})=>setIsAdmin(!!data));
     track('login');
@@ -2646,9 +2651,18 @@ function App(){
     setBusiness(b=>({...b,offer_accepted_at:now,offer_accepted:true}));
     setShowOfferModal(false);
   }
-  if(session===undefined)return<div className="loading-wrap" style={{minHeight:'100vh'}}><div className="spinner"/></div>;
+  if(session===undefined||bizLoading)return<div className="loading-wrap" style={{minHeight:'100vh'}}><div className="spinner"/></div>;
   if(!session)return<AuthPage lang={lang} setLang={setLang}/>;
   if(resetMode)return<PasswordResetPage t={t} lang={lang} setLang={setLang} onDone={()=>setResetMode(false)}/>;
+  if(!business&&!bizLoading)return(
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16,padding:24,background:'var(--g50)'}}>
+      <div style={{fontSize:48}}>⚠️</div>
+      <div style={{fontSize:18,fontWeight:800,color:'var(--g900)',textAlign:'center'}}>Не удалось загрузить данные</div>
+      <div style={{fontSize:14,color:'var(--g500)',textAlign:'center',maxWidth:300}}>Проверьте интернет-соединение и попробуйте снова.</div>
+      <button className="btn btn-primary" style={{minWidth:180}} onClick={()=>loadBusinesses(session)}>🔄 Повторить</button>
+      <button className="btn" onClick={()=>sb.auth.signOut()}>Выйти</button>
+    </div>
+  );
   const Page=PAGES[page]??Dashboard;
   return(
     <AppCtx.Provider value={{session,business,setBusiness,setPage,allBusinesses,switchBusiness,refreshBusinesses,isAdmin,darkMode,setDarkMode}}>
