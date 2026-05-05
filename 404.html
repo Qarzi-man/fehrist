@@ -865,11 +865,11 @@ function LoginForm({t,onSwitch}){
     <>
       <div className="auth-title">{t.loginTitle}</div>
       <div className="auth-subtitle">{t.loginSub}</div>
-      <form onSubmit={submit}>
+      <form onSubmit={submit} id="login-form">
         <label>{t.email}</label>
-        <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required autoFocus/>
+        <input type="email" name="email" autoComplete="username" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required autoFocus/>
         <label>{t.password}</label>
-        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••" required/>
+        <input type="password" name="password" autoComplete="current-password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••" required/>
         {error&&<div className="alert alert-error">{error}</div>}
         <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={loading}>{loading?'...':t.login}</button>
       </form>
@@ -996,8 +996,8 @@ function RegisterForm({t,onSwitch}){
       <form onSubmit={submit}>
         <label>{t.bizName} *</label><input value={bizName} onChange={e=>setBizName(e.target.value)} required autoFocus/>
         <label>{t.bizType}</label><select value={bizType} onChange={e=>setBizType(e.target.value)}>{t.types.map(tp=><option key={tp}>{tp}</option>)}</select>
-        <label>{t.email} *</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required/>
-        <label>{t.password} *</label><input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="min 8" minLength={8} required/>
+        <label>{t.email} *</label><input type="email" name="email" autoComplete="username" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required/>
+        <label>{t.password} *</label><input type="password" name="password" autoComplete="new-password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="min 8" minLength={8} required/>
         {error&&<div className="alert alert-error">⚠️ {error}</div>}
         <div onClick={()=>setShowOffer(true)} style={{display:'flex',alignItems:'center',gap:10,marginTop:14,padding:'12px 14px',background:offerAccepted?'var(--green-bg)':'var(--g50)',borderRadius:'var(--r)',border:`1.5px solid ${offerAccepted?'var(--green)':'var(--g200)'}`,cursor:'pointer',transition:'all .15s'}}>
           <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${offerAccepted?'var(--green)':'var(--g300)'}`,background:offerAccepted?'var(--green)':'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all .15s'}}>
@@ -1100,7 +1100,7 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
   const isPayable=debtType==='payable';
   const nameLabel=isPayable?(t.creditorName||'Кредитор'):(t.clientName);
-  const hasContactsAPI=typeof navigator!=='undefined'&&navigator.contacts&&typeof navigator.contacts.select==='function';
+  const hasContactsAPI=typeof navigator!=='undefined'&&'contacts' in navigator&&typeof navigator.contacts?.select==='function';
   async function pickContact(){
     try{
       const contacts=await navigator.contacts.select(['name','tel'],{multiple:false});
@@ -2558,7 +2558,7 @@ function App(){
   const [business,setBusiness]=useState(null);
   const [bizLoading,setBizLoading]=useState(false);
   const [allBusinesses,setAllBusinesses]=useState([]);
-  const [page,setPage]=useState('dashboard');
+  const [page,setPage]=useState(()=>{try{return localStorage.getItem('lastPage')||'dashboard';}catch{return 'dashboard';}});
   const [lang,setLang]=useState(()=>{try{return localStorage.getItem('appLang')||'tg';}catch{return 'tg';}});
   const [toastState,setToast]=useState(null);
   const [overdueCount,setOverdueCount]=useState(0);
@@ -2577,6 +2577,7 @@ function App(){
   },[]);
 
   useEffect(()=>{try{localStorage.setItem('appLang',lang);}catch{}},[lang]);
+  useEffect(()=>{try{localStorage.setItem('lastPage',page);}catch{}},[page]);
   useEffect(()=>{
     const auth=!session||resetMode;
     document.documentElement.style.overflow=auth?'auto':'';
