@@ -2687,7 +2687,7 @@ function App(){
       if(!done){done=true;clearTimeout(timer);}
       if(event==='PASSWORD_RECOVERY')setResetMode(true);
       if(event==='SIGNED_IN'&&localStorage.getItem('phoneReset')==='1'){localStorage.removeItem('phoneReset');setResetMode(true);}
-      if(event==='SIGNED_OUT'){try{localStorage.removeItem('lastPage');localStorage.removeItem('lastBizId');}catch{}}
+      if(event==='SIGNED_OUT'){try{localStorage.removeItem('lastBizId');}catch{}}
       setSession(s);
     });
     return()=>{done=true;clearTimeout(timer);subscription.unsubscribe();};
