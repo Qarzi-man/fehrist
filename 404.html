@@ -835,11 +835,29 @@ function AuthPage({lang,setLang}){
   );
 }
 
+function PhoneWrap({phone,setPhone,autoFocus}){
+  function clean(v){return v.replace(/\D/g,'');}
+  return(
+    <div style={{display:'flex',alignItems:'center',border:'1.5px solid var(--g200)',borderRadius:'var(--r)',overflow:'hidden',background:'#fff',transition:'border-color .15s'}} onFocusCapture={e=>e.currentTarget.style.borderColor='var(--primary)'} onBlurCapture={e=>e.currentTarget.style.borderColor='var(--g200)'}>
+      <span style={{padding:'10px 12px',fontSize:15,color:'var(--g600)',fontWeight:600,borderRight:'1px solid var(--g200)',background:'var(--g50)',flexShrink:0}}>+</span>
+      <input type="tel" inputMode="numeric" name="phone" autoComplete="username" value={phone} onChange={e=>setPhone(clean(e.target.value))} placeholder="992901234567" maxLength={15} required autoFocus={autoFocus} style={{border:'none',borderRadius:0,outline:'none',flex:1,boxShadow:'none'}}/>
+    </div>
+  );
+}
+
 function LoginForm({t,onSwitch}){
   const [phone,setPhone]=useState('');
   const [pass,setPass]=useState('');
   const [error,setError]=useState('');
   const [loading,setLoading]=useState(false);
+  const [forgotMode,setForgotMode]=useState(false);
+  const [fPhone,setFPhone]=useState('');
+  const [fOtp,setFOtp]=useState('');
+  const [fStep,setFStep]=useState('phone');
+  const [fLoading,setFLoading]=useState(false);
+  const [fError,setFError]=useState('');
+  const [fCountdown,setFCountdown]=useState(0);
+  useEffect(()=>{if(fCountdown<=0)return;const tm=setTimeout(()=>setFCountdown(c=>c-1),1000);return()=>clearTimeout(tm);},[fCountdown]);
   function clean(v){return v.replace(/\D/g,'');}
   function e164(d){return d.startsWith('+')?d:'+'+d;}
   async function submit(e){
@@ -851,22 +869,70 @@ function LoginForm({t,onSwitch}){
     setLoading(false);
     if(err)setError(t.loginError||'Неверный номер или пароль');
   }
+  async function forgotSend(e){
+    e.preventDefault();setFError('');
+    const d=clean(fPhone);
+    if(d.length<9){setFError(t.phoneInvalid||'Введите корректный номер');return;}
+    setFLoading(true);
+    localStorage.setItem('phoneReset','1');
+    const{error:err}=await sb.auth.signInWithOtp({phone:e164(d)});
+    setFLoading(false);
+    if(err){setFError(err.message);localStorage.removeItem('phoneReset');return;}
+    setFStep('otp');setFCountdown(60);
+  }
+  async function forgotVerify(e){
+    e.preventDefault();setFError('');setFLoading(true);
+    const{error:err}=await sb.auth.verifyOtp({phone:e164(clean(fPhone)),token:fOtp,type:'sms'});
+    setFLoading(false);
+    if(err){setFError(t.invalidCode||'Неверный код');localStorage.removeItem('phoneReset');}
+  }
+  if(forgotMode)return(
+    <>
+      <div className="auth-title">🔑 {t.forgotTitle||'Восстановление пароля'}</div>
+      {fStep==='phone'?(
+        <form onSubmit={forgotSend}>
+          <div className="auth-subtitle" style={{marginBottom:18}}>{t.phoneNumber||'Номер телефона'}</div>
+          <PhoneWrap phone={fPhone} setPhone={setFPhone} autoFocus={true}/>
+          {fError&&<div className="alert alert-error">{fError}</div>}
+          <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={fLoading}>{fLoading?'...':t.sendCode||'Получить код'}</button>
+          <button type="button" className="btn btn-full" style={{marginTop:8}} onClick={()=>setForgotMode(false)}>{t.forgotBack||'← Назад'}</button>
+        </form>
+      ):(
+        <form onSubmit={forgotVerify}>
+          <div className="auth-subtitle" style={{marginBottom:18}}>{t.codeSentTo||'Код отправлен на'} +{clean(fPhone)}</div>
+          <label>{t.enterCode||'Код из SMS'} *</label>
+          <input type="text" inputMode="numeric" maxLength={6} value={fOtp} onChange={e=>setFOtp(e.target.value.replace(/\D/g,''))} placeholder="• • • • • •" autoFocus style={{fontSize:26,letterSpacing:10,textAlign:'center',fontWeight:700}}/>
+          {fError&&<div className="alert alert-error">{fError}</div>}
+          <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={fLoading||fOtp.length<4}>{fLoading?'...':t.confirmCode||'Подтвердить'}</button>
+          <div style={{textAlign:'center',marginTop:10}}>
+            {fCountdown>0
+              ?<span style={{fontSize:13,color:'var(--g400)'}}>{t.resendIn||'Повторно через'} {fCountdown}с</span>
+              :<button style={{background:'none',border:'none',color:'var(--primary)',cursor:'pointer',fontSize:13,fontWeight:600}} onClick={()=>{setFStep('phone');setFOtp('');setFError('');}}>{t.resendCode||'Отправить ещё раз'}</button>
+            }
+          </div>
+          <div style={{textAlign:'center',marginTop:6}}>
+            <button type="button" style={{background:'none',border:'none',color:'var(--g400)',cursor:'pointer',fontSize:12}} onClick={()=>{setFStep('phone');setFOtp('');setFError('');}}>← {t.changePhone||'Изменить номер'}</button>
+          </div>
+        </form>
+      )}
+    </>
+  );
   return(
     <>
       <div className="auth-title">{t.loginTitle}</div>
       <div className="auth-subtitle">{t.loginSub}</div>
       <form onSubmit={submit} id="login-form">
         <label>{t.phoneNumber||'Номер телефона'} *</label>
-        <div style={{display:'flex',alignItems:'center',border:'1.5px solid var(--g200)',borderRadius:'var(--r)',overflow:'hidden',background:'#fff',transition:'border-color .15s'}} onFocusCapture={e=>e.currentTarget.style.borderColor='var(--primary)'} onBlurCapture={e=>e.currentTarget.style.borderColor='var(--g200)'}>
-          <span style={{padding:'10px 12px',fontSize:15,color:'var(--g600)',fontWeight:600,borderRight:'1px solid var(--g200)',background:'var(--g50)',flexShrink:0}}>+</span>
-          <input type="tel" inputMode="numeric" name="phone" autoComplete="username" value={phone} onChange={e=>setPhone(clean(e.target.value))} placeholder="992901234567" maxLength={15} required autoFocus style={{border:'none',borderRadius:0,outline:'none',flex:1,boxShadow:'none'}}/>
-        </div>
+        <PhoneWrap phone={phone} setPhone={setPhone} autoFocus={true}/>
         <label>{t.password} *</label>
         <input type="password" name="password" autoComplete="current-password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••" required/>
         {error&&<div className="alert alert-error">{error}</div>}
         <button className="btn btn-primary btn-full" type="submit" style={{marginTop:16}} disabled={loading}>{loading?'...':t.login}</button>
       </form>
-      <div style={{textAlign:'center',marginTop:14}}>
+      <div style={{textAlign:'center',marginTop:10}}>
+        <button style={{background:'none',border:'none',color:'var(--g400)',cursor:'pointer',fontSize:13}} onClick={()=>{setForgotMode(true);setFPhone(phone);}}>{t.forgotPass||'Забыли пароль?'}</button>
+      </div>
+      <div style={{textAlign:'center',marginTop:10}}>
         <span style={{fontSize:13,color:'var(--g400)'}}>{t.noAccount||'Нет аккаунта?'} </span>
         <button style={{background:'none',border:'none',color:'var(--primary)',cursor:'pointer',fontSize:13,fontWeight:600}} onClick={onSwitch}>{t.register}</button>
       </div>
@@ -974,7 +1040,8 @@ function RegisterForm({t,onSwitch}){
     if(d.length<9){setError(t.phoneInvalid||'Введите корректный номер');return;}
     if(pass.length<8){setError(t.passMin8||'Минимум 8 символов');return;}
     setLoading(true);
-    const{error:err}=await sb.auth.signUp({phone:e164(d),password:pass,options:{data:{biz_name:bizName.trim(),biz_type:bizType}}});
+    const offerTime=new Date().toISOString();
+    const{error:err}=await sb.auth.signUp({phone:e164(d),password:pass,options:{data:{biz_name:bizName.trim(),biz_type:bizType,offer_accepted_at:offerTime}}});
     setLoading(false);
     if(err){setError(err.message);return;}
     setStep('otp');setCountdown(60);
@@ -986,9 +1053,11 @@ function RegisterForm({t,onSwitch}){
     const userId=data?.user?.id;
     if(userId){
       const offerTime=new Date().toISOString();
-      const{data:existing}=await sb.from('businesses').select('id').eq('owner_id',userId).maybeSingle();
+      const{data:existing}=await sb.from('businesses').select('id,offer_accepted_at').eq('owner_id',userId).maybeSingle();
       if(!existing){
         await sb.from('businesses').insert({owner_id:userId,name:bizName.trim(),type:bizType,offer_accepted_at:offerTime,offer_accepted:true});
+      }else if(!existing.offer_accepted_at){
+        await sb.from('businesses').update({offer_accepted_at:offerTime,offer_accepted:true}).eq('id',existing.id);
       }
     }
     setLoading(false);
@@ -2619,6 +2688,7 @@ function App(){
     const{data:{subscription}}=sb.auth.onAuthStateChange((event,s)=>{
       if(!done){done=true;clearTimeout(timer);}
       if(event==='PASSWORD_RECOVERY')setResetMode(true);
+      if(event==='SIGNED_IN'&&localStorage.getItem('phoneReset')==='1'){localStorage.removeItem('phoneReset');setResetMode(true);}
       setSession(s);
     });
     return()=>{done=true;clearTimeout(timer);subscription.unsubscribe();};
