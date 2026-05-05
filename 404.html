@@ -899,7 +899,6 @@ function LoginForm({t,onSwitch}){
         <span style={{fontSize:13,color:'var(--g400)'}}>{t.noAccount||'Нет аккаунта?'} </span>
         <button style={{background:'none',border:'none',color:'var(--primary)',cursor:'pointer',fontSize:13,fontWeight:600}} onClick={onSwitch}>{t.register}</button>
       </div>
-      <div className="auth-switch">{t.register}? <button onClick={onSwitch}>{t.register}</button></div>
     </>
   );
 }
