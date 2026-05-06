@@ -2738,7 +2738,7 @@ function App(){
   useEffect(()=>{
     loadBusinesses(session);
     if(!session)return;
-    sb.from('admins').select('email').eq('email',session.user.email).single()
+    sb.from('admins').select('phone').eq('phone',session.user.phone).single()
       .then(({data})=>setIsAdmin(!!data));
     track('login');
   },[session]);
