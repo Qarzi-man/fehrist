@@ -2666,7 +2666,7 @@ const PAGES={dashboard:Dashboard,debts:DebtsPage,clients:ClientsPage,overdueHist
 function App(){
   const [session,setSession]=useState(undefined);
   const [business,setBusiness]=useState(null);
-  const [bizLoading,setBizLoading]=useState(false);
+  const [bizLoading,setBizLoading]=useState(true);
   const [allBusinesses,setAllBusinesses]=useState([]);
   const [page,setPage]=useState(()=>{try{return localStorage.getItem('lastPage')||'dashboard';}catch{return 'dashboard';}});
   const [lang,setLang]=useState(()=>{try{return localStorage.getItem('appLang')||'tg';}catch{return 'tg';}});
