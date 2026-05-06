@@ -2738,10 +2738,9 @@ function App(){
   useEffect(()=>{
     loadBusinesses(session);
     if(!session)return;
-    const uPhone=session.user.phone||'';
-    const uPhoneAlt=uPhone.startsWith('+')?uPhone.slice(1):'+'+uPhone;
-    sb.from('admins').select('phone').or(`phone.eq.${uPhone},phone.eq.${uPhoneAlt}`).limit(1)
-      .then(({data})=>setIsAdmin(!!(data&&data.length)));
+    const uPhone=(session.user.phone||'').replace(/^\+/,'');
+    sb.from('admins').select('phone')
+      .then(({data})=>setIsAdmin(!!(data&&data.some(r=>(r.phone||'').replace(/^\+/,'')===uPhone))));
     track('login');
   },[session]);
   useEffect(()=>{
