@@ -843,7 +843,7 @@ function AuthPage({lang,setLang}){
               <strong style={{color:'var(--g600)'}}>GAMMA GROUP</strong> · niyatorzuzoda@gmail.com
             </div>
           </div>
-          {mode==='login'?<LoginForm t={t} onSwitch={()=>setMode('register')}/>:<RegisterForm t={t} onSwitch={()=>setMode('login')}/>}
+          {mode==='login'?<LoginForm t={t} onSwitch={()=>setMode('register')} onResetMode={()=>setResetMode(true)}/>:<RegisterForm t={t} onSwitch={()=>setMode('login')}/>}
         </div>
       </div>
     </div>
@@ -860,7 +860,7 @@ function PhoneWrap({phone,setPhone,autoFocus}){
   );
 }
 
-function LoginForm({t,onSwitch}){
+function LoginForm({t,onSwitch,onResetMode}){
   const [phone,setPhone]=useState('');
   const [pass,setPass]=useState('');
   const [error,setError]=useState('');
@@ -899,7 +899,9 @@ function LoginForm({t,onSwitch}){
     e.preventDefault();setFError('');setFLoading(true);
     const{error:err}=await sb.auth.verifyOtp({phone:e164(clean(fPhone)),token:fOtp,type:'sms'});
     setFLoading(false);
-    if(err){setFError(t.invalidCode||'Неверный код');localStorage.removeItem('phoneReset');}
+    if(err){setFError(t.invalidCode||'Неверный код');localStorage.removeItem('phoneReset');return;}
+    localStorage.removeItem('phoneReset');
+    if(onResetMode)onResetMode();
   }
   if(forgotMode)return(
     <>
