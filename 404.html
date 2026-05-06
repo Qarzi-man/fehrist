@@ -2738,8 +2738,10 @@ function App(){
   useEffect(()=>{
     loadBusinesses(session);
     if(!session)return;
-    sb.from('admins').select('phone').eq('phone',session.user.phone).single()
-      .then(({data})=>setIsAdmin(!!data));
+    const uPhone=session.user.phone||'';
+    const uPhoneAlt=uPhone.startsWith('+')?uPhone.slice(1):'+'+uPhone;
+    sb.from('admins').select('phone').or(`phone.eq.${uPhone},phone.eq.${uPhoneAlt}`).limit(1)
+      .then(({data})=>setIsAdmin(!!(data&&data.length)));
     track('login');
   },[session]);
   useEffect(()=>{
