@@ -11,5 +11,8 @@
       "destination": "https://daftarcha.tj/$1",
       "permanent": true
     }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/404.html" }
   ]
 }
