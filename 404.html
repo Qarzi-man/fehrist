@@ -2335,7 +2335,7 @@ function ChangePassSection({t}){
 function LinkGoogleSection({t,session}){
   const [loading,setLoading]=useState(false);
   const hasGoogle=!!(session?.user?.identities?.some(i=>i.provider==='google'));
-  const hasPhone=!!(session?.user?.phone);
+  const hasPhone=!!(session?.user?.identities?.some(i=>i.provider==='phone')||session?.user?.phone);
   if(!hasPhone)return null;
   async function link(){
     setLoading(true);
