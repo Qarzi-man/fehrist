@@ -26,10 +26,10 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Daftarcha — Учёт долгов онлайн"/>
 <meta name="twitter:description" content="Онлайн-дафтари ҳисоби қарзҳо барои Тоҷикистон. Бесплатно."/>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7P54M2X3CZ"></script>
@@ -355,6 +355,13 @@ const AppCtx=createContext(null);
 const useApp=()=>useContext(AppCtx);
 let _toast=null;
 function toast(msg,type='success'){_toast?.({msg,type,id:Date.now()});}
+function safeErr(err,fallback='Ошибка. Попробуйте ещё раз.'){
+  if(!err)return fallback;
+  const m=err.message||'';
+  // Show auth errors verbatim (user-friendly); sanitize DB/internal errors
+  if(m.includes('Invalid')||m.includes('incorrect')||m.includes('expired')||m.includes('already')||m.includes('not found')||m.includes('too short')||m.includes('weak'))return m;
+  return fallback;
+}
 
 function track(event,params={}){try{if(typeof gtag==='function')gtag('event',event,{app:'daftarcha',...params});}catch{}}
 
@@ -436,7 +443,7 @@ const T={
     newPass:'Рамзи нав',confirmPass:'Тасдиқи рамз',passNoMatch:'Рамзҳо мувофиқ нестанд',updatePass:'Навсозии рамз',passUpdated:'Рамз навсозӣ шуд ✓',
     offerOld:'Аккаунти кӯҳна',remind:'Хотиррасонӣ',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Занг',remindSMS:'SMS',remindCopy:'Нусхабардорӣ матни хотиррасонӣ',remindTemplate:'Шаблони паём',remindTplFriend:'Дӯстона',remindTplOfficial:'Расмӣ',remindTplCustom:'Дигар',tplFriend:'Салом! Ёдоварӣ мекунам, ки Шумо дар {bizName} {amount} {sum} қарз доред. Мо интизори пардохт ҳастем. Ташаккур!',tplOfficial:'Салом. Шумо аз {bizName} {amount} {sum} қарздор ҳастед, лутфан қарзатонро саривақт супоред. Сипос!',pickContact:'Аз контактҳо',copyPhoneOk:'Рақам нусхабардорӣ шуд ✓',editDebt:'Таҳрири қарз',printReport:'Чоп кардан',darkMode:'Торик',byDueDate:'Аввал наздиктарин',dueSoon3:'3 рӯз',dueSoon7:'7 рӯз',dueSoon14:'14 рӯз',dueSoonFilter:'Ба зудӣ',privacy:'Сиёсати махфият',offline:'📡 Пайвандӣ нест — маълумот кӯҳна шуда метавонад',notifOverdue:'{n} қарзи мӯҳлатгузошта',notifDueSoon:'{n} қарз — мӯҳлат наздик аст',
     teamTitle:'Гурӯҳи корӣ',inviteEmailPlaceholder:'Email-и корманд',invite:'Даъват кардан',noMembers:'Кормандон ҳоло нестанд',roleOwner:'Соҳиб',roleStaff:'Корманд',pendingInvite:'Интизори бақайдгирӣ',activeInvite:'Фаъол',inviteOk:'Даъватнома сохта шуд ✓',inviteSelfError:'Шумо худатонро даъват карда наметавонед',inviteAlreadyError:'Аллакай даъват шудааст',inviteHint:'Корманд бояд бо ин email бақайд шавад',
-    changePhoneTitle:'Рақами телефонро иваз кунед',phoneChanged:'Рақам иваз шуд ✓',changePassTitle:'Рамзро иваз кунед',loginGoogle:'Бо Google ворид шавед',linkGoogle:'Пайвастан',linked:'Пайваст аст',linkGoogleHint:'Google-ро пайвастед, то бе рамз ворид шавед',googleLinkedHint:'Google пайваст шуд — тавассути Google ворид шуда метавонед',googleNoData:'Маълумоти шумо бо рақами телефон алоқаманд аст. Бо рақам ворид шавед ва дар Танзимот Google-ро пайвастед.',
+    changePhoneTitle:'Рақами телефонро иваз кунед',phoneChanged:'Рақам иваз шуд ✓',changePassTitle:'Рамзро иваз кунед',loginGoogle:'Бо Google ворид шавед',linkGoogle:'Пайвастан',linked:'Пайваст аст',linkGoogleHint:'Google-ро пайвастед, то бе рамз ворид шавед',googleLinkedHint:'Google пайваст шуд — тавассути Google ворид шуда метавонед',googleNoData:'Маълумоти шумо бо рақами телефон алоқаманд аст. Бо рақам ворид шавед ва дар Танзимот Google-ро пайвастед.',saveError:'Хато. Боз кӯшиш кунед.',amountBelowPaid:'Маблағ аз пардохтшуда кам шуда наметавонад',
   },
   ru:{
     appName:'Daftarcha',appSub:'Учёт задолженностей',
@@ -488,7 +495,7 @@ const T={
     newPass:'Новый пароль',confirmPass:'Подтвердить пароль',passNoMatch:'Пароли не совпадают',updatePass:'Обновить пароль',passUpdated:'Пароль обновлён ✓',
     offerOld:'Старый аккаунт',remind:'Напоминание',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Позвонить',remindSMS:'SMS',remindCopy:'Скопировать текст напоминания',remindTemplate:'Шаблон сообщения',remindTplFriend:'Другу',remindTplOfficial:'Официальный',remindTplCustom:'Другой',tplFriend:'Здравствуйте! Напоминаем, что у Вас долг в {bizName} на сумму {amount} {sum}. Ждём оплаты. Спасибо!',tplOfficial:'Здравствуйте. Вы являетесь должником {bizName} на сумму {amount} {sum}. Пожалуйста, погасите долг своевременно. Благодарим!',pickContact:'Из контактов',copyPhoneOk:'Номер скопирован ✓',editDebt:'Изменить долг',printReport:'Распечатать',darkMode:'Тёмный режим',byDueDate:'Сначала ближайшие',dueSoon3:'3 дня',dueSoon7:'7 дней',dueSoon14:'14 дней',dueSoonFilter:'Скоро срок',privacy:'Конфиденциальность',offline:'📡 Нет соединения — данные могут быть устаревшими',notifOverdue:'{n} просроченных долгов',notifDueSoon:'{n} долгов — срок через 1-3 дня',
     teamTitle:'Команда',inviteEmailPlaceholder:'Email сотрудника',invite:'Пригласить',noMembers:'Сотрудников пока нет',roleOwner:'Владелец',roleStaff:'Сотрудник',pendingInvite:'Ожидает регистрации',activeInvite:'Активен',inviteOk:'Приглашение создано ✓',inviteSelfError:'Нельзя пригласить себя',inviteAlreadyError:'Уже приглашён',inviteHint:'Сотрудник должен зарегистрироваться с этим email',
-    changePhoneTitle:'Изменить номер телефона',phoneChanged:'Номер изменён ✓',changePassTitle:'Изменить пароль',loginGoogle:'Войти через Google',linkGoogle:'Привязать',linked:'Привязан',linkGoogleHint:'Привяжите Google, чтобы входить без пароля',googleLinkedHint:'Google привязан — можете входить через Google',googleNoData:'Ваши данные привязаны к номеру телефона. Войдите по номеру, затем привяжите Google в Настройках.',
+    changePhoneTitle:'Изменить номер телефона',phoneChanged:'Номер изменён ✓',changePassTitle:'Изменить пароль',loginGoogle:'Войти через Google',linkGoogle:'Привязать',linked:'Привязан',linkGoogleHint:'Привяжите Google, чтобы входить без пароля',googleLinkedHint:'Google привязан — можете входить через Google',googleNoData:'Ваши данные привязаны к номеру телефона. Войдите по номеру, затем привяжите Google в Настройках.',saveError:'Ошибка. Попробуйте ещё раз.',amountBelowPaid:'Сумма не может быть меньше уже выплаченного',
   },
   uz:{
     appName:'Daftarcha',appSub:'Qarz hisobi',
@@ -540,7 +547,7 @@ const T={
     newPass:"Yangi parol",confirmPass:"Parolni tasdiqlash",passNoMatch:"Parollar mos kelmadi",updatePass:"Parolni yangilash",passUpdated:"Parol yangilandi ✓",
     offerOld:"Eski hisob",remind:"Eslatma",remindWA:"WhatsApp",remindTG:"Telegram",remindCall:"Qo'ng'iroq",remindSMS:"SMS",remindCopy:"Eslatma matnini nusxalash",remindTemplate:"Xabar shabloni",remindTplFriend:"Do'stona",remindTplOfficial:"Rasmiy",remindTplCustom:"Boshqa",tplFriend:"Salom! {bizName} da sizda {amount} {sum} qarz borligini eslatib o'tamiz. To'lovni kutamiz. Rahmat!",tplOfficial:"Salom. Siz {bizName} ga {amount} {sum} qarzdorsiz, iltimos qarzingizni o'z vaqtida to'lang. Rahmat!",pickContact:"Kontaktlardan",copyPhoneOk:"Raqam nusxalandi ✓",editDebt:"Qarzni tahrirlash",printReport:"Chop etish",darkMode:"Qorong'u rejim",byDueDate:"Avval yaqin",dueSoon3:"3 kun",dueSoon7:"7 kun",dueSoon14:"14 kun",dueSoonFilter:"Yaqin muddat",privacy:"Maxfiylik",offline:"📡 Ulanish yo'q — ma'lumotlar eskirgan bo'lishi mumkin",notifOverdue:"{n} muddati o'tgan qarzlar",notifDueSoon:"{n} qarz — muddati 1-3 kunda",
     teamTitle:"Jamoa",inviteEmailPlaceholder:"Xodim email",invite:"Taklif qilish",noMembers:"Hozircha xodimlar yo'q",roleOwner:"Egasi",roleStaff:"Xodim",pendingInvite:"Ro'yxatdan o'tishni kutmoqda",activeInvite:"Faol",inviteOk:"Taklif yaratildi ✓",inviteSelfError:"O'zingizni taklif qila olmaysiz",inviteAlreadyError:"Allaqachon taklif qilingan",inviteHint:"Xodim ushbu email bilan ro'yxatdan o'tishi kerak",
-    changePhoneTitle:"Telefon raqamini o'zgartirish",phoneChanged:"Raqam o'zgartirildi ✓",changePassTitle:"Parolni o'zgartirish",loginGoogle:'Google orqali kirish',linkGoogle:"Bog'lash",linked:"Bog'langan",linkGoogleHint:"Parolsiz kirish uchun Google'ni bog'lang",googleLinkedHint:"Google bog'landi — Google orqali kirishingiz mumkin",googleNoData:"Sizning ma'lumotlaringiz telefon raqamiga bog'liq. Raqam bilan kiring, so'ng Sozlamalarda Google'ni bog'lang.",
+    changePhoneTitle:"Telefon raqamini o'zgartirish",phoneChanged:"Raqam o'zgartirildi ✓",changePassTitle:"Parolni o'zgartirish",loginGoogle:'Google orqali kirish',linkGoogle:"Bog'lash",linked:"Bog'langan",linkGoogleHint:"Parolsiz kirish uchun Google'ni bog'lang",googleLinkedHint:"Google bog'landi — Google orqali kirishingiz mumkin",googleNoData:"Sizning ma'lumotlaringiz telefon raqamiga bog'liq. Raqam bilan kiring, so'ng Sozlamalarda Google'ni bog'lang.",saveError:"Xatolik. Qayta urinib ko'ring.",amountBelowPaid:"To'langan summadan kam bo'lishi mumkin emas",
   },
   en:{
     appName:'Daftarcha',appSub:'Debt management',
@@ -592,7 +599,7 @@ const T={
     newPass:'New password',confirmPass:'Confirm password',passNoMatch:'Passwords do not match',updatePass:'Update password',passUpdated:'Password updated ✓',
     offerOld:'Legacy account',remind:'Reminder',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Call',remindSMS:'SMS',remindCopy:'Copy reminder text',remindTemplate:'Message template',remindTplFriend:'Friendly',remindTplOfficial:'Official',remindTplCustom:'Other',tplFriend:'Hello! Reminding you that you have a debt of {amount} {sum} at {bizName}. We look forward to your payment. Thank you!',tplOfficial:'Hello. You have an outstanding debt of {amount} {sum} at {bizName}. Please repay on time. Thank you!',pickContact:'From contacts',copyPhoneOk:'Phone copied ✓',editDebt:'Edit debt',printReport:'Print report',darkMode:'Dark mode',byDueDate:'Nearest first',dueSoon3:'3 days',dueSoon7:'7 days',dueSoon14:'14 days',dueSoonFilter:'Due soon',privacy:'Privacy Policy',offline:'📡 No connection — data may be outdated',notifOverdue:'{n} overdue debts',notifDueSoon:'{n} debts due in 1-3 days',
     teamTitle:'Team',inviteEmailPlaceholder:'Employee email',invite:'Invite',noMembers:'No team members yet',roleOwner:'Owner',roleStaff:'Employee',pendingInvite:'Waiting for registration',activeInvite:'Active',inviteOk:'Invitation created ✓',inviteSelfError:'You cannot invite yourself',inviteAlreadyError:'Already invited',inviteHint:'The employee must register with this email',
-    changePhoneTitle:'Change phone number',phoneChanged:'Phone number changed ✓',changePassTitle:'Change password',loginGoogle:'Continue with Google',linkGoogle:'Link',linked:'Linked',linkGoogleHint:'Link Google to sign in without a password',googleLinkedHint:'Google linked — you can sign in with Google',googleNoData:'Your data is linked to your phone number. Sign in with phone, then link Google in Settings.',
+    changePhoneTitle:'Change phone number',phoneChanged:'Phone number changed ✓',changePassTitle:'Change password',loginGoogle:'Continue with Google',linkGoogle:'Link',linked:'Linked',linkGoogleHint:'Link Google to sign in without a password',googleLinkedHint:'Google linked — you can sign in with Google',googleNoData:'Your data is linked to your phone number. Sign in with phone, then link Google in Settings.',saveError:'Error. Please try again.',amountBelowPaid:'Amount cannot be less than what is already paid',
   }
 };
 
@@ -1243,11 +1250,15 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
     }catch(e){console.error(e);}
   }
 
-  async function checkPhone(phone){
+  const checkPhoneRef=useRef(null);
+  function checkPhone(phone){
     set('phone',phone);
     if(phone.length<7){setDupClient(null);return;}
-    const{data}=await sb.from('debts').select('client_name,phone').eq('business_id',business.id).eq('phone',phone.trim()).limit(1);
-    setDupClient(data&&data.length>0?data[0]:null);
+    clearTimeout(checkPhoneRef.current);
+    checkPhoneRef.current=setTimeout(async()=>{
+      const{data}=await sb.from('debts').select('client_name,phone').eq('business_id',business.id).eq('phone',phone.trim()).limit(1);
+      setDupClient(data&&data.length>0?data[0]:null);
+    },400);
   }
 
   async function doInsert(nameOverride){
@@ -1256,7 +1267,7 @@ function AddDebtModal({business,onClose,onSaved,t,initialType}){
     const row={business_id:business.id,client_name:clientName,phone:f.phone.trim(),amount:+f.amount,date_issued:f.dateIssued,due_date:f.dueDate,category:f.cat,comment:f.comment.trim(),status:'active',paid_amount:0,debt_type:debtType};
     const{error:err}=await sb.from('debts').insert(row);
     setSaving(false);
-    if(err){setError(err.message);return;}
+    if(err){setError(safeErr(err,'Ошибка при добавлении долга.'));return;}
     track('debt_added',{debt_type:debtType});
     onSaved();onClose();
   }
@@ -1353,10 +1364,12 @@ function PayModal({debt,onClose,onSaved,t}){
     if(debt.date_issued&&actualDate<debt.date_issued){setError(t.dueDateError||'Дата оплаты не может быть раньше даты долга');return;}
     setSaving(true);
     const payRow={debt_id:debt.id,amount:amt,paid_at:actualDate,expected_date:expectedDate,method,note};
-    await sb.from('payments').insert(payRow);
+    const{error:payErr}=await sb.from('payments').insert(payRow);
+    if(payErr){setError(t.saveError||'Ошибка при сохранении. Попробуйте ещё раз.');setSaving(false);return;}
     const newPaid=Number(debt.paid_amount??0)+amt;
     const newStatus=newPaid>=Number(debt.amount)-0.01?'paid':'partial';
-    await sb.from('debts').update({paid_amount:newPaid,status:newStatus}).eq('id',debt.id);
+    const{error:debtErr}=await sb.from('debts').update({paid_amount:newPaid,status:newStatus}).eq('id',debt.id);
+    if(debtErr){setError(t.saveError||'Ошибка при обновлении долга.');setSaving(false);return;}
     track('payment_recorded',{amount:amt});
     setSaving(false);onSaved();
   }
@@ -1397,8 +1410,7 @@ function PayHistoryModal({debt,onClose,t}){
   useEffect(()=>{
     if(!debt||!debt.id){setLoading(false);return;}
     sb.from('payments').select('*').eq('debt_id',debt.id).order('paid_at',{ascending:true})
-      .then(({data,error})=>{
-        if(error){console.error('payments error:',error);}
+      .then(({data})=>{
         setPayments(data??[]);
         setLoading(false);
       });
@@ -1647,12 +1659,13 @@ function EditDebtModal({d,onClose,onSaved,t}){
   async function submit(e){
     e.preventDefault();setError('');
     if(!f.amount||+f.amount<=0){setError(t.amount+'!');return;}
+    if(+f.amount<Number(d.paid_amount??0)){setError((t.amountBelowPaid||'Сумма не может быть меньше уже выплаченного')+': '+fmt(d.paid_amount));return;}
     if(!f.dueDate){setError(t.dueDate+'!');return;}
     if(f.dueDate<f.dateIssued){setError(t.dueDateError);return;}
     setSaving(true);
     const{error:err}=await sb.from('debts').update({amount:+f.amount,date_issued:f.dateIssued,due_date:f.dueDate,category:f.cat,comment:f.comment.trim()}).eq('id',d.id);
     setSaving(false);
-    if(err){setError(err.message);return;}
+    if(err){setError(safeErr(err,'Ошибка при сохранении.'));return;}
     toast(t.savedOk);onSaved();onClose();
   }
   return(
