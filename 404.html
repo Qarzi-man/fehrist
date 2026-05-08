@@ -862,11 +862,15 @@ function AuthPage({lang,setLang,onForgotPass}){
 }
 
 function PhoneWrap({phone,setPhone,autoFocus}){
-  function clean(v){return v.replace(/\D/g,'');}
+  const suffix=phone.startsWith('992')?phone.slice(3):phone;
+  function handleChange(e){
+    const d=e.target.value.replace(/\D/g,'').slice(0,9);
+    setPhone('992'+d);
+  }
   return(
     <div style={{display:'flex',alignItems:'center',border:'1.5px solid var(--g200)',borderRadius:'var(--r)',overflow:'hidden',background:'#fff',transition:'border-color .15s'}} onFocusCapture={e=>e.currentTarget.style.borderColor='var(--primary)'} onBlurCapture={e=>e.currentTarget.style.borderColor='var(--g200)'}>
-      <span style={{padding:'10px 12px',fontSize:15,color:'var(--g600)',fontWeight:600,borderRight:'1px solid var(--g200)',background:'var(--g50)',flexShrink:0}}>+</span>
-      <input type="tel" inputMode="numeric" name="phone" autoComplete="username" value={phone} onChange={e=>setPhone(clean(e.target.value))} placeholder="992901234567" maxLength={15} required autoFocus={autoFocus} style={{border:'none',borderRadius:0,outline:'none',flex:1,boxShadow:'none'}}/>
+      <span style={{padding:'10px 12px',fontSize:15,color:'var(--g600)',fontWeight:600,borderRight:'1px solid var(--g200)',background:'var(--g50)',flexShrink:0}}>+992</span>
+      <input type="tel" inputMode="numeric" name="phone" autoComplete="username" value={suffix} onChange={handleChange} placeholder="901234567" maxLength={9} required autoFocus={autoFocus} style={{border:'none',borderRadius:0,outline:'none',flex:1,boxShadow:'none'}}/>
     </div>
   );
 }
@@ -2281,8 +2285,8 @@ function ChangePhoneSection({t,session}){
         <form onSubmit={sendOtp} style={{padding:18}}>
           <label>{t.changePhone||'Новый номер'} *</label>
           <div style={{display:'flex',alignItems:'center',border:'1.5px solid var(--g200)',borderRadius:'var(--r)',overflow:'hidden',background:'#fff'}} onFocusCapture={e=>e.currentTarget.style.borderColor='var(--primary)'} onBlurCapture={e=>e.currentTarget.style.borderColor='var(--g200)'}>
-            <span style={{padding:'10px 12px',fontSize:15,color:'var(--g600)',fontWeight:600,borderRight:'1px solid var(--g200)',background:'var(--g50)',flexShrink:0}}>+</span>
-            <input type="tel" inputMode="numeric" value={newPhone} onChange={e=>setNewPhone(e.target.value.replace(/\D/g,''))} placeholder="992901234567" maxLength={15} autoFocus style={{border:'none',borderRadius:0,outline:'none',flex:1,boxShadow:'none'}}/>
+            <span style={{padding:'10px 12px',fontSize:15,color:'var(--g600)',fontWeight:600,borderRight:'1px solid var(--g200)',background:'var(--g50)',flexShrink:0}}>+992</span>
+            <input type="tel" inputMode="numeric" value={newPhone.startsWith('992')?newPhone.slice(3):newPhone} onChange={e=>setNewPhone('992'+e.target.value.replace(/\D/g,'').slice(0,9))} placeholder="901234567" maxLength={9} autoFocus style={{border:'none',borderRadius:0,outline:'none',flex:1,boxShadow:'none'}}/>
           </div>
           {error&&<div className="alert alert-error">{error}</div>}
           <div style={{display:'flex',gap:8,marginTop:14}}>
