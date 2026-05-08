@@ -1099,11 +1099,9 @@ function RegisterForm({t,onSwitch}){
     const userId=data?.user?.id;
     if(userId){
       const offerTime=offerTimeRef.current||new Date().toISOString();
-      const{data:existing}=await sb.from('businesses').select('id,offer_accepted_at').eq('owner_id',userId).maybeSingle();
+      const{data:existing}=await sb.from('businesses').select('id').eq('owner_id',userId).maybeSingle();
       if(!existing){
-        await sb.from('businesses').insert({owner_id:userId,name:bizName.trim(),type:bizType,offer_accepted_at:offerTime,offer_accepted:true});
-      }else if(!existing.offer_accepted_at){
-        await sb.from('businesses').update({offer_accepted_at:offerTime,offer_accepted:true}).eq('id',existing.id);
+        await sb.from('businesses').insert({owner_id:userId,name:bizName.trim(),type:bizType,offer_accepted_at:offerTime,offer_accepted:true,is_active:true});
       }
     }
     setLoading(false);
@@ -2945,8 +2943,18 @@ function App(){
             offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
             offer_accepted:true,is_active:true
           }).select().single();
-          if(insErr)setBizError('INSERT: '+insErr.message);
-          if(newBiz)list=[newBiz];
+          if(insErr){
+            // Race: confirmCode may have already inserted — retry SELECT
+            const{data:fb}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
+            if(fb&&fb.length>0){list=fb;}
+            else setBizError('INSERT: '+insErr.message);
+          }else if(newBiz){
+            list=[newBiz];
+          }else{
+            // INSERT ok but RETURNING blocked by RLS — plain SELECT
+            const{data:fb}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
+            if(fb&&fb.length>0){list=fb;}
+          }
         }else{setBizError('no_biz_name uid='+sess.user.id);}
       }
       setAllBusinesses(list);
