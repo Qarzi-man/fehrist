@@ -1763,8 +1763,12 @@ function QuickPayModal({debts,onClose,onPaid,t}){
 }
 
 function Dashboard({t}){
-  const {business,setPage}=useApp();
+  const {business,setPage,session}=useApp();
   const [debts,setDebts]=useState([]);const [loading,setLoading]=useState(true);
+  const [googleHintDismissed,setGoogleHintDismissed]=useState(()=>{try{return localStorage.getItem('googleLinkHintDismissed')==='1';}catch{return false;}});
+  const hasPhone=session?.user?.identities?.some(i=>i.provider==='phone');
+  const hasGoogle=session?.user?.identities?.some(i=>i.provider==='google');
+  const showGoogleHint=hasPhone&&!hasGoogle&&!googleHintDismissed;
   const [addOpen,setAddOpen]=useState(false);const [payDebt,setPayDebt]=useState(null);const [histDebt,setHistDebt]=useState(null);
   async function load(){if(!business){setLoading(false);return;}setLoading(true);try{const{data}=await sb.from('debts').select('*').eq('business_id',business.id).order('created_at',{ascending:false});setDebts(data??[]);showDebtNotifications(data??[],business.name,t);}finally{setLoading(false);}}
   useEffect(()=>{load();},[business]);
@@ -1789,6 +1793,15 @@ function Dashboard({t}){
           <button className="btn btn-primary" onClick={()=>setAddOpen(true)}>{t.addDebt}</button>
         </div>
       </div>
+      {showGoogleHint&&(
+        <div style={{background:'#EFF6FF',border:'1px solid #BFDBFE',borderRadius:'var(--r)',padding:'10px 14px',marginBottom:12,display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}>
+          <div style={{flex:1,fontSize:13,color:'#1E40AF',lineHeight:1.5}}>💡 {t.linkGoogleHint||'Привяжите Google, чтобы входить без пароля'}</div>
+          <div style={{display:'flex',gap:6,flexShrink:0}}>
+            <button className="btn btn-sm" style={{background:'var(--primary)',color:'#fff',border:'none',fontSize:12}} onClick={()=>setPage('settings')}>{t.settingsTitle||'Настройки'} →</button>
+            <button className="btn btn-sm" style={{fontSize:12}} onClick={()=>{setGoogleHintDismissed(true);try{localStorage.setItem('googleLinkHintDismissed','1');}catch{}}} title="Закрыть">✕</button>
+          </div>
+        </div>
+      )}
       <div className="stats-grid">
         {[
           {label:t.theyOwe||'Мне должны',val:fmt(totalReceivable)+' '+t.sum,sub:receivableActive.length+' '+t.debts.toLowerCase(),color:'var(--primary)',bg:'var(--primary-bg)',icon:IC.debts,sm:true},
@@ -2899,6 +2912,42 @@ function PasswordResetPage({t,lang,setLang,onDone}){
   );
 }
 
+function GoogleNoDataScreen({t}){
+  const [phone,setPhone]=useState('');
+  const [pass,setPass]=useState('');
+  const [error,setError]=useState('');
+  const [loading,setLoading]=useState(false);
+  async function submit(e){
+    e.preventDefault();setError('');
+    if(phone.replace(/\D/g,'').length<12){setError(t.phoneInvalid||'Введите корректный номер');return;}
+    if(!pass){setError(t.password+'!');return;}
+    setLoading(true);
+    const{error:err}=await sb.auth.signInWithPassword({phone:'+'+phone.replace(/\D/g,''),password:pass});
+    setLoading(false);
+    if(err){setError(safeErr(err,t.loginError||'Неверный номер или пароль'));return;}
+  }
+  return(
+    <>
+      <div style={{fontSize:48}}>📱</div>
+      <div style={{fontSize:18,fontWeight:800,color:'var(--g900)',textAlign:'center'}}>{t.googleNoDataTitle||'Это новый Google-аккаунт'}</div>
+      <div style={{fontSize:13,color:'var(--g500)',textAlign:'center',maxWidth:320,lineHeight:1.6}}>{t.googleNoData||'Ваши данные привязаны к номеру телефона. Войдите ниже.'}</div>
+      <form onSubmit={submit} style={{width:'100%',maxWidth:320,marginTop:8}}>
+        <label>{t.phoneNumber||'Номер телефона'}</label>
+        <PhoneWrap phone={phone} setPhone={setPhone} autoFocus={false}/>
+        <label style={{marginTop:10,display:'block'}}>{t.password}</label>
+        <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••" autoComplete="current-password"/>
+        {error&&<div className="alert alert-error">{error}</div>}
+        <button className="btn btn-primary btn-full" type="submit" style={{marginTop:12}} disabled={loading}>
+          {loading?'...':'📲 '+(t.login||'Войти')}
+        </button>
+      </form>
+      <button className="btn btn-full" style={{maxWidth:320,marginTop:6,color:'var(--g400)',fontSize:12}} onClick={()=>sb.auth.signOut()}>
+        {t.register||'Регистрация'} →
+      </button>
+    </>
+  );
+}
+
 const PAGES={dashboard:Dashboard,debts:DebtsPage,clients:ClientsPage,overdueHistory:OverdueHistoryPage,settings:SettingsPage,admin:AdminPage};
 function App(){
   const [session,setSession]=useState(undefined);
@@ -3025,12 +3074,7 @@ function App(){
     return(
       <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:12,padding:24,background:'var(--g50)'}}>
         {isGoogleUser?(
-          <>
-            <div style={{fontSize:48}}>📱</div>
-            <div style={{fontSize:18,fontWeight:800,color:'var(--g900)',textAlign:'center'}}>{t.googleNoDataTitle||'Это новый Google-аккаунт'}</div>
-            <div style={{fontSize:13,color:'var(--g500)',textAlign:'center',maxWidth:320,lineHeight:1.6}}>{t.googleNoData||'Ваши данные привязаны к номеру телефона. Войдите по номеру, затем привяжите Google в Настройках.'}</div>
-            <button className="btn btn-primary" style={{minWidth:180,marginTop:4}} onClick={()=>sb.auth.signOut()}>📲 {t.login||'Войти по номеру'}</button>
-          </>
+          <GoogleNoDataScreen t={t}/>
         ):(
           <>
             <div style={{fontSize:48}}>⚠️</div>
