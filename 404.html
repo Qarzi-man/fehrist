@@ -1679,9 +1679,12 @@ function EditDebtModal({d,onClose,onSaved,t}){
     if(!f.amount||+f.amount<=0){setError(t.amount+'!');return;}
     if(+f.amount<Number(d.paid_amount??0)){setError((t.amountBelowPaid||'Сумма не может быть меньше уже выплаченного')+': '+fmt(d.paid_amount));return;}
     if(!f.dueDate){setError(t.dueDate+'!');return;}
-    if(f.dueDate<f.dateIssued){setError(t.dueDateError);return;}
+    if(f.dateIssued&&f.dueDate&&f.dueDate<f.dateIssued){setError(t.dueDateError||'Срок оплаты не может быть раньше даты долга');return;}
     setSaving(true);
-    const{error:err}=await sb.from('debts').update({amount:+f.amount,date_issued:f.dateIssued,due_date:f.dueDate,category:f.cat,comment:f.comment.trim()}).eq('id',d.id);
+    const newAmount=+f.amount;
+    const existingPaid=Number(d.paid_amount??0);
+    const newStatus=existingPaid>=newAmount?'paid':existingPaid>0?'partial':'active';
+    const{error:err}=await sb.from('debts').update({amount:newAmount,status:newStatus,date_issued:f.dateIssued,due_date:f.dueDate,category:f.cat,comment:f.comment.trim()}).eq('id',d.id);
     setSaving(false);
     if(err){setError(safeErr(err,'Ошибка при сохранении.'));return;}
     toast(t.savedOk);onSaved();onClose();
