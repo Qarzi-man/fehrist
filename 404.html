@@ -358,8 +358,8 @@ function toast(msg,type='success'){_toast?.({msg,type,id:Date.now()});}
 function safeErr(err,fallback='Ошибка. Попробуйте ещё раз.'){
   if(!err)return fallback;
   const m=err.message||'';
-  // Show auth errors verbatim (user-friendly); sanitize DB/internal errors
-  if(m.includes('Invalid')||m.includes('incorrect')||m.includes('expired')||m.includes('already')||m.includes('not found')||m.includes('too short')||m.includes('weak'))return m;
+  const ml=m.toLowerCase();
+  if(ml.includes('invalid')||ml.includes('incorrect')||ml.includes('expired')||ml.includes('already')||ml.includes('not found')||ml.includes('too short')||ml.includes('weak')||ml.includes('rate')||ml.includes('seconds')||ml.includes('phone'))return m;
   return fallback;
 }
 
@@ -444,6 +444,7 @@ const T={
     offerOld:'Аккаунти кӯҳна',remind:'Хотиррасонӣ',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Занг',remindSMS:'SMS',remindCopy:'Нусхабардорӣ матни хотиррасонӣ',remindTemplate:'Шаблони паём',remindTplFriend:'Дӯстона',remindTplOfficial:'Расмӣ',remindTplCustom:'Дигар',tplFriend:'Салом! Ёдоварӣ мекунам, ки Шумо дар {bizName} {amount} {sum} қарз доред. Мо интизори пардохт ҳастем. Ташаккур!',tplOfficial:'Салом. Шумо аз {bizName} {amount} {sum} қарздор ҳастед, лутфан қарзатонро саривақт супоред. Сипос!',pickContact:'Аз контактҳо',copyPhoneOk:'Рақам нусхабардорӣ шуд ✓',editDebt:'Таҳрири қарз',printReport:'Чоп кардан',darkMode:'Торик',byDueDate:'Аввал наздиктарин',dueSoon3:'3 рӯз',dueSoon7:'7 рӯз',dueSoon14:'14 рӯз',dueSoonFilter:'Ба зудӣ',privacy:'Сиёсати махфият',offline:'📡 Пайвандӣ нест — маълумот кӯҳна шуда метавонад',notifOverdue:'{n} қарзи мӯҳлатгузошта',notifDueSoon:'{n} қарз — мӯҳлат наздик аст',
     teamTitle:'Гурӯҳи корӣ',inviteEmailPlaceholder:'Email-и корманд',invite:'Даъват кардан',noMembers:'Кормандон ҳоло нестанд',roleOwner:'Соҳиб',roleStaff:'Корманд',pendingInvite:'Интизори бақайдгирӣ',activeInvite:'Фаъол',inviteOk:'Даъватнома сохта шуд ✓',inviteSelfError:'Шумо худатонро даъват карда наметавонед',inviteAlreadyError:'Аллакай даъват шудааст',inviteHint:'Корманд бояд бо ин email бақайд шавад',
     changePhoneTitle:'Рақами телефонро иваз кунед',phoneChanged:'Рақам иваз шуд ✓',changePassTitle:'Рамзро иваз кунед',loginGoogle:'Бо Google ворид шавед',linkGoogle:'Пайвастан',linked:'Пайваст аст',linkGoogleHint:'Google-ро пайвастед, то бе рамз ворид шавед',googleLinkedHint:'Google пайваст шуд — тавассути Google ворид шуда метавонед',googleNoData:'Маълумоти шумо бо рақами телефон алоқаманд аст. Бо рақам ворид шавед ва дар Танзимот Google-ро пайвастед.',saveError:'Хато. Боз кӯшиш кунед.',amountBelowPaid:'Маблағ аз пардохтшуда кам шуда наметавонад',
+    googleNoDataTitle:'Ин аккаунти нави Google аст',googlePhoneWarning:'Агар аккаунт бо рақами телефон дошта бошед — бо Google ворид нашавед. Бо рақами телефон ворид шавед ва дар Танзимот Google-ро пайвастед.',
   },
   ru:{
     appName:'Daftarcha',appSub:'Учёт задолженностей',
@@ -496,6 +497,7 @@ const T={
     offerOld:'Старый аккаунт',remind:'Напоминание',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Позвонить',remindSMS:'SMS',remindCopy:'Скопировать текст напоминания',remindTemplate:'Шаблон сообщения',remindTplFriend:'Другу',remindTplOfficial:'Официальный',remindTplCustom:'Другой',tplFriend:'Здравствуйте! Напоминаем, что у Вас долг в {bizName} на сумму {amount} {sum}. Ждём оплаты. Спасибо!',tplOfficial:'Здравствуйте. Вы являетесь должником {bizName} на сумму {amount} {sum}. Пожалуйста, погасите долг своевременно. Благодарим!',pickContact:'Из контактов',copyPhoneOk:'Номер скопирован ✓',editDebt:'Изменить долг',printReport:'Распечатать',darkMode:'Тёмный режим',byDueDate:'Сначала ближайшие',dueSoon3:'3 дня',dueSoon7:'7 дней',dueSoon14:'14 дней',dueSoonFilter:'Скоро срок',privacy:'Конфиденциальность',offline:'📡 Нет соединения — данные могут быть устаревшими',notifOverdue:'{n} просроченных долгов',notifDueSoon:'{n} долгов — срок через 1-3 дня',
     teamTitle:'Команда',inviteEmailPlaceholder:'Email сотрудника',invite:'Пригласить',noMembers:'Сотрудников пока нет',roleOwner:'Владелец',roleStaff:'Сотрудник',pendingInvite:'Ожидает регистрации',activeInvite:'Активен',inviteOk:'Приглашение создано ✓',inviteSelfError:'Нельзя пригласить себя',inviteAlreadyError:'Уже приглашён',inviteHint:'Сотрудник должен зарегистрироваться с этим email',
     changePhoneTitle:'Изменить номер телефона',phoneChanged:'Номер изменён ✓',changePassTitle:'Изменить пароль',loginGoogle:'Войти через Google',linkGoogle:'Привязать',linked:'Привязан',linkGoogleHint:'Привяжите Google, чтобы входить без пароля',googleLinkedHint:'Google привязан — можете входить через Google',googleNoData:'Ваши данные привязаны к номеру телефона. Войдите по номеру, затем привяжите Google в Настройках.',saveError:'Ошибка. Попробуйте ещё раз.',amountBelowPaid:'Сумма не может быть меньше уже выплаченного',
+    googleNoDataTitle:'Это новый Google-аккаунт',googlePhoneWarning:'Если у вас уже есть аккаунт по номеру телефона — не входите через Google. Войдите по номеру, затем привяжите Google в Настройках.',
   },
   uz:{
     appName:'Daftarcha',appSub:'Qarz hisobi',
@@ -548,6 +550,7 @@ const T={
     offerOld:"Eski hisob",remind:"Eslatma",remindWA:"WhatsApp",remindTG:"Telegram",remindCall:"Qo'ng'iroq",remindSMS:"SMS",remindCopy:"Eslatma matnini nusxalash",remindTemplate:"Xabar shabloni",remindTplFriend:"Do'stona",remindTplOfficial:"Rasmiy",remindTplCustom:"Boshqa",tplFriend:"Salom! {bizName} da sizda {amount} {sum} qarz borligini eslatib o'tamiz. To'lovni kutamiz. Rahmat!",tplOfficial:"Salom. Siz {bizName} ga {amount} {sum} qarzdorsiz, iltimos qarzingizni o'z vaqtida to'lang. Rahmat!",pickContact:"Kontaktlardan",copyPhoneOk:"Raqam nusxalandi ✓",editDebt:"Qarzni tahrirlash",printReport:"Chop etish",darkMode:"Qorong'u rejim",byDueDate:"Avval yaqin",dueSoon3:"3 kun",dueSoon7:"7 kun",dueSoon14:"14 kun",dueSoonFilter:"Yaqin muddat",privacy:"Maxfiylik",offline:"📡 Ulanish yo'q — ma'lumotlar eskirgan bo'lishi mumkin",notifOverdue:"{n} muddati o'tgan qarzlar",notifDueSoon:"{n} qarz — muddati 1-3 kunda",
     teamTitle:"Jamoa",inviteEmailPlaceholder:"Xodim email",invite:"Taklif qilish",noMembers:"Hozircha xodimlar yo'q",roleOwner:"Egasi",roleStaff:"Xodim",pendingInvite:"Ro'yxatdan o'tishni kutmoqda",activeInvite:"Faol",inviteOk:"Taklif yaratildi ✓",inviteSelfError:"O'zingizni taklif qila olmaysiz",inviteAlreadyError:"Allaqachon taklif qilingan",inviteHint:"Xodim ushbu email bilan ro'yxatdan o'tishi kerak",
     changePhoneTitle:"Telefon raqamini o'zgartirish",phoneChanged:"Raqam o'zgartirildi ✓",changePassTitle:"Parolni o'zgartirish",loginGoogle:'Google orqali kirish',linkGoogle:"Bog'lash",linked:"Bog'langan",linkGoogleHint:"Parolsiz kirish uchun Google'ni bog'lang",googleLinkedHint:"Google bog'landi — Google orqali kirishingiz mumkin",googleNoData:"Sizning ma'lumotlaringiz telefon raqamiga bog'liq. Raqam bilan kiring, so'ng Sozlamalarda Google'ni bog'lang.",saveError:"Xatolik. Qayta urinib ko'ring.",amountBelowPaid:"To'langan summadan kam bo'lishi mumkin emas",
+    googleNoDataTitle:"Bu yangi Google hisob",googlePhoneWarning:"Telefon raqami bilan hisobingiz bo'lsa — bu yerda Google orqali kirmang. Raqam bilan kiring, so'ng Sozlamalarda Google'ni bog'lang.",
   },
   en:{
     appName:'Daftarcha',appSub:'Debt management',
@@ -600,6 +603,7 @@ const T={
     offerOld:'Legacy account',remind:'Reminder',remindWA:'WhatsApp',remindTG:'Telegram',remindCall:'Call',remindSMS:'SMS',remindCopy:'Copy reminder text',remindTemplate:'Message template',remindTplFriend:'Friendly',remindTplOfficial:'Official',remindTplCustom:'Other',tplFriend:'Hello! Reminding you that you have a debt of {amount} {sum} at {bizName}. We look forward to your payment. Thank you!',tplOfficial:'Hello. You have an outstanding debt of {amount} {sum} at {bizName}. Please repay on time. Thank you!',pickContact:'From contacts',copyPhoneOk:'Phone copied ✓',editDebt:'Edit debt',printReport:'Print report',darkMode:'Dark mode',byDueDate:'Nearest first',dueSoon3:'3 days',dueSoon7:'7 days',dueSoon14:'14 days',dueSoonFilter:'Due soon',privacy:'Privacy Policy',offline:'📡 No connection — data may be outdated',notifOverdue:'{n} overdue debts',notifDueSoon:'{n} debts due in 1-3 days',
     teamTitle:'Team',inviteEmailPlaceholder:'Employee email',invite:'Invite',noMembers:'No team members yet',roleOwner:'Owner',roleStaff:'Employee',pendingInvite:'Waiting for registration',activeInvite:'Active',inviteOk:'Invitation created ✓',inviteSelfError:'You cannot invite yourself',inviteAlreadyError:'Already invited',inviteHint:'The employee must register with this email',
     changePhoneTitle:'Change phone number',phoneChanged:'Phone number changed ✓',changePassTitle:'Change password',loginGoogle:'Continue with Google',linkGoogle:'Link',linked:'Linked',linkGoogleHint:'Link Google to sign in without a password',googleLinkedHint:'Google linked — you can sign in with Google',googleNoData:'Your data is linked to your phone number. Sign in with phone, then link Google in Settings.',saveError:'Error. Please try again.',amountBelowPaid:'Amount cannot be less than what is already paid',
+    googleNoDataTitle:'This is a new Google account',googlePhoneWarning:'If you already have a phone account — do not sign in with Google here. Sign in with your phone number, then link Google in Settings.',
   }
 };
 
@@ -864,8 +868,9 @@ function AuthPage({lang,setLang,onForgotPass}){
 function PhoneWrap({phone,setPhone,autoFocus}){
   const suffix=phone.startsWith('992')?phone.slice(3):phone;
   function handleChange(e){
-    const d=e.target.value.replace(/\D/g,'').slice(0,9);
-    setPhone('992'+d);
+    let d=e.target.value.replace(/\D/g,'');
+    if(d.startsWith('992'))d=d.slice(3);
+    setPhone('992'+d.slice(0,9));
   }
   return(
     <div style={{display:'flex',alignItems:'center',border:'1.5px solid var(--g200)',borderRadius:'var(--r)',overflow:'hidden',background:'#fff',transition:'border-color .15s'}} onFocusCapture={e=>e.currentTarget.style.borderColor='var(--primary)'} onBlurCapture={e=>e.currentTarget.style.borderColor='var(--g200)'}>
@@ -981,6 +986,9 @@ function LoginForm({t,onSwitch,onResetMode}){
         <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.4 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.9 6.1C12.6 13 17.9 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4 7.1-10 7.1-17z"/><path fill="#FBBC05" d="M10.7 28.6A14.9 14.9 0 0 1 9.5 24c0-1.6.3-3.1.7-4.6L2.3 13.3A23.9 23.9 0 0 0 0 24c0 3.8.9 7.4 2.5 10.6l8.2-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.1 0-11.3-4.1-13.2-9.7l-8 6.2C6.6 42.5 14.7 48 24 48z"/></svg>
         {t.loginGoogle||'Войти через Google'}
       </button>
+      <div style={{background:'#FFFBEB',border:'1px solid #FDE68A',borderRadius:'var(--r)',padding:'8px 12px',marginTop:8,fontSize:11.5,color:'#78350F',lineHeight:1.5}}>
+        ⚠️ {t.googlePhoneWarning||'Если у вас уже есть аккаунт по номеру — не входите через Google. Войдите по номеру, затем привяжите Google в Настройках.'}
+      </div>
       <div style={{textAlign:'center',marginTop:10}}>
         <span style={{fontSize:13,color:'var(--g400)'}}>{t.noAccount||'Нет аккаунта?'} </span>
         <button style={{background:'none',border:'none',color:'var(--primary)',cursor:'pointer',fontSize:13,fontWeight:600}} onClick={onSwitch}>{t.register}</button>
@@ -2245,7 +2253,9 @@ function ChangePhoneSection({t,session}){
   async function sendOtp(e){
     e.preventDefault();setError('');
     const d=clean(newPhone);
-    if(d.length<9){setError(t.phoneInvalid);return;}
+    if(d.length<12){setError(t.phoneInvalid||'Введите корректный номер');return;}
+    const currentD=clean(currentPhone);
+    if(d===currentD||d==='992'+currentD||currentD==='992'+d){setError(t.phoneInvalid||'Введите другой номер');return;}
     setLoading(true);
     const{error:err}=await sb.auth.updateUser({phone:e164(d)});
     setLoading(false);
@@ -2286,7 +2296,7 @@ function ChangePhoneSection({t,session}){
           <label>{t.changePhone||'Новый номер'} *</label>
           <div style={{display:'flex',alignItems:'center',border:'1.5px solid var(--g200)',borderRadius:'var(--r)',overflow:'hidden',background:'#fff'}} onFocusCapture={e=>e.currentTarget.style.borderColor='var(--primary)'} onBlurCapture={e=>e.currentTarget.style.borderColor='var(--g200)'}>
             <span style={{padding:'10px 12px',fontSize:15,color:'var(--g600)',fontWeight:600,borderRight:'1px solid var(--g200)',background:'var(--g50)',flexShrink:0}}>+992</span>
-            <input type="tel" inputMode="numeric" value={newPhone.startsWith('992')?newPhone.slice(3):newPhone} onChange={e=>setNewPhone('992'+e.target.value.replace(/\D/g,'').slice(0,9))} placeholder="901234567" maxLength={9} autoFocus style={{border:'none',borderRadius:0,outline:'none',flex:1,boxShadow:'none'}}/>
+            <input type="tel" inputMode="numeric" value={newPhone.startsWith('992')?newPhone.slice(3):newPhone} onChange={e=>{let d=e.target.value.replace(/\D/g,'');if(d.startsWith('992'))d=d.slice(3);setNewPhone('992'+d.slice(0,9));}} placeholder="901234567" maxLength={9} autoFocus style={{border:'none',borderRadius:0,outline:'none',flex:1,boxShadow:'none'}}/>
           </div>
           {error&&<div className="alert alert-error">{error}</div>}
           <div style={{display:'flex',gap:8,marginTop:14}}>
@@ -2718,6 +2728,7 @@ function MobileNav({page,setPage,overdueCount,t,isAdmin,business,onRefresh}){
   const nav=[
     {id:'dashboard',icon:IC.dashboard,label:t.dashboard},
     {id:'debts',icon:IC.debts,label:t.debts,badge:overdueCount},
+    {id:'overdueHistory',icon:IC.history,label:t.overdueHistory},
     {id:'clients',icon:IC.clients,label:t.clients},
     {id:'settings',icon:IC.settings,label:t.settingsTitle},
   ];
@@ -3010,8 +3021,8 @@ function App(){
         {isGoogleUser?(
           <>
             <div style={{fontSize:48}}>📱</div>
-            <div style={{fontSize:18,fontWeight:800,color:'var(--g900)',textAlign:'center'}}>{t.googleNoData||'Данные привязаны к номеру телефона'}</div>
-            <div style={{fontSize:13,color:'var(--g500)',textAlign:'center',maxWidth:320,lineHeight:1.6}}>{t.googleNoData||'Войдите по номеру телефона, затем привяжите Google в Настройках — и с Google тоже будут видны все ваши данные.'}</div>
+            <div style={{fontSize:18,fontWeight:800,color:'var(--g900)',textAlign:'center'}}>{t.googleNoDataTitle||'Это новый Google-аккаунт'}</div>
+            <div style={{fontSize:13,color:'var(--g500)',textAlign:'center',maxWidth:320,lineHeight:1.6}}>{t.googleNoData||'Ваши данные привязаны к номеру телефона. Войдите по номеру, затем привяжите Google в Настройках.'}</div>
             <button className="btn btn-primary" style={{minWidth:180,marginTop:4}} onClick={()=>sb.auth.signOut()}>📲 {t.login||'Войти по номеру'}</button>
           </>
         ):(
