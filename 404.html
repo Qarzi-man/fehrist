@@ -909,7 +909,7 @@ function LoginForm({t,onSwitch,onResetMode}){
     const d=clean(fPhone);
     if(d.length<9){setFError(t.phoneInvalid||'Введите корректный номер');return;}
     setFLoading(true);
-    localStorage.setItem('phoneReset','1');
+    localStorage.setItem('phoneReset',Date.now().toString());
     const{error:err}=await sb.auth.signInWithOtp({phone:e164(d)});
     setFLoading(false);
     if(err){setFError(err.message);localStorage.removeItem('phoneReset');return;}
@@ -1115,6 +1115,7 @@ function RegisterForm({t,onSwitch}){
       if(!existing){
         await sb.from('businesses').insert({owner_id:userId,name:bizName.trim(),type:bizType,offer_accepted_at:offerTime,offer_accepted:true,is_active:true});
       }
+      try{localStorage.setItem('justRegistered','1');}catch{}
     }
     setLoading(false);
   }
@@ -2261,14 +2262,13 @@ function ChangePhoneSection({t,session}){
   const [step,setStep]=useState('input');
   const [newPhone,setNewPhone]=useState('');
   const [otp,setOtp]=useState('');
-  const [pass,setPass]=useState('');const [confirm,setConfirm]=useState('');
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState('');
   const [countdown,setCountdown]=useState(0);
   useEffect(()=>{if(countdown<=0)return;const tm=setTimeout(()=>setCountdown(c=>c-1),1000);return()=>clearTimeout(tm);},[countdown]);
   function clean(v){return v.replace(/\D/g,'');}
   function e164(d){return d.startsWith('+')?d:'+'+d;}
-  function reset(){setStep('input');setNewPhone('');setOtp('');setPass('');setConfirm('');setError('');setCountdown(0);}
+  function reset(){setStep('input');setNewPhone('');setOtp('');setError('');setCountdown(0);}
   async function sendOtp(e){
     e.preventDefault();setError('');
     const d=clean(newPhone);
@@ -2286,17 +2286,7 @@ function ChangePhoneSection({t,session}){
     const{error:err}=await sb.auth.verifyOtp({phone:e164(clean(newPhone)),token:otp,type:'phone_change'});
     setLoading(false);
     if(err){setError(t.invalidCode);return;}
-    setStep('newpass');
-  }
-  async function savePass(e){
-    e.preventDefault();setError('');
-    if(pass.length<8){setError(t.passMin8||'Минимум 8 символов');return;}
-    if(pass!==confirm){setError(t.passNoMatch);return;}
-    setLoading(true);
-    const{error:err}=await sb.auth.updateUser({password:pass});
-    setLoading(false);
-    if(err){setError(safeErr(err,t.saveError||'Ошибка.'));return;}
-    toast((t.phoneChanged||'Номер изменён')+' · '+(t.passUpdated||'Пароль обновлён ✓'));
+    toast(t.phoneChanged||'Номер изменён ✓');
     setOpen(false);reset();
   }
   const currentPhone=(session?.user?.phone||'').replace(/^\+/,'');
@@ -2337,18 +2327,6 @@ function ChangePhoneSection({t,session}){
             {countdown>0
               ?<span style={{fontSize:12,color:'var(--g400)'}}>{t.resendIn||'Повторно через'} {countdown}с</span>
               :<button type="button" style={{background:'none',border:'none',color:'var(--primary)',cursor:'pointer',fontSize:12,fontWeight:600}} onClick={()=>setStep('input')}>{t.resendCode||'Отправить ещё раз'}</button>}
-          </div>
-        </form>
-      ):(
-        <form onSubmit={savePass} style={{padding:18}}>
-          <div style={{padding:'10px 12px',background:'var(--green-bg)',borderRadius:'var(--r)',fontSize:13,color:'var(--green-t)',fontWeight:600,marginBottom:14}}>✓ {t.phoneChanged||'Номер изменён'} — теперь обновите пароль</div>
-          <label>{t.newPass} *</label>
-          <input type="password" autoComplete="new-password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="min 8" minLength={8} autoFocus/>
-          <label>{t.confirmPass} *</label>
-          <input type="password" autoComplete="new-password" value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="min 8" minLength={8}/>
-          {error&&<div className="alert alert-error">{error}</div>}
-          <div style={{display:'flex',gap:8,marginTop:14}}>
-            <button className="btn btn-primary btn-full" type="submit" disabled={loading}>{loading?'...':t.updatePass||'Сохранить пароль'}</button>
           </div>
         </form>
       )}
@@ -2989,8 +2967,10 @@ function App(){
     const{data:{subscription}}=sb.auth.onAuthStateChange((event,s)=>{
       if(!done){done=true;clearTimeout(timer);}
       if(event==='PASSWORD_RECOVERY')setResetMode(true);
-      if(event==='SIGNED_IN'&&localStorage.getItem('phoneReset')==='1'){localStorage.removeItem('phoneReset');setResetMode(true);}
-      if(event==='SIGNED_OUT'){try{localStorage.removeItem('lastBizId');}catch{}}
+      if(event==='SIGNED_IN'){
+        const resetTs=parseInt(localStorage.getItem('phoneReset')||'0');
+        if(resetTs&&(Date.now()-resetTs)<600000){localStorage.removeItem('phoneReset');setResetMode(true);}
+      }
       setSession(s);
     });
     return()=>{done=true;clearTimeout(timer);subscription.unsubscribe();};
@@ -3004,28 +2984,33 @@ function App(){
       if(selErr)throw selErr;
       let list=data??[];
       if(list.length===0){
-        const meta=sess.user.user_metadata||{};
-        const bizName=meta.biz_name||meta.full_name;
-        if(bizName){
-          const{data:newBiz,error:insErr}=await sb.from('businesses').insert({
-            owner_id:sess.user.id,name:bizName,
-            type:meta.biz_type||'Бизнес',
-            offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
-            offer_accepted:true,is_active:true
-          }).select().single();
-          if(insErr){
-            // Race: confirmCode may have already inserted — retry SELECT
-            const{data:fb}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
-            if(fb&&fb.length>0){list=fb;}
-            else setBizError('INSERT: '+insErr.message);
-          }else if(newBiz){
-            list=[newBiz];
-          }else{
-            // INSERT ok but RETURNING blocked by RLS — plain SELECT
-            const{data:fb}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
-            if(fb&&fb.length>0){list=fb;}
-          }
-        }else{setBizError('no_biz_name uid='+sess.user.id);}
+        const isNew=localStorage.getItem('justRegistered')==='1';
+        try{localStorage.removeItem('justRegistered');}catch{}
+        if(isNew){
+          const meta=sess.user.user_metadata||{};
+          const bizName=meta.biz_name||meta.full_name;
+          if(bizName){
+            const{data:newBiz,error:insErr}=await sb.from('businesses').insert({
+              owner_id:sess.user.id,name:bizName,
+              type:meta.biz_type||'Бизнес',
+              offer_accepted_at:meta.offer_accepted_at||new Date().toISOString(),
+              offer_accepted:true,is_active:true
+            }).select().single();
+            if(insErr){
+              // Race: confirmCode may have already inserted — retry SELECT
+              const{data:fb}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
+              if(fb&&fb.length>0){list=fb;}
+              else setBizError('INSERT: '+insErr.message);
+            }else if(newBiz){
+              list=[newBiz];
+            }else{
+              // INSERT ok but RETURNING blocked by RLS — plain SELECT
+              const{data:fb}=await sb.from('businesses').select('*').eq('owner_id',sess.user.id).order('created_at',{ascending:true});
+              if(fb&&fb.length>0){list=fb;}
+            }
+          }else{setBizError('no_biz_name uid='+sess.user.id);}
+        }
+        // existing user — do NOT auto-create; show error/retry screen
       }
       setAllBusinesses(list);
       try{const lastId=localStorage.getItem('lastBizId');const found=list.find(b=>b.id===lastId);setBusiness(found||list[0]||null);}
