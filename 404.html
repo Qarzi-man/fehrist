@@ -1106,8 +1106,9 @@ function RegisterForm({t,onSwitch}){
   }
   async function confirmCode(e){
     e.preventDefault();setError('');setLoading(true);
+    try{localStorage.setItem('justRegistered',Date.now().toString());}catch{}
     const{data,error:err}=await sb.auth.verifyOtp({phone:e164(clean(phone)),token:otp,type:'sms'});
-    if(err){setError(t.invalidCode||'Неверный код');setLoading(false);return;}
+    if(err){try{localStorage.removeItem('justRegistered');}catch{}setError(t.invalidCode||'Неверный код');setLoading(false);return;}
     const userId=data?.user?.id;
     if(userId){
       const offerTime=offerTimeRef.current||new Date().toISOString();
@@ -1115,7 +1116,6 @@ function RegisterForm({t,onSwitch}){
       if(!existing){
         await sb.from('businesses').insert({owner_id:userId,name:bizName.trim(),type:bizType,offer_accepted_at:offerTime,offer_accepted:true,is_active:true});
       }
-      try{localStorage.setItem('justRegistered','1');}catch{}
     }
     setLoading(false);
   }
@@ -1255,7 +1255,7 @@ function PrivacyPolicyModal({onClose,initialLang}){
 
 function AddDebtModal({business,onClose,onSaved,t,initialType}){
   const [debtType,setDebtType]=useState(initialType||'receivable');
-  const [f,setF]=useState({name:'',phone:'',amount:'',cat:'',dateIssued:todayStr(),dueDate:'',comment:''});
+  const [f,setF]=useState({name:'',phone:'+992',amount:'',cat:'',dateIssued:todayStr(),dueDate:'',comment:''});
   const [error,setError]=useState('');const [saving,setSaving]=useState(false);
   const [dupClient,setDupClient]=useState(null);
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
@@ -2984,7 +2984,8 @@ function App(){
       if(selErr)throw selErr;
       let list=data??[];
       if(list.length===0){
-        const isNew=localStorage.getItem('justRegistered')==='1';
+        const regTs=parseInt(localStorage.getItem('justRegistered')||'0');
+        const isNew=regTs&&(Date.now()-regTs)<600000;
         try{localStorage.removeItem('justRegistered');}catch{}
         if(isNew){
           const meta=sess.user.user_metadata||{};
