@@ -34,10 +34,10 @@ export default function BottomNav() {
 
   const cls = ({ isActive }: { isActive: boolean }) =>
     ['flex flex-col items-center gap-0.5 flex-1 py-2 text-xs transition-all',
-     isActive ? 'text-indigo-600' : 'text-gray-400'].join(' ')
+     isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500'].join(' ')
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 flex bg-white border-t border-gray-100 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 flex bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 md:hidden">
       {links.map((l) => (
         <NavLink key={l.to} to={l.to} className={cls} end={l.to === '/dashboard'}>
           {l.icon}

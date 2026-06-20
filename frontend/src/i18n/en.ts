@@ -62,4 +62,8 @@ export const en: Translations = {
   statusActive: 'Active',
   statusPaid: 'Paid',
   statusOverdue: 'Overdue',
+  theme: 'Theme',
+  darkMode: 'Dark mode',
+  logoutConfirmTitle: 'Are you sure you want to sign out?',
+  logoutConfirmYes: 'Yes, sign out',
 }

@@ -12,12 +12,18 @@ import Button from '../components/ui/Button'
 
 function statusBadge(status: RecentDebt['status'], t: ReturnType<typeof useT>) {
   const map = {
-    active:  { cls: 'bg-blue-50 text-blue-600',    label: t.statusActive },
+    active:  { cls: 'bg-blue-50 text-blue-600',      label: t.statusActive },
     paid:    { cls: 'bg-emerald-50 text-emerald-600', label: t.statusPaid },
-    overdue: { cls: 'bg-red-50 text-red-600',       label: t.statusOverdue },
+    overdue: { cls: 'bg-red-50 text-red-600',         label: t.statusOverdue },
   }
   const s = map[status] ?? map.active
   return <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${s.cls}`}>{s.label}</span>
+}
+
+function typeBadge(type: RecentDebt['type'], t: ReturnType<typeof useT>) {
+  return type === 'receivable'
+    ? <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">{t.receivable}</span>
+    : <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">{t.payable}</span>
 }
 
 export default function DashboardPage() {
@@ -46,8 +52,8 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{t.dashboard}</h1>
-            <p className="text-sm text-gray-500">{user?.full_name ?? user?.phone}</p>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{t.dashboard}</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{user?.full_name ?? user?.phone}</p>
           </div>
           <Button onClick={() => setShowAdd(true)} className="text-sm px-4 py-2.5">
             {t.addDebt}
@@ -77,10 +83,10 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent debts */}
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-                <h2 className="text-sm font-semibold text-gray-700">{t.recentDebts}</h2>
-                <Link to="/debts" className="text-xs font-medium text-indigo-600 hover:underline">{t.seeAll}</Link>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50 dark:border-gray-700">
+                <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t.recentDebts}</h2>
+                <Link to="/debts" className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline">{t.seeAll}</Link>
               </div>
 
               {stats.recent_debts.length === 0 ? (
@@ -88,7 +94,7 @@ export default function DashboardPage() {
               ) : (
                 <ul>
                   {stats.recent_debts.map((d, i) => (
-                    <li key={d.id} className={['flex items-center gap-3 px-4 py-3', i !== 0 ? 'border-t border-gray-50' : ''].join(' ')}>
+                    <li key={d.id} className={['flex items-center gap-3 px-4 py-3', i !== 0 ? 'border-t border-gray-50 dark:border-gray-700' : ''].join(' ')}>
                       {/* Avatar */}
                       <div className={['h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0',
                         d.type === 'receivable' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'].join(' ')}>
@@ -97,17 +103,20 @@ export default function DashboardPage() {
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{d.client_name}</p>
-                        <p className="text-xs text-gray-400">{formatDate(d.due_date ?? d.created_at)}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{d.client_name}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(d.due_date ?? d.created_at)}</p>
                       </div>
 
-                      {/* Amount + badge */}
+                      {/* Amount + badges */}
                       <div className="flex flex-col items-end gap-1 shrink-0">
                         <span className={['text-sm font-semibold',
                           d.type === 'receivable' ? 'text-emerald-600' : 'text-rose-600'].join(' ')}>
                           {d.type === 'receivable' ? '+' : '−'}{formatMoney(d.amount, d.currency)}
                         </span>
-                        {statusBadge(d.status, t)}
+                        <div className="flex gap-1">
+                          {typeBadge(d.type, t)}
+                          {statusBadge(d.status, t)}
+                        </div>
                       </div>
                     </li>
                   ))}

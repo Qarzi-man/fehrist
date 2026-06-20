@@ -66,6 +66,12 @@ export const ru = {
   statusActive: 'Активный',
   statusPaid: 'Оплачен',
   statusOverdue: 'Просрочен',
+  // Theme
+  theme: 'Тема',
+  darkMode: 'Тёмная тема',
+  // Logout confirm
+  logoutConfirmTitle: 'Вы уверены, что хотите выйти?',
+  logoutConfirmYes: 'Да, выйти',
 }
 
 export type Translations = typeof ru

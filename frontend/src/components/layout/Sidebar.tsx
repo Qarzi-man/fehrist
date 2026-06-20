@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useT } from '../../i18n'
@@ -28,6 +29,7 @@ export default function Sidebar() {
   const t = useT()
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const links = [
     { to: '/dashboard', icon: <HomeIcon />, label: t.dashboard },
@@ -40,51 +42,81 @@ export default function Sidebar() {
     [
       'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
       isActive
-        ? 'bg-indigo-50 text-indigo-700'
-        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800',
+        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+        : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200',
     ].join(' ')
 
+  function handleLogout() {
+    logout()
+    navigate('/auth')
+  }
+
   return (
-    <aside className="hidden md:flex flex-col fixed left-0 top-0 h-full w-56 bg-white border-r border-gray-100 z-30">
-      {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-violet-600">
-          <svg width="16" height="16" viewBox="0 0 36 36" fill="none">
-            <path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fillOpacity="0.9"/>
-            <path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round"/>
-          </svg>
-        </div>
-        <span className="text-base font-bold text-gray-900">{t.appName}</span>
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 p-3 flex flex-col gap-1">
-        {links.map((l) => (
-          <NavLink key={l.to} to={l.to} className={linkClass} end={l.to === '/dashboard'}>
-            {l.icon}
-            {l.label}
-          </NavLink>
-        ))}
-      </nav>
-
-      {/* User + logout */}
-      <div className="p-3 border-t border-gray-100">
-        <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-1">
-          <div className="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-600">
-            {(user?.full_name ?? user?.phone ?? '?')[0].toUpperCase()}
+    <>
+      <aside className="hidden md:flex flex-col fixed left-0 top-0 h-full w-56 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 z-30">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-violet-600">
+            <svg width="16" height="16" viewBox="0 0 36 36" fill="none">
+              <path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fillOpacity="0.9"/>
+              <path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round"/>
+            </svg>
           </div>
-          <span className="text-xs font-medium text-gray-700 truncate">{user?.full_name ?? user?.phone}</span>
+          <span className="text-base font-bold text-gray-900 dark:text-white">{t.appName}</span>
         </div>
-        <button
-          onClick={() => { logout(); navigate('/auth') }}
-          className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
-        >
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          {t.logout}
-        </button>
-      </div>
-    </aside>
+
+        {/* Nav */}
+        <nav className="flex-1 p-3 flex flex-col gap-1">
+          {links.map((l) => (
+            <NavLink key={l.to} to={l.to} className={linkClass} end={l.to === '/dashboard'}>
+              {l.icon}
+              {l.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* User + logout */}
+        <div className="p-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-1">
+            <div className="h-7 w-7 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300">
+              {(user?.full_name ?? user?.phone ?? '?')[0].toUpperCase()}
+            </div>
+            <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{user?.full_name ?? user?.phone}</span>
+          </div>
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+          >
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            {t.logout}
+          </button>
+        </div>
+      </aside>
+
+      {/* Logout confirm modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white mb-5 text-center">{t.logoutConfirmTitle}</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 rounded-xl border border-gray-200 dark:border-gray-600 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 rounded-xl bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition"
+              >
+                {t.logoutConfirmYes}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

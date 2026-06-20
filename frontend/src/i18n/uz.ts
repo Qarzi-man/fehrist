@@ -62,4 +62,8 @@ export const uz: Translations = {
   statusActive: 'Faol',
   statusPaid: "To'langan",
   statusOverdue: "Muddati o'tgan",
+  theme: 'Mavzu',
+  darkMode: 'Qorong\'u mavzu',
+  logoutConfirmTitle: 'Chiqishni xohlaysizmi?',
+  logoutConfirmYes: 'Ha, chiqish',
 }
