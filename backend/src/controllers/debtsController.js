@@ -23,7 +23,7 @@ async function list(req, res, next) {
 
 async function create(req, res, next) {
   try {
-    const { client_id, amount, currency, description, due_date } = req.body;
+    const { client_id, amount, currency, description, due_date, type } = req.body;
     if (!client_id || !amount) return res.status(400).json({ error: 'client_id and amount required' });
 
     // Ensure client belongs to user
@@ -33,10 +33,11 @@ async function create(req, res, next) {
     );
     if (!owner.rows.length) return res.status(403).json({ error: 'Forbidden' });
 
+    const debtType = type === 'payable' ? 'payable' : 'receivable';
     const { rows } = await pool.query(
-      `INSERT INTO debts (user_id, client_id, amount, currency, description, due_date)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [req.user.userId, client_id, amount, currency || 'TJS', description || null, due_date || null]
+      `INSERT INTO debts (user_id, client_id, amount, currency, description, due_date, type)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [req.user.userId, client_id, amount, currency || 'TJS', description || null, due_date || null, debtType]
     );
     res.status(201).json(rows[0]);
   } catch (err) {

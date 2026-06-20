@@ -36,9 +36,13 @@ CREATE TABLE IF NOT EXISTS debts (
   currency     VARCHAR(5) DEFAULT 'TJS',
   description  TEXT,
   due_date     DATE,
-  status       VARCHAR(20) DEFAULT 'active', -- active | paid | overdue
+  type         VARCHAR(20) DEFAULT 'receivable', -- receivable | payable
+  status       VARCHAR(20) DEFAULT 'active',    -- active | paid | overdue
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migrate existing tables (safe: IF NOT EXISTS)
+ALTER TABLE debts ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'receivable';
 
 -- Repayments
 CREATE TABLE IF NOT EXISTS repayments (

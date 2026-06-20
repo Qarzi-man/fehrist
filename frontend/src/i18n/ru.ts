@@ -1,6 +1,7 @@
 export const ru = {
   appName: 'Daftarcha',
   appTagline: 'Учёт долгов для вашего бизнеса',
+  // Auth
   login: 'Войти',
   register: 'Регистрация',
   phone: 'Телефон',
@@ -17,7 +18,7 @@ export const ru = {
   step2Hint: 'Введите код из SMS и создайте пароль',
   alreadyHaveAccount: 'Уже есть аккаунт?',
   noAccount: 'Нет аккаунта?',
-  // Errors
+  // Auth errors
   errPhoneRequired: 'Введите номер телефона',
   errPasswordRequired: 'Введите пароль',
   errOtpRequired: 'Введите код из SMS',
@@ -27,6 +28,39 @@ export const ru = {
   errInvalidOtp: 'Неверный или устаревший код',
   errNetwork: 'Ошибка сети. Попробуйте снова',
   errPasswordShort: 'Пароль минимум 6 символов',
+  // Navigation
+  dashboard: 'Главная',
+  debts: 'Долги',
+  clients: 'Клиенты',
+  settings: 'Настройки',
+  logout: 'Выйти',
+  // Dashboard
+  receivable: 'Мне должны',
+  payable: 'Я должен',
+  overdue: 'Просрочено',
+  recentDebts: 'Последние долги',
+  addDebt: '+ Долг',
+  noDebts: 'Долгов пока нет',
+  loading: 'Загрузка...',
+  tryAgain: 'Попробовать снова',
+  seeAll: 'Все',
+  // Debt form
+  debtType: 'Тип долга',
+  iAmOwed: 'Мне должны',
+  iOwe: 'Я должен',
+  amount: 'Сумма',
+  currency: 'Валюта',
+  description: 'Описание (необязательно)',
+  dueDate: 'Срок оплаты (необязательно)',
+  contact: 'Контакт',
+  selectContact: 'Выбрать контакт',
+  newContactName: 'Новый контакт (имя)',
+  save: 'Сохранить',
+  cancel: 'Отмена',
+  // Debt status
+  statusActive: 'Активный',
+  statusPaid: 'Оплачен',
+  statusOverdue: 'Просрочен',
 }
 
 export type Translations = typeof ru

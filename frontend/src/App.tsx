@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
+import DebtsPage from './pages/DebtsPage'
+import ClientsPage from './pages/ClientsPage'
+import SettingsPage from './pages/SettingsPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token)
@@ -19,7 +22,10 @@ export default function App() {
       <Routes>
         <Route path="/auth" element={<RequireGuest><AuthPage /></RequireGuest>} />
         <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
-        <Route path="*" element={<Navigate to="/auth" replace />} />
+        <Route path="/debts"     element={<RequireAuth><DebtsPage /></RequireAuth>} />
+        <Route path="/clients"   element={<RequireAuth><ClientsPage /></RequireAuth>} />
+        <Route path="/settings"  element={<RequireAuth><SettingsPage /></RequireAuth>} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   )

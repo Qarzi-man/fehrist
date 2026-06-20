@@ -10,9 +10,10 @@ app.use(express.json());
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/clients', require('./routes/clients'));
-app.use('/api/debts', require('./routes/debts'));
+app.use('/api/auth',      require('./routes/auth'));
+app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/clients',   require('./routes/clients'));
+app.use('/api/debts',     require('./routes/debts'));
 
 app.use(errorHandler);
 

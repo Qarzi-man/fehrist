@@ -1,31 +1,129 @@
-import { useAuthStore } from '../store/authStore'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
+import { useAuthStore } from '../store/authStore'
+import { getDashboardStats, type DashboardStats, type RecentDebt } from '../api/dashboard'
+import { formatMoney, formatDate } from '../lib/format'
+import AppLayout from '../components/layout/AppLayout'
+import StatsCard from '../components/dashboard/StatsCard'
+import AddDebtModal from '../components/debts/AddDebtModal'
+import Spinner from '../components/ui/Spinner'
+import Button from '../components/ui/Button'
+
+function statusBadge(status: RecentDebt['status'], t: ReturnType<typeof useT>) {
+  const map = {
+    active:  { cls: 'bg-blue-50 text-blue-600',    label: t.statusActive },
+    paid:    { cls: 'bg-emerald-50 text-emerald-600', label: t.statusPaid },
+    overdue: { cls: 'bg-red-50 text-red-600',       label: t.statusOverdue },
+  }
+  const s = map[status] ?? map.active
+  return <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${s.cls}`}>{s.label}</span>
+}
 
 export default function DashboardPage() {
-  const { user, logout } = useAuthStore()
-  const navigate = useNavigate()
   const t = useT()
+  const user = useAuthStore((s) => s.user)
 
-  function handleLogout() {
-    logout()
-    navigate('/auth')
-  }
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [showAdd, setShowAdd] = useState(false)
+
+  const load = useCallback(() => {
+    setLoading(true)
+    setError(false)
+    getDashboardStats()
+      .then(setStats)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => { load() }, [load])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 p-8">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">{t.appName}</h1>
-        <p className="mt-1 text-gray-500">
-          {user?.full_name ?? user?.phone}
-        </p>
+    <AppLayout>
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">{t.dashboard}</h1>
+            <p className="text-sm text-gray-500">{user?.full_name ?? user?.phone}</p>
+          </div>
+          <Button onClick={() => setShowAdd(true)} className="text-sm px-4 py-2.5">
+            {t.addDebt}
+          </Button>
+        </div>
+
+        {loading && (
+          <div className="flex justify-center py-16 text-indigo-400">
+            <Spinner size={32} />
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="flex flex-col items-center gap-3 py-16 text-gray-400">
+            <p className="text-sm">{t.errNetwork}</p>
+            <Button variant="ghost" onClick={load}>{t.tryAgain}</Button>
+          </div>
+        )}
+
+        {stats && !loading && (
+          <>
+            {/* Stats cards */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <StatsCard label={t.receivable} value={stats.receivable} color="emerald" />
+              <StatsCard label={t.payable}    value={stats.payable}    color="rose" />
+              <StatsCard label={t.overdue}    value={stats.overdue_count} color="amber" isCount />
+            </div>
+
+            {/* Recent debts */}
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+                <h2 className="text-sm font-semibold text-gray-700">{t.recentDebts}</h2>
+                <Link to="/debts" className="text-xs font-medium text-indigo-600 hover:underline">{t.seeAll}</Link>
+              </div>
+
+              {stats.recent_debts.length === 0 ? (
+                <div className="py-12 text-center text-sm text-gray-400">{t.noDebts}</div>
+              ) : (
+                <ul>
+                  {stats.recent_debts.map((d, i) => (
+                    <li key={d.id} className={['flex items-center gap-3 px-4 py-3', i !== 0 ? 'border-t border-gray-50' : ''].join(' ')}>
+                      {/* Avatar */}
+                      <div className={['h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0',
+                        d.type === 'receivable' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'].join(' ')}>
+                        {d.client_name[0].toUpperCase()}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{d.client_name}</p>
+                        <p className="text-xs text-gray-400">{formatDate(d.due_date ?? d.created_at)}</p>
+                      </div>
+
+                      {/* Amount + badge */}
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <span className={['text-sm font-semibold',
+                          d.type === 'receivable' ? 'text-emerald-600' : 'text-rose-600'].join(' ')}>
+                          {d.type === 'receivable' ? '+' : '−'}{formatMoney(d.amount, d.currency)}
+                        </span>
+                        {statusBadge(d.status, t)}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        )}
       </div>
-      <button
-        onClick={handleLogout}
-        className="rounded-xl bg-gray-200 px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 transition"
-      >
-        Выйти
-      </button>
-    </div>
+
+      {showAdd && (
+        <AddDebtModal
+          onClose={() => setShowAdd(false)}
+          onSuccess={() => { setShowAdd(false); load() }}
+        />
+      )}
+    </AppLayout>
   )
 }
