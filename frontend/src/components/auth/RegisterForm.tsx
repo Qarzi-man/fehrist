@@ -19,24 +19,29 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
   const [phone, setPhone] = useState('+992')
   const [otp, setOtp] = useState('')
   const [fullName, setFullName] = useState('')
+  const [businessName, setBusinessName] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function handleSendOtp(e: FormEvent) {
-    e.preventDefault()
+  async function sendOtp() {
     setError('')
-    if (!phone.trim()) return setError(t.errPhoneRequired)
-
+    if (!phone.trim()) { setError(t.errPhoneRequired); return false }
     setLoading(true)
     try {
       await api.post('/auth/send-otp', { phone: phone.trim() })
-      setStep(2)
+      return true
     } catch {
       setError(t.errNetwork)
+      return false
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleSendOtp(e: FormEvent) {
+    e.preventDefault()
+    if (await sendOtp()) setStep(2)
   }
 
   async function handleRegister(e: FormEvent) {
@@ -45,6 +50,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
 
     if (otp.length < 6) return setError(t.errOtpRequired)
     if (!fullName.trim()) return setError(t.errNameRequired)
+    if (!businessName.trim()) return setError(t.errBusinessNameRequired)
     if (password.length < 6) return setError(t.errPasswordShort)
 
     setLoading(true)
@@ -53,6 +59,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
         phone: phone.trim(),
         otp,
         full_name: fullName.trim(),
+        business_name: businessName.trim(),
         password,
       })
       setAuth(data.token, data.user)
@@ -81,9 +88,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
           autoFocus
         />
 
-        {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
-        )}
+        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
         <Button type="submit" loading={loading} className="w-full mt-1">
           {t.sendOtp}
@@ -120,6 +125,15 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
       />
 
       <Input
+        label={t.businessName}
+        type="text"
+        value={businessName}
+        onChange={(e) => setBusinessName(e.target.value)}
+        placeholder={t.businessNamePlaceholder}
+        autoComplete="organization"
+      />
+
+      <Input
         label={t.password}
         type="password"
         showToggle
@@ -129,9 +143,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
         autoComplete="new-password"
       />
 
-      {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
-      )}
+      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
       <div className="flex gap-2 mt-1">
         <Button
@@ -150,7 +162,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
       <div className="text-center">
         <button
           type="button"
-          onClick={handleSendOtp}
+          onClick={() => { void sendOtp() }}
           className="text-sm text-gray-400 hover:text-indigo-600 transition"
         >
           {t.resendOtp}

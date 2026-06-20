@@ -36,14 +36,15 @@ async function sendOtpHandler(req, res, next) {
 
 // POST /api/auth/register
 async function register(req, res, next) {
+  const client = await pool.connect();
   try {
-    const { phone, password, full_name, otp } = req.body;
+    const { phone, password, full_name, business_name, otp } = req.body;
     if (!phone || !password || !otp) {
       return res.status(400).json({ error: 'phone, password and otp required' });
     }
 
     // Verify OTP
-    const { rows } = await pool.query(
+    const { rows } = await client.query(
       `SELECT * FROM otp_codes
        WHERE phone = $1 AND code = $2 AND used = FALSE AND expires_at > NOW()
        ORDER BY created_at DESC LIMIT 1`,
@@ -52,21 +53,35 @@ async function register(req, res, next) {
     if (!rows.length) return res.status(400).json({ error: 'Invalid or expired OTP' });
 
     // Mark OTP used
-    await pool.query(`UPDATE otp_codes SET used = TRUE WHERE id = $1`, [rows[0].id]);
+    await client.query(`UPDATE otp_codes SET used = TRUE WHERE id = $1`, [rows[0].id]);
 
     // Check duplicate
-    const exists = await pool.query(`SELECT id FROM users WHERE phone = $1`, [phone]);
+    const exists = await client.query(`SELECT id FROM users WHERE phone = $1`, [phone]);
     if (exists.rows.length) return res.status(409).json({ error: 'Phone already registered' });
 
+    await client.query('BEGIN');
+
     const hash = await bcrypt.hash(password, 10);
-    const user = await pool.query(
+    const userResult = await client.query(
       `INSERT INTO users (phone, password, full_name) VALUES ($1, $2, $3) RETURNING id, phone, full_name`,
       [phone, hash, full_name || null]
     );
+    const user = userResult.rows[0];
 
-    res.status(201).json({ token: signToken(user.rows[0].id), user: user.rows[0] });
+    if (business_name && business_name.trim()) {
+      await client.query(
+        `INSERT INTO businesses (owner_id, name) VALUES ($1, $2)`,
+        [user.id, business_name.trim()]
+      );
+    }
+
+    await client.query('COMMIT');
+    res.status(201).json({ token: signToken(user.id), user });
   } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
     next(err);
+  } finally {
+    client.release();
   }
 }
 

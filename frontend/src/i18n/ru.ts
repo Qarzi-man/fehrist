@@ -15,7 +15,10 @@ export const ru = {
   passwordPlaceholder: '••••••••',
   otpSentTo: 'Код отправлен на номер',
   step1Hint: 'Введите номер для получения кода',
-  step2Hint: 'Введите код из SMS и создайте пароль',
+  step2Hint: 'Введите код из SMS, заполните данные и создайте пароль',
+  businessName: 'Название бизнеса',
+  businessNamePlaceholder: 'ИП Иванов, Моя лавка...',
+  errBusinessNameRequired: 'Введите название бизнеса',
   alreadyHaveAccount: 'Уже есть аккаунт?',
   noAccount: 'Нет аккаунта?',
   // Auth errors

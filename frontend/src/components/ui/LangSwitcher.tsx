@@ -1,9 +1,9 @@
 import { useLangStore, type Lang } from '../../store/langStore'
 
 const LANGS: { code: Lang; label: string }[] = [
-  { code: 'tj', label: 'ТЧ' },
-  { code: 'ru', label: 'РУ' },
-  { code: 'uz', label: 'УЗ' },
+  { code: 'tj', label: 'TJ' },
+  { code: 'ru', label: 'RU' },
+  { code: 'uz', label: 'UZ' },
   { code: 'en', label: 'EN' },
 ]
 
