@@ -1,22 +1,27 @@
 const https = require('https');
 const http = require('http');
+const { randomUUID } = require('crypto');
 
 // Payomchi SMS API — https://api.payomchi.tj/api/v1
-// Auth: Authorization: Bearer <PAYOMCHI_API_KEY>
-// Request: POST /send, JSON body { phone, text, sender }
 const BASE_URL = process.env.PAYOMCHI_BASE_URL || 'https://api.payomchi.tj/api/v1';
 
 async function sendSms(phone, message) {
   const apiKey = process.env.PAYOMCHI_API_KEY;
-  const sender = process.env.PAYOMCHI_SENDER || 'Daftarcha';
+  const sender = process.env.PAYOMCHI_SENDER;
 
   if (!apiKey) {
     console.warn('[SMS] PAYOMCHI_API_KEY is not set — skipping SMS send');
     return { skipped: true, reason: 'no_api_key' };
   }
 
-  const body = JSON.stringify({ phone, text: message, sender });
-  const url = `${BASE_URL}/send`;
+  // Strip leading "+" — Payomchi expects digits only (e.g. 992901234567)
+  const cleanPhone = phone.replace(/^\+/, '');
+
+  const bodyObj = { phone: cleanPhone, message, channel: 'sms' };
+  if (sender) bodyObj.senderId = sender;
+
+  const body = JSON.stringify(bodyObj);
+  const url = `${BASE_URL}/user/sms`;
   const parsed = new URL(url);
 
   const options = {
@@ -27,11 +32,12 @@ async function sendSms(phone, message) {
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(body),
-      'Authorization': `Bearer ${apiKey}`,
+      'X-Api-Key': apiKey,
+      'Idempotency-Key': randomUUID(),
     },
   };
 
-  console.log(`[SMS] POST ${url} — phone=${phone} sender=${sender}`);
+  console.log(`[SMS] POST ${url} — phone=${cleanPhone}`);
 
   return new Promise((resolve, reject) => {
     const lib = parsed.protocol === 'https:' ? https : http;
@@ -43,8 +49,8 @@ async function sendSms(phone, message) {
         console.log(`[SMS] Response status=${res.statusCode} body=${data}`);
         try {
           const result = JSON.parse(data);
-          if (result.error || result.status === 'error') {
-            console.error('[SMS] API returned error:', result);
+          if (res.statusCode !== 201) {
+            console.error('[SMS] Unexpected status:', res.statusCode, result);
           }
           resolve(result);
         } catch {
