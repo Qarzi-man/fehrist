@@ -19,6 +19,8 @@ export const ru = {
   businessName: 'Название бизнеса',
   businessNamePlaceholder: 'ИП Иванов, Моя лавка...',
   errBusinessNameRequired: 'Введите название бизнеса',
+  email: 'Email (необязательно)',
+  emailPlaceholder: 'example@mail.com',
   alreadyHaveAccount: 'Уже есть аккаунт?',
   noAccount: 'Нет аккаунта?',
   // Auth errors

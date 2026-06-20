@@ -20,6 +20,8 @@ export const tj: Translations = {
   businessName: 'Номи тиҷорат',
   businessNamePlaceholder: 'Мағозаи ман, ИП...',
   errBusinessNameRequired: 'Номи тиҷоратро ворид кунед',
+  email: 'Email (ихтиёрӣ)',
+  emailPlaceholder: 'example@mail.com',
   alreadyHaveAccount: 'Аккаунт доред?',
   noAccount: 'Аккаунт надоред?',
   errPhoneRequired: 'Рақами телефонро ворид кунед',

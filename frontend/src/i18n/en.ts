@@ -20,6 +20,8 @@ export const en: Translations = {
   businessName: 'Business name',
   businessNamePlaceholder: 'My Shop, LLC...',
   errBusinessNameRequired: 'Enter your business name',
+  email: 'Email (optional)',
+  emailPlaceholder: 'example@mail.com',
   alreadyHaveAccount: 'Already have an account?',
   noAccount: "Don't have an account?",
   errPhoneRequired: 'Phone number is required',

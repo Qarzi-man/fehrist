@@ -20,6 +20,8 @@ export const uz: Translations = {
   businessName: 'Biznes nomi',
   businessNamePlaceholder: 'Mening do\'konim, YaT...',
   errBusinessNameRequired: 'Biznes nomini kiriting',
+  email: 'Email (ixtiyoriy)',
+  emailPlaceholder: 'example@mail.com',
   alreadyHaveAccount: 'Hisobingiz bormi?',
   noAccount: "Hisobingiz yo'qmi?",
   errPhoneRequired: 'Telefon raqamini kiriting',

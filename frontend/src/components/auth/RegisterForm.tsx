@@ -10,6 +10,31 @@ import OtpInput from '../ui/OtpInput'
 
 type Step = 1 | 2
 
+function StepIndicator({ step }: { step: Step }) {
+  return (
+    <div className="flex items-center gap-2 mb-1">
+      {([1, 2] as Step[]).map((s) => (
+        <div key={s} className="flex items-center gap-2">
+          <div className={[
+            'h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold transition-all',
+            step === s
+              ? 'bg-indigo-600 text-white'
+              : step > s
+              ? 'bg-indigo-100 text-indigo-600'
+              : 'bg-gray-100 text-gray-400',
+          ].join(' ')}>
+            {s}
+          </div>
+          {s < 2 && <div className={['h-px w-6 transition-all', step > s ? 'bg-indigo-300' : 'bg-gray-200'].join(' ')} />}
+        </div>
+      ))}
+      <span className="text-xs text-gray-400 ml-1">
+        {step === 1 ? 'Номер телефона' : 'Данные аккаунта'}
+      </span>
+    </div>
+  )
+}
+
 export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
   const t = useT()
   const navigate = useNavigate()
@@ -20,6 +45,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
   const [otp, setOtp] = useState('')
   const [fullName, setFullName] = useState('')
   const [businessName, setBusinessName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -60,6 +86,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
         otp,
         full_name: fullName.trim(),
         business_name: businessName.trim(),
+        email: email.trim() || undefined,
         password,
       })
       setAuth(data.token, data.user)
@@ -77,6 +104,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
   if (step === 1) {
     return (
       <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
+        <StepIndicator step={1} />
         <p className="text-sm text-gray-500">{t.step1Hint}</p>
         <Input
           label={t.phone}
@@ -106,6 +134,8 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
 
   return (
     <form onSubmit={handleRegister} className="flex flex-col gap-4">
+      <StepIndicator step={2} />
+
       <div className="rounded-xl bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
         {t.otpSentTo} <span className="font-semibold">{phone}</span>
       </div>
@@ -131,6 +161,15 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
         onChange={(e) => setBusinessName(e.target.value)}
         placeholder={t.businessNamePlaceholder}
         autoComplete="organization"
+      />
+
+      <Input
+        label={t.email}
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder={t.emailPlaceholder}
+        autoComplete="email"
       />
 
       <Input

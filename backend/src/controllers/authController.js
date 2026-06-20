@@ -38,7 +38,7 @@ async function sendOtpHandler(req, res, next) {
 async function register(req, res, next) {
   const client = await pool.connect();
   try {
-    const { phone, password, full_name, business_name, otp } = req.body;
+    const { phone, password, full_name, business_name, email, otp } = req.body;
     if (!phone || !password || !otp) {
       return res.status(400).json({ error: 'phone, password and otp required' });
     }
@@ -63,8 +63,9 @@ async function register(req, res, next) {
 
     const hash = await bcrypt.hash(password, 10);
     const userResult = await client.query(
-      `INSERT INTO users (phone, password, full_name) VALUES ($1, $2, $3) RETURNING id, phone, full_name`,
-      [phone, hash, full_name || null]
+      `INSERT INTO users (phone, password, full_name, email)
+       VALUES ($1, $2, $3, $4) RETURNING id, phone, full_name, email`,
+      [phone, hash, full_name || null, email?.trim() || null]
     );
     const user = userResult.rows[0];
 
