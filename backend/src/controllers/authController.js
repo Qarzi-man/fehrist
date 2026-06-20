@@ -22,14 +22,25 @@ async function sendOtpHandler(req, res, next) {
     const code = generateOtp();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 min
 
+    // Save OTP to DB first — this must succeed
     await pool.query(
       `INSERT INTO otp_codes (phone, code, expires_at) VALUES ($1, $2, $3)`,
       [phone, code, expiresAt]
     );
 
-    await sendOtp(phone, code);
+    // SMS is non-fatal: failure logs the code so you can still test
+    try {
+      await sendOtp(phone, code);
+      console.log(`[OTP] Sent to ${phone}`);
+    } catch (smsErr) {
+      console.error(`[OTP] SMS failed for ${phone}:`, smsErr.message);
+      console.log(`[OTP] Code for manual testing — phone=${phone} code=${code}`);
+    }
+
     res.json({ message: 'OTP sent' });
   } catch (err) {
+    // Only DB errors reach here
+    console.error('[OTP] DB error:', err);
     next(err);
   }
 }
