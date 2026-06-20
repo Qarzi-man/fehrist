@@ -1,39 +1,52 @@
 const https = require('https');
 const http = require('http');
-const querystring = require('querystring');
 
-// Paymochi (Payomchi) SMS API
-// Docs: https://paymochi.com — adjust BASE_URL if your account uses a different endpoint
-const BASE_URL = process.env.PAYMOCHI_BASE_URL || 'https://paymochi.com';
+// Payomchi SMS API — https://api.payomchi.tj/api/v1
+// Auth: Authorization: Bearer <PAYOMCHI_API_KEY>
+// Request: POST /send, JSON body { phone, text, sender }
+const BASE_URL = process.env.PAYOMCHI_BASE_URL || 'https://api.payomchi.tj/api/v1';
 
 async function sendSms(phone, message) {
-  const apiKey = process.env.PAYMOCHI_API_KEY;
-  const sender = process.env.PAYMOCHI_SENDER || 'Daftarcha';
+  const apiKey = process.env.PAYOMCHI_API_KEY;
+  const sender = process.env.PAYOMCHI_SENDER || 'Daftarcha';
 
   if (!apiKey) {
-    console.warn('[SMS] PAYMOCHI_API_KEY is not set — skipping SMS send');
+    console.warn('[SMS] PAYOMCHI_API_KEY is not set — skipping SMS send');
     return { skipped: true, reason: 'no_api_key' };
   }
 
-  const params = querystring.stringify({ apikey: apiKey, sender, phone, message });
-  const url = `${BASE_URL}/api/sms/send?${params}`;
+  const body = JSON.stringify({ phone, text: message, sender });
+  const url = `${BASE_URL}/send`;
+  const parsed = new URL(url);
 
-  console.log(`[SMS] Sending to ${phone} via ${BASE_URL}`);
+  const options = {
+    hostname: parsed.hostname,
+    port: parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
+    path: parsed.pathname + parsed.search,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(body),
+      'Authorization': `Bearer ${apiKey}`,
+    },
+  };
+
+  console.log(`[SMS] POST ${url} — phone=${phone} sender=${sender}`);
 
   return new Promise((resolve, reject) => {
-    const lib = url.startsWith('https') ? https : http;
+    const lib = parsed.protocol === 'https:' ? https : http;
 
-    const req = lib.get(url, (res) => {
+    const req = lib.request(options, (res) => {
       let data = '';
       res.on('data', (chunk) => (data += chunk));
       res.on('end', () => {
         console.log(`[SMS] Response status=${res.statusCode} body=${data}`);
         try {
-          const parsed = JSON.parse(data);
-          if (parsed.error || parsed.status === 'error') {
-            console.error('[SMS] API returned error:', parsed);
+          const result = JSON.parse(data);
+          if (result.error || result.status === 'error') {
+            console.error('[SMS] API returned error:', result);
           }
-          resolve(parsed);
+          resolve(result);
         } catch {
           resolve({ raw: data, status: res.statusCode });
         }
@@ -49,6 +62,9 @@ async function sendSms(phone, message) {
       console.error('[SMS] Request timed out');
       req.destroy(new Error('SMS request timeout'));
     });
+
+    req.write(body);
+    req.end();
   });
 }
 
