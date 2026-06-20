@@ -1,0 +1,32 @@
+export const ru = {
+  appName: 'Daftarcha',
+  appTagline: 'Учёт долгов для вашего бизнеса',
+  login: 'Войти',
+  register: 'Регистрация',
+  phone: 'Телефон',
+  password: 'Пароль',
+  fullName: 'Полное имя',
+  sendOtp: 'Отправить код',
+  resendOtp: 'Отправить снова',
+  verifyAndRegister: 'Подтвердить и создать аккаунт',
+  phonePlaceholder: '+992 XX XXX XX XX',
+  namePlaceholder: 'Ваше полное имя',
+  passwordPlaceholder: '••••••••',
+  otpSentTo: 'Код отправлен на номер',
+  step1Hint: 'Введите номер для получения кода',
+  step2Hint: 'Введите код из SMS и создайте пароль',
+  alreadyHaveAccount: 'Уже есть аккаунт?',
+  noAccount: 'Нет аккаунта?',
+  // Errors
+  errPhoneRequired: 'Введите номер телефона',
+  errPasswordRequired: 'Введите пароль',
+  errOtpRequired: 'Введите код из SMS',
+  errNameRequired: 'Введите имя',
+  errInvalidCredentials: 'Неверный номер или пароль',
+  errPhoneExists: 'Этот номер уже зарегистрирован',
+  errInvalidOtp: 'Неверный или устаревший код',
+  errNetwork: 'Ошибка сети. Попробуйте снова',
+  errPasswordShort: 'Пароль минимум 6 символов',
+}
+
+export type Translations = typeof ru
