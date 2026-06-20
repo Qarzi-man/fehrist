@@ -72,6 +72,21 @@ export const ru = {
   // Logout confirm
   logoutConfirmTitle: 'Вы уверены, что хотите выйти?',
   logoutConfirmYes: 'Да, выйти',
+  // Debts page
+  filterAll: 'Все',
+  addPayment: 'Добавить платёж',
+  paymentHistory: 'История платежей',
+  remaining: 'Остаток',
+  totalDebt: 'Сумма долга',
+  paidAmount: 'Оплачено',
+  deleteDebt: 'Удалить долг',
+  editDebt: 'Редактировать',
+  confirmDeleteDebt: 'Удалить этот долг? Все платежи по нему также будут удалены.',
+  paymentNote: 'Комментарий (необязательно)',
+  noPayments: 'Платежей пока нет',
+  searchContact: 'Поиск по контакту...',
+  createdAt: 'Создан',
+  debtDeleted: 'Долг удалён',
 }
 
 export type Translations = typeof ru

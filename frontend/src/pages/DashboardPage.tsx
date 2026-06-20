@@ -48,14 +48,14 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-2xl mx-auto px-4 pt-6 pb-8">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 md:mb-8">
           <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{t.dashboard}</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{user?.full_name ?? user?.phone}</p>
+            <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">{t.dashboard}</h1>
+            <p className="text-sm md:text-base text-gray-500 dark:text-gray-400">{user?.full_name ?? user?.phone}</p>
           </div>
-          <Button onClick={() => setShowAdd(true)} className="text-sm px-4 py-2.5">
+          <Button onClick={() => setShowAdd(true)} className="text-sm md:text-base px-4 md:px-5 py-2 md:py-2.5">
             {t.addDebt}
           </Button>
         </div>
@@ -76,7 +76,7 @@ export default function DashboardPage() {
         {stats && !loading && (
           <>
             {/* Stats cards */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-3 gap-3 md:gap-5 mb-6 md:mb-8">
               <StatsCard label={t.receivable} value={stats.receivable} color="emerald" />
               <StatsCard label={t.payable}    value={stats.payable}    color="rose" />
               <StatsCard label={t.overdue}    value={stats.overdue_count} color="amber" isCount />

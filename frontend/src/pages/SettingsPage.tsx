@@ -39,8 +39,8 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-2xl mx-auto px-4 pt-6 pb-8">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-6">{t.settings}</h1>
+      <div className="max-w-2xl mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-8">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6 md:mb-8">{t.settings}</h1>
 
         {/* Profile */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-4">
