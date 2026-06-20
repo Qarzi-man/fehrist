@@ -7,6 +7,14 @@ CREATE TABLE IF NOT EXISTS users (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Businesses owned by users
+CREATE TABLE IF NOT EXISTS businesses (
+  id         SERIAL PRIMARY KEY,
+  owner_id   INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  name       VARCHAR(255) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- OTP codes for phone verification
 CREATE TABLE IF NOT EXISTS otp_codes (
   id          SERIAL PRIMARY KEY,
