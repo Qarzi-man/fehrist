@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useAuthStore } from '../../store/authStore'
 import { useBusinessStore, type Business } from '../../store/businessStore'
 import { getBusinesses, createBusiness, updateBusiness, deleteBusiness } from '../../api/businesses'
 import { useT } from '../../i18n'
@@ -36,6 +37,7 @@ const CheckIcon = () => (
 
 export default function BusinessSwitcher({ isMobile }: { isMobile?: boolean }) {
   const t = useT()
+  const currentUserId = useAuthStore((s) => s.user?.id)
   const { activeBusiness, setActiveBusiness } = useBusinessStore()
   const [open, setOpen] = useState(false)
   const [businesses, setBusinesses] = useState<Business[]>([])
@@ -221,30 +223,37 @@ export default function BusinessSwitcher({ isMobile }: { isMobile?: boolean }) {
                           <span className={`h-5 w-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${isActive ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-gray-300 dark:border-gray-600'}`}>
                             {isActive && <CheckIcon />}
                           </span>
-                          <span className={`text-sm truncate ${isActive ? 'font-bold text-indigo-700 dark:text-indigo-300' : 'font-medium text-gray-800 dark:text-gray-200'}`}>
-                            {b.name}
-                          </span>
+                          <div className="min-w-0 flex-1">
+                            <span className={`text-sm truncate block ${isActive ? 'font-bold text-indigo-700 dark:text-indigo-300' : 'font-medium text-gray-800 dark:text-gray-200'}`}>
+                              {b.name}
+                            </span>
+                            {b.owner_id !== currentUserId && (
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500">{t.employeeLabel}</span>
+                            )}
+                          </div>
                         </button>
 
-                        {/* Action buttons (right side) */}
-                        <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => { setEditingId(b.id); setNameInput(b.name); setAdding(false); setError('') }}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
-                            title={t.editBusiness}
-                          >
-                            <PencilIcon />
-                          </button>
-                          {businesses.length > 1 && (
+                        {/* Action buttons — only for owned businesses */}
+                        {b.owner_id === currentUserId && (
+                          <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                              onClick={() => setDeleteConfirmId(b.id)}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
-                              title={t.deleteBusiness}
+                              onClick={() => { setEditingId(b.id); setNameInput(b.name); setAdding(false); setError('') }}
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
+                              title={t.editBusiness}
                             >
-                              <TrashIcon />
+                              <PencilIcon />
                             </button>
-                          )}
-                        </div>
+                            {businesses.filter((x) => x.owner_id === currentUserId).length > 1 && (
+                              <button
+                                onClick={() => setDeleteConfirmId(b.id)}
+                                className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+                                title={t.deleteBusiness}
+                              >
+                                <TrashIcon />
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </li>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useT } from '../../i18n'
+import { useIsOwner } from '../../lib/useIsOwner'
 import BusinessSwitcher from './BusinessSwitcher'
 
 const HomeIcon = () => (
@@ -35,6 +36,7 @@ export default function Sidebar() {
   const t = useT()
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+  const isOwner = useIsOwner()
   const [showConfirm, setShowConfirm] = useState(false)
 
   const links = [
@@ -92,10 +94,13 @@ export default function Sidebar() {
         {/* User + logout */}
         <div className="p-3 border-t border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-1">
-            <div className="h-7 w-7 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300">
+            <div className="h-7 w-7 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
               {(user?.full_name ?? user?.phone ?? '?')[0].toUpperCase()}
             </div>
-            <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{user?.full_name ?? user?.phone}</span>
+            <div className="min-w-0 flex-1">
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate block">{user?.full_name ?? user?.phone}</span>
+              <span className="text-[10px] font-semibold text-indigo-500 dark:text-indigo-400">{isOwner ? t.ownerLabel : t.employeeLabel}</span>
+            </div>
           </div>
           <button
             onClick={() => setShowConfirm(true)}

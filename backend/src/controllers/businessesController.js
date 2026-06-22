@@ -2,10 +2,15 @@ const pool = require('../config/db');
 
 async function list(req, res, next) {
   try {
-    const { rows } = await pool.query(
-      'SELECT * FROM businesses WHERE owner_id = $1 ORDER BY created_at',
-      [req.user.userId]
-    );
+    const uid = req.user.userId;
+    const { rows } = await pool.query(`
+      SELECT b.*, 'owner' AS my_role FROM businesses b WHERE b.owner_id = $1
+      UNION ALL
+      SELECT b.*, bm.role AS my_role FROM businesses b
+        JOIN business_members bm ON bm.business_id = b.id
+        WHERE bm.user_id = $1 AND bm.status = 'active'
+      ORDER BY created_at
+    `, [uid]);
     res.json(rows);
   } catch (err) { next(err); }
 }

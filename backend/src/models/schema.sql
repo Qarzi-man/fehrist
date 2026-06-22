@@ -85,8 +85,22 @@ CREATE TABLE IF NOT EXISTS repayments (
   paid_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Employee access
+CREATE TABLE IF NOT EXISTS business_members (
+  id          SERIAL PRIMARY KEY,
+  business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+  user_id     INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  role        VARCHAR(20) DEFAULT 'employee',
+  invited_by  INTEGER REFERENCES users(id),
+  status      VARCHAR(20) DEFAULT 'pending',
+  created_at  TIMESTAMP DEFAULT NOW(),
+  UNIQUE(business_id, user_id)
+);
+
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_debts_user_id    ON debts(user_id);
-CREATE INDEX IF NOT EXISTS idx_debts_client_id  ON debts(client_id);
-CREATE INDEX IF NOT EXISTS idx_repayments_debt  ON repayments(debt_id);
-CREATE INDEX IF NOT EXISTS idx_otp_phone        ON otp_codes(phone);
+CREATE INDEX IF NOT EXISTS idx_debts_user_id        ON debts(user_id);
+CREATE INDEX IF NOT EXISTS idx_debts_client_id      ON debts(client_id);
+CREATE INDEX IF NOT EXISTS idx_repayments_debt      ON repayments(debt_id);
+CREATE INDEX IF NOT EXISTS idx_otp_phone            ON otp_codes(phone);
+CREATE INDEX IF NOT EXISTS idx_business_members_user ON business_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_business_members_biz  ON business_members(business_id);

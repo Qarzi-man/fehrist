@@ -6,6 +6,7 @@ export interface Business {
   owner_id: number
   name: string
   created_at: string
+  my_role?: 'owner' | 'employee'
 }
 
 interface BusinessState {

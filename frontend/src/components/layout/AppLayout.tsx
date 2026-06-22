@@ -1,9 +1,25 @@
-import { ReactNode } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
+import { useAuthStore } from '../../store/authStore'
+import { getPendingInvites, type PendingInvite } from '../../api/members'
 import Sidebar from './Sidebar'
 import BottomNav from './BottomNav'
 import BusinessSwitcher from './BusinessSwitcher'
+import PendingInviteModal from '../members/PendingInviteModal'
+
+let pendingChecked = false
 
 export default function AppLayout({ children }: { children: ReactNode }) {
+  const user = useAuthStore((s) => s.user)
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([])
+
+  useEffect(() => {
+    if (!user || pendingChecked) return
+    pendingChecked = true
+    getPendingInvites()
+      .then((invites) => { if (invites.length) setPendingInvites(invites) })
+      .catch(() => {})
+  }, [user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar />
@@ -15,6 +31,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         {children}
       </main>
       <BottomNav />
+      {pendingInvites.length > 0 && (
+        <PendingInviteModal
+          invites={pendingInvites}
+          onDone={() => setPendingInvites([])}
+        />
+      )}
     </div>
   )
 }

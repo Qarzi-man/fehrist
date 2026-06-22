@@ -125,6 +125,24 @@ export const ru = {
   exportPDF: 'Скачать PDF',
   exportExcel: 'Скачать Excel',
   printBtn: 'Печать',
+  // Employees
+  employees: 'Сотрудники',
+  inviteEmployee: 'Пригласить',
+  inviteByPhone: 'Телефон сотрудника',
+  memberLimitReached: 'Нужно больше 3 сотрудников? Напишите нам: support@daftarcha.tj',
+  memberStatusPending: 'Ожидает',
+  memberStatusActive: 'Активен',
+  ownerLabel: 'Владелец',
+  employeeLabel: 'Сотрудник',
+  pendingInviteTitle: 'Приглашение в бизнес',
+  pendingInviteText: 'Вас пригласили присоединиться к бизнесу',
+  acceptInvite: 'Принять',
+  declineInvite: 'Отклонить',
+  inviteSent: 'Приглашение отправлено',
+  memberRemoved: 'Сотрудник удалён',
+  memberNotFound: 'Пользователь с таким телефоном не найден',
+  removeMember: 'Удалить',
+  noMembers: 'Сотрудников пока нет',
 }
 
 export type Translations = typeof ru
