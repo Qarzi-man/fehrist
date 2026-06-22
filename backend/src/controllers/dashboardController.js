@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 async function stats(req, res, next) {
   try {
-    const uid = req.user.userId;
+    const bid = req.businessId;
 
     const [receivable, payable, overdue, recent] = await Promise.all([
       pool.query(
@@ -10,32 +10,32 @@ async function stats(req, res, next) {
          FROM debts d
          LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
            ON r.debt_id = d.id
-         WHERE d.user_id = $1 AND d.type = 'receivable' AND d.status = 'active'
+         WHERE d.business_id = $1 AND d.type = 'receivable' AND d.status = 'active' AND d.deleted_at IS NULL
          GROUP BY d.currency`,
-        [uid]
+        [bid]
       ),
       pool.query(
         `SELECT d.currency, COALESCE(SUM(d.amount - COALESCE(r.paid, 0)), 0) AS total
          FROM debts d
          LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
            ON r.debt_id = d.id
-         WHERE d.user_id = $1 AND d.type = 'payable' AND d.status = 'active'
+         WHERE d.business_id = $1 AND d.type = 'payable' AND d.status = 'active' AND d.deleted_at IS NULL
          GROUP BY d.currency`,
-        [uid]
+        [bid]
       ),
       pool.query(
         `SELECT COUNT(*) AS count FROM debts
-         WHERE user_id = $1 AND status = 'active' AND due_date < NOW()`,
-        [uid]
+         WHERE business_id = $1 AND status = 'active' AND deleted_at IS NULL AND due_date < NOW()`,
+        [bid]
       ),
       pool.query(
         `SELECT d.id, d.amount, d.currency, d.type, d.status, d.due_date, d.created_at,
                 c.full_name AS client_name
          FROM debts d
          JOIN clients c ON c.id = d.client_id
-         WHERE d.user_id = $1
+         WHERE d.business_id = $1 AND d.deleted_at IS NULL
          ORDER BY d.created_at DESC LIMIT 10`,
-        [uid]
+        [bid]
       ),
     ]);
 

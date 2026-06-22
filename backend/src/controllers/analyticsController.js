@@ -2,9 +2,9 @@ const pool = require('../config/db');
 
 async function analytics(req, res, next) {
   try {
-    const uid    = req.user.userId;
+    const bid    = req.businessId;
     const months = Math.min(12, Math.max(1, parseInt(req.query.months) || 6));
-    const back   = months - 1; // months to subtract (inclusive of current)
+    const back   = months - 1;
 
     const [newDebtsRes, repaymentsRes, topClientsRes, summaryRes, repaidMonthRes] = await Promise.all([
       pool.query(
@@ -13,10 +13,10 @@ async function analytics(req, res, next) {
            currency, type,
            SUM(amount) AS total
          FROM debts
-         WHERE user_id = $1 AND deleted_at IS NULL
+         WHERE business_id = $1 AND deleted_at IS NULL
            AND created_at >= date_trunc('month', NOW()) - INTERVAL '${back} months'
          GROUP BY 1, 2, 3 ORDER BY 1`,
-        [uid]
+        [bid]
       ),
       pool.query(
         `SELECT
@@ -25,10 +25,10 @@ async function analytics(req, res, next) {
            SUM(r.amount) AS total
          FROM repayments r
          JOIN debts d ON d.id = r.debt_id
-         WHERE d.user_id = $1
+         WHERE d.business_id = $1
            AND r.paid_at >= date_trunc('month', NOW()) - INTERVAL '${back} months'
          GROUP BY 1, 2 ORDER BY 1`,
-        [uid]
+        [bid]
       ),
       pool.query(
         `SELECT
@@ -38,30 +38,29 @@ async function analytics(req, res, next) {
          JOIN clients c ON c.id = d.client_id
          LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
            ON r.debt_id = d.id
-         WHERE d.user_id = $1 AND d.status = 'active'
+         WHERE d.business_id = $1 AND d.status = 'active'
            AND d.deleted_at IS NULL AND c.deleted_at IS NULL
          GROUP BY c.id, c.full_name, d.currency`,
-        [uid]
+        [bid]
       ),
       pool.query(
         `SELECT
-           COUNT(*) FILTER (WHERE status = 'active' AND deleted_at IS NULL)          AS total_active,
+           COUNT(*) FILTER (WHERE status = 'active' AND deleted_at IS NULL)        AS total_active,
            COUNT(*) FILTER (WHERE deleted_at IS NULL AND status != 'paid'
-             AND due_date IS NOT NULL AND due_date < CURRENT_DATE)                   AS overdue_count
-         FROM debts WHERE user_id = $1`,
-        [uid]
+             AND due_date IS NOT NULL AND due_date < CURRENT_DATE)                 AS overdue_count
+         FROM debts WHERE business_id = $1`,
+        [bid]
       ),
       pool.query(
         `SELECT d.currency, SUM(r.amount) AS total
          FROM repayments r
          JOIN debts d ON d.id = r.debt_id
-         WHERE d.user_id = $1 AND r.paid_at >= date_trunc('month', NOW())
+         WHERE d.business_id = $1 AND r.paid_at >= date_trunc('month', NOW())
          GROUP BY d.currency`,
-        [uid]
+        [bid]
       ),
     ]);
 
-    // Build monthly map with all months pre-filled
     const monthlyMap = {};
     const now = new Date();
     for (let i = back; i >= 0; i--) {
@@ -83,7 +82,6 @@ async function analytics(req, res, next) {
         (monthlyMap[row.month].repaid[row.currency] || 0) + parseFloat(row.total);
     }
 
-    // Top clients: aggregate across currencies
     const clientMap = {};
     for (const row of topClientsRes.rows) {
       if (!clientMap[row.client_id]) {

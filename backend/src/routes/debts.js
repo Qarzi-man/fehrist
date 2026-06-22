@@ -1,9 +1,11 @@
 const router = require('express').Router();
 const auth = require('../middleware/authMiddleware');
+const business = require('../middleware/businessMiddleware');
 const d = require('../controllers/debtsController');
 const { list: listRepayments, create: createRepayment } = require('../controllers/repaymentsController');
 
 router.use(auth);
+router.use(business);
 router.get('/',      d.list);
 router.post('/',     d.create);
 router.get('/:id',   d.getOne);

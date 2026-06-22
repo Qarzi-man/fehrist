@@ -56,6 +56,26 @@ ALTER TABLE debts    ADD COLUMN IF NOT EXISTS type        VARCHAR(20) DEFAULT 'r
 ALTER TABLE debts    ADD COLUMN IF NOT EXISTS deleted_at  TIMESTAMPTZ;
 ALTER TABLE clients  ADD COLUMN IF NOT EXISTS deleted_at  TIMESTAMPTZ;
 
+-- Multi-business support
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS business_id INTEGER REFERENCES businesses(id);
+ALTER TABLE debts   ADD COLUMN IF NOT EXISTS business_id INTEGER REFERENCES businesses(id);
+
+-- Backfill: create a default business for every user who doesn't have one yet
+INSERT INTO businesses (owner_id, name)
+SELECT u.id, COALESCE(NULLIF(TRIM(u.full_name), ''), 'Мой бизнес')
+FROM users u
+WHERE NOT EXISTS (SELECT 1 FROM businesses b WHERE b.owner_id = u.id);
+
+-- Backfill: assign business_id to existing clients
+UPDATE clients SET business_id = (
+  SELECT b.id FROM businesses b WHERE b.owner_id = clients.user_id ORDER BY b.created_at LIMIT 1
+) WHERE business_id IS NULL;
+
+-- Backfill: assign business_id to existing debts
+UPDATE debts SET business_id = (
+  SELECT b.id FROM businesses b WHERE b.owner_id = debts.user_id ORDER BY b.created_at LIMIT 1
+) WHERE business_id IS NULL;
+
 -- Repayments
 CREATE TABLE IF NOT EXISTS repayments (
   id         SERIAL PRIMARY KEY,

@@ -4,10 +4,9 @@ async function list(req, res, next) {
   try {
     const { debt_id } = req.params;
 
-    // Verify debt belongs to user
     const debt = await pool.query(
-      `SELECT id FROM debts WHERE id = $1 AND user_id = $2`,
-      [debt_id, req.user.userId]
+      `SELECT id FROM debts WHERE id = $1 AND business_id = $2`,
+      [debt_id, req.businessId]
     );
     if (!debt.rows.length) return res.status(403).json({ error: 'Forbidden' });
 
@@ -27,10 +26,9 @@ async function create(req, res, next) {
     const { amount, note } = req.body;
     if (!amount) return res.status(400).json({ error: 'amount required' });
 
-    // Verify debt belongs to user
     const debt = await pool.query(
-      `SELECT * FROM debts WHERE id = $1 AND user_id = $2`,
-      [debt_id, req.user.userId]
+      `SELECT * FROM debts WHERE id = $1 AND business_id = $2`,
+      [debt_id, req.businessId]
     );
     if (!debt.rows.length) return res.status(403).json({ error: 'Forbidden' });
 
@@ -39,7 +37,6 @@ async function create(req, res, next) {
       [debt_id, amount, note || null]
     );
 
-    // Auto-close debt if fully paid
     const totalPaid = await pool.query(
       `SELECT COALESCE(SUM(amount), 0) AS paid FROM repayments WHERE debt_id = $1`,
       [debt_id]

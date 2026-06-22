@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 async function list(req, res, next) {
   try {
-    const uid = req.user.userId;
+    const bid    = req.businessId;
     const search = (req.query.search ?? '').trim();
     const page   = Math.max(1, parseInt(req.query.page)  || 1);
     const limit  = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
@@ -11,9 +11,9 @@ async function list(req, res, next) {
     const [countResult, dataResult] = await Promise.all([
       pool.query(
         `SELECT COUNT(*) FROM clients
-         WHERE user_id = $1 AND deleted_at IS NULL
+         WHERE business_id = $1 AND deleted_at IS NULL
            AND ($2 = '' OR full_name ILIKE '%' || $2 || '%' OR phone ILIKE '%' || $2 || '%')`,
-        [uid, search]
+        [bid, search]
       ),
       pool.query(
         `SELECT c.*,
@@ -23,7 +23,7 @@ async function list(req, res, next) {
          LEFT JOIN (
            SELECT client_id, COUNT(*) AS active_count
            FROM debts
-           WHERE status = 'active' AND deleted_at IS NULL
+           WHERE status = 'active' AND deleted_at IS NULL AND business_id = $1
            GROUP BY client_id
          ) dstats ON dstats.client_id = c.id
          LEFT JOIN LATERAL (
@@ -38,14 +38,15 @@ async function list(req, res, next) {
              LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
                ON r.debt_id = d.id
              WHERE d.client_id = c.id AND d.status = 'active' AND d.deleted_at IS NULL
+               AND d.business_id = $1
              GROUP BY d.currency
            ) cs
          ) cstats ON true
-         WHERE c.user_id = $1 AND c.deleted_at IS NULL
+         WHERE c.business_id = $1 AND c.deleted_at IS NULL
            AND ($2 = '' OR c.full_name ILIKE '%' || $2 || '%' OR c.phone ILIKE '%' || $2 || '%')
          ORDER BY c.full_name
          LIMIT $3 OFFSET $4`,
-        [uid, search, limit, offset]
+        [bid, search, limit, offset]
       ),
     ]);
 
@@ -65,16 +66,16 @@ async function list(req, res, next) {
 async function getOne(req, res, next) {
   try {
     const { id } = req.params;
-    const uid = req.user.userId;
+    const bid = req.businessId;
 
     const [clientResult, debtsResult] = await Promise.all([
       pool.query(
-        `SELECT * FROM clients WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
-        [id, uid]
+        `SELECT * FROM clients WHERE id = $1 AND business_id = $2 AND deleted_at IS NULL`,
+        [id, bid]
       ),
       pool.query(
         `SELECT d.*,
-           COALESCE(r.paid, 0)::numeric           AS total_paid,
+           COALESCE(r.paid, 0)::numeric              AS total_paid,
            (d.amount - COALESCE(r.paid, 0))::numeric AS remaining,
            CASE
              WHEN d.status = 'paid' THEN 'paid'
@@ -84,9 +85,9 @@ async function getOne(req, res, next) {
          FROM debts d
          LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
            ON r.debt_id = d.id
-         WHERE d.client_id = $1 AND d.user_id = $2 AND d.deleted_at IS NULL
+         WHERE d.client_id = $1 AND d.business_id = $2 AND d.deleted_at IS NULL
          ORDER BY d.created_at DESC`,
-        [id, uid]
+        [id, bid]
       ),
     ]);
 
@@ -103,8 +104,9 @@ async function create(req, res, next) {
     if (!full_name) return res.status(400).json({ error: 'full_name required' });
 
     const { rows } = await pool.query(
-      `INSERT INTO clients (user_id, full_name, phone, note) VALUES ($1, $2, $3, $4) RETURNING *`,
-      [req.user.userId, full_name, phone || null, note || notes || null]
+      `INSERT INTO clients (user_id, business_id, full_name, phone, note)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [req.user.userId, req.businessId, full_name, phone || null, note || notes || null]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -122,8 +124,8 @@ async function update(req, res, next) {
          full_name = COALESCE($1, full_name),
          phone     = COALESCE($2, phone),
          note      = COALESCE($3, note)
-       WHERE id = $4 AND user_id = $5 AND deleted_at IS NULL RETURNING *`,
-      [full_name || null, phone || null, note ?? notes ?? null, id, req.user.userId]
+       WHERE id = $4 AND business_id = $5 AND deleted_at IS NULL RETURNING *`,
+      [full_name || null, phone || null, note ?? notes ?? null, id, req.businessId]
     );
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
     res.json(rows[0]);
@@ -136,8 +138,9 @@ async function remove(req, res, next) {
   try {
     const { id } = req.params;
     const { rowCount } = await pool.query(
-      `UPDATE clients SET deleted_at = NOW() WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
-      [id, req.user.userId]
+      `UPDATE clients SET deleted_at = NOW()
+       WHERE id = $1 AND business_id = $2 AND deleted_at IS NULL`,
+      [id, req.businessId]
     );
     if (!rowCount) return res.status(404).json({ error: 'Not found' });
     res.json({ message: 'Deleted' });

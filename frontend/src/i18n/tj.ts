@@ -103,4 +103,11 @@ export const tj: Translations = {
   noClients: 'Муштарӣ нест',
   activeDebts: 'қарзҳои фаъол',
   allDebts: 'Ҳама қарзҳо',
+  addBusiness: '+ Тиҷорат',
+  editBusiness: 'Номгӯзорӣ',
+  deleteBusiness: 'Ҳазф кардан',
+  confirmDeleteBusiness: 'Тиҷоратро ҳазф кунем? Бо қарзҳои фаъол ҳазф кардан мумкин нест.',
+  businessDeleted: 'Тиҷорат ҳазф шуд',
+  noBusiness: 'Тиҷорат нест',
+  businessHasDebts: 'Ҳазф кардан мумкин нест: қарзҳои фаъол мавҷуданд',
 }

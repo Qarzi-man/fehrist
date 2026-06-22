@@ -80,12 +80,13 @@ async function register(req, res, next) {
     );
     const user = userResult.rows[0];
 
-    if (business_name && business_name.trim()) {
-      await client.query(
-        `INSERT INTO businesses (owner_id, name) VALUES ($1, $2)`,
-        [user.id, business_name.trim()]
-      );
-    }
+    const bizName = (business_name && business_name.trim())
+      ? business_name.trim()
+      : (full_name && full_name.trim()) || 'Мой бизнес';
+    await client.query(
+      `INSERT INTO businesses (owner_id, name) VALUES ($1, $2)`,
+      [user.id, bizName]
+    );
 
     await client.query('COMMIT');
     res.status(201).json({ token: signToken(user.id), user });

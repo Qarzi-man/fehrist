@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useT } from '../../i18n'
+import BusinessSwitcher from './BusinessSwitcher'
 
 const HomeIcon = () => (
   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -69,6 +70,11 @@ export default function Sidebar() {
             </svg>
           </div>
           <span className="text-base font-bold text-gray-900 dark:text-white">{t.appName}</span>
+        </div>
+
+        {/* Business switcher */}
+        <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
+          <BusinessSwitcher />
         </div>
 
         {/* Nav */}

@@ -110,6 +110,13 @@ export const ru = {
   noClients: 'Клиентов пока нет',
   activeDebts: 'активных долгов',
   allDebts: 'Все долги',
+  addBusiness: '+ Бизнес',
+  editBusiness: 'Переименовать',
+  deleteBusiness: 'Удалить',
+  confirmDeleteBusiness: 'Удалить бизнес? Нельзя удалить при наличии активных долгов.',
+  businessDeleted: 'Бизнес удалён',
+  noBusiness: 'Нет бизнесов',
+  businessHasDebts: 'Нельзя удалить: есть активные долги',
 }
 
 export type Translations = typeof ru

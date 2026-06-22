@@ -1,13 +1,10 @@
 const router = require('express').Router();
 const auth = require('../middleware/authMiddleware');
-const business = require('../middleware/businessMiddleware');
-const c = require('../controllers/clientsController');
+const c = require('../controllers/businessesController');
 
 router.use(auth);
-router.use(business);
 router.get('/',     c.list);
 router.post('/',    c.create);
-router.get('/:id',  c.getOne);
 router.put('/:id',  c.update);
 router.delete('/:id', c.remove);
 

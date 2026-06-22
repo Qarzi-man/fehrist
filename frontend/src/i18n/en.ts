@@ -103,4 +103,11 @@ export const en: Translations = {
   noClients: 'No clients yet',
   activeDebts: 'active debts',
   allDebts: 'All debts',
+  addBusiness: '+ Business',
+  editBusiness: 'Rename',
+  deleteBusiness: 'Delete',
+  confirmDeleteBusiness: 'Delete this business? Cannot delete while it has active debts.',
+  businessDeleted: 'Business deleted',
+  noBusiness: 'No businesses',
+  businessHasDebts: 'Cannot delete: has active debts',
 }

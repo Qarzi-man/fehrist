@@ -103,4 +103,11 @@ export const uz: Translations = {
   noClients: 'Mijozlar mavjud emas',
   activeDebts: 'faol qarzlar',
   allDebts: 'Barcha qarzlar',
+  addBusiness: '+ Biznes',
+  editBusiness: 'Qayta nomlash',
+  deleteBusiness: "O'chirish",
+  confirmDeleteBusiness: "Biznesni o'chirasizmi? Faol qarzlar bo'lsa o'chirib bo'lmaydi.",
+  businessDeleted: "Biznes o'chirildi",
+  noBusiness: "Biznes yo'q",
+  businessHasDebts: "O'chirib bo'lmaydi: faol qarzlar mavjud",
 }
