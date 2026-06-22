@@ -83,4 +83,13 @@ export const en: Translations = {
   dateFrom: 'From',
   dateTo: 'To',
   allCurrencies: 'All currencies',
+  addClient: '+ Client',
+  editClient: 'Edit client',
+  deleteClient: 'Delete client',
+  confirmDeleteClient: 'Hide client from list? Their debts will remain in the system.',
+  clientDeleted: 'Client deleted',
+  clientNote: 'Note (optional)',
+  noClients: 'No clients yet',
+  activeDebts: 'active debts',
+  allDebts: 'All debts',
 }

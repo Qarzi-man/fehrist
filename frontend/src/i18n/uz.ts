@@ -83,4 +83,13 @@ export const uz: Translations = {
   dateFrom: 'Dan',
   dateTo: 'Gacha',
   allCurrencies: 'Barcha valyutalar',
+  addClient: '+ Mijoz',
+  editClient: 'Mijozni tahrirlash',
+  deleteClient: "Mijozni o'chirish",
+  confirmDeleteClient: "Mijozni ro'yxatdan yashirish? Uning qarzlari tizimda qoladi.",
+  clientDeleted: "Mijoz o'chirildi",
+  clientNote: 'Izoh (ixtiyoriy)',
+  noClients: 'Mijozlar mavjud emas',
+  activeDebts: 'faol qarzlar',
+  allDebts: 'Barcha qarzlar',
 }

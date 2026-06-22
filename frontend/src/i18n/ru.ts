@@ -90,6 +90,15 @@ export const ru = {
   dateFrom: 'От',
   dateTo: 'До',
   allCurrencies: 'Все валюты',
+  addClient: '+ Клиент',
+  editClient: 'Редактировать клиента',
+  deleteClient: 'Удалить клиента',
+  confirmDeleteClient: 'Скрыть клиента из списка? Его долги останутся в системе.',
+  clientDeleted: 'Клиент удалён',
+  clientNote: 'Заметка (необязательно)',
+  noClients: 'Клиентов пока нет',
+  activeDebts: 'активных долгов',
+  allDebts: 'Все долги',
 }
 
 export type Translations = typeof ru

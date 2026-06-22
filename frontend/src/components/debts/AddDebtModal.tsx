@@ -30,7 +30,7 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!isEdit) getClients().then(setClients).catch(() => {})
+    if (!isEdit) getClients({ limit: 200 }).then((r) => setClients(r.data)).catch(() => {})
   }, [isEdit])
 
   async function handleSubmit(e: FormEvent) {

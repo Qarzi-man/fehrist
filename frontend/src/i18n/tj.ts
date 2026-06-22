@@ -83,4 +83,13 @@ export const tj: Translations = {
   dateFrom: 'Аз',
   dateTo: 'То',
   allCurrencies: 'Ҳама асъор',
+  addClient: '+ Муштарӣ',
+  editClient: 'Муштариро таҳрир кардан',
+  deleteClient: 'Муштариро ҳазф кардан',
+  confirmDeleteClient: 'Муштариро пинҳон кунем? Қарзҳои ӯ дар система мемонанд.',
+  clientDeleted: 'Муштарӣ ҳазф шуд',
+  clientNote: 'Тавзеҳ (ихтиёрӣ)',
+  noClients: 'Муштарӣ нест',
+  activeDebts: 'қарзҳои фаъол',
+  allDebts: 'Ҳама қарзҳо',
 }
