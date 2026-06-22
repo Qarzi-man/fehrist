@@ -53,7 +53,7 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
       } else {
         let resolvedClientId = clientId
         if (!resolvedClientId) {
-          const c = await createClient(newName.trim())
+          const c = await createClient({ full_name: newName.trim() })
           resolvedClientId = c.id
         }
         await createDebt({

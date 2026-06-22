@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useT } from '../../i18n'
 import { getClient, deleteClient, type Client, type ClientDetail } from '../../api/clients'
 import { formatMoney, formatDate } from '../../lib/format'
-import Button from '../ui/Button'
 import Spinner from '../ui/Spinner'
 
 interface Props {
