@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useT } from '../i18n'
+import { useBusinessStore } from '../store/businessStore'
 import { getClients, type Client, type PaginatedClients, type ClientDebtSummary } from '../api/clients'
 import AppLayout from '../components/layout/AppLayout'
 import ClientFormModal from '../components/clients/ClientFormModal'
@@ -63,6 +64,7 @@ function ClientRow({ client, onClick }: { client: Client; onClick: () => void })
 
 export default function ClientsPage() {
   const t = useT()
+  const activeBusinessId = useBusinessStore((s) => s.activeBusiness?.id)
   const [result, setResult] = useState<PaginatedClients | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -79,7 +81,7 @@ export default function ClientsPage() {
       .then(setResult)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [search, page])
+  }, [search, page, activeBusinessId])
 
   useEffect(() => { load() }, [load])
   useEffect(() => { setPage(1) }, [search])

@@ -4,6 +4,7 @@ import {
   CartesianGrid, Tooltip, Legend,
 } from 'recharts'
 import { useT } from '../i18n'
+import { useBusinessStore } from '../store/businessStore'
 import { getAnalytics, type AnalyticsData } from '../api/analytics'
 import AppLayout from '../components/layout/AppLayout'
 import Spinner from '../components/ui/Spinner'
@@ -71,6 +72,7 @@ function SummaryCard({ label, value, sub, color }: {
 
 export default function AnalyticsPage() {
   const t = useT()
+  const activeBusinessId = useBusinessStore((s) => s.activeBusiness?.id)
   const [period, setPeriod] = useState<Period>(6)
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -83,7 +85,6 @@ export default function AnalyticsPage() {
     getAnalytics(period)
       .then((d) => {
         setData(d)
-        // Auto-select first available currency
         const currencies = deriveCurrencies(d)
         if (currencies.length && !currencies.includes(activeCurrency)) {
           setActiveCurrency(currencies[0])
@@ -91,7 +92,7 @@ export default function AnalyticsPage() {
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [period]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [period, activeBusinessId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load() }, [load])
 

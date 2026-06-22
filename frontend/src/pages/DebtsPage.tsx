@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useT } from '../i18n'
+import { useBusinessStore } from '../store/businessStore'
 import { getDebts, type Debt, type PaginatedDebts } from '../api/debts'
 import { formatMoney, formatDate } from '../lib/format'
 import AppLayout from '../components/layout/AppLayout'
@@ -59,6 +60,7 @@ function DebtRow({ debt, onClick }: { debt: Debt; onClick: () => void }) {
 
 export default function DebtsPage() {
   const t = useT()
+  const activeBusinessId = useBusinessStore((s) => s.activeBusiness?.id)
   const [result, setResult] = useState<PaginatedDebts | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -86,7 +88,7 @@ export default function DebtsPage() {
       .then(setResult)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [tab, search, currency, dateFrom, dateTo, page])
+  }, [tab, search, currency, dateFrom, dateTo, page, activeBusinessId])
 
   useEffect(() => { load() }, [load])
 

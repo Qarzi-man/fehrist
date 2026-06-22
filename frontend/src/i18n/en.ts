@@ -103,6 +103,7 @@ export const en: Translations = {
   noClients: 'No clients yet',
   activeDebts: 'active debts',
   allDebts: 'All debts',
+  myBusinesses: 'My businesses',
   addBusiness: '+ Business',
   editBusiness: 'Rename',
   deleteBusiness: 'Delete',

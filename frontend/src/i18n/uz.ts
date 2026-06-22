@@ -103,6 +103,7 @@ export const uz: Translations = {
   noClients: 'Mijozlar mavjud emas',
   activeDebts: 'faol qarzlar',
   allDebts: 'Barcha qarzlar',
+  myBusinesses: 'Mening bizneslarim',
   addBusiness: '+ Biznes',
   editBusiness: 'Qayta nomlash',
   deleteBusiness: "O'chirish",

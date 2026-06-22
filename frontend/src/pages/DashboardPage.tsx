@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import { useAuthStore } from '../store/authStore'
+import { useBusinessStore } from '../store/businessStore'
 import { getDashboardStats, type DashboardStats, type RecentDebt } from '../api/dashboard'
 import { formatMoney, formatDate } from '../lib/format'
 import AppLayout from '../components/layout/AppLayout'
@@ -29,6 +30,7 @@ function typeBadge(type: RecentDebt['type'], t: ReturnType<typeof useT>) {
 export default function DashboardPage() {
   const t = useT()
   const user = useAuthStore((s) => s.user)
+  const activeBusinessId = useBusinessStore((s) => s.activeBusiness?.id)
 
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -42,7 +44,7 @@ export default function DashboardPage() {
       .then(setStats)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [])
+  }, [activeBusinessId])
 
   useEffect(() => { load() }, [load])
 

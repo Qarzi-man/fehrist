@@ -110,6 +110,7 @@ export const ru = {
   noClients: 'Клиентов пока нет',
   activeDebts: 'активных долгов',
   allDebts: 'Все долги',
+  myBusinesses: 'Мои бизнесы',
   addBusiness: '+ Бизнес',
   editBusiness: 'Переименовать',
   deleteBusiness: 'Удалить',
