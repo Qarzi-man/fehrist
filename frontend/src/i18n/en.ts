@@ -111,4 +111,8 @@ export const en: Translations = {
   businessDeleted: 'Business deleted',
   noBusiness: 'No businesses',
   businessHasDebts: 'Cannot delete: has active debts',
+  exportBtn: 'Export',
+  exportPDF: 'Download PDF',
+  exportExcel: 'Download Excel',
+  printBtn: 'Print',
 }

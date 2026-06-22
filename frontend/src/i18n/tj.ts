@@ -111,4 +111,8 @@ export const tj: Translations = {
   businessDeleted: 'Тиҷорат ҳазф шуд',
   noBusiness: 'Тиҷорат нест',
   businessHasDebts: 'Ҳазф кардан мумкин нест: қарзҳои фаъол мавҷуданд',
+  exportBtn: 'Содирот',
+  exportPDF: 'PDF зеркашӣ',
+  exportExcel: 'Excel зеркашӣ',
+  printBtn: 'Чоп кардан',
 }

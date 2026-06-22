@@ -60,7 +60,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden md:flex flex-col fixed left-0 top-0 h-full w-56 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 z-30">
+      <aside className="hidden md:flex print:hidden flex-col fixed left-0 top-0 h-full w-56 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 z-30">
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100 dark:border-gray-700">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-violet-600">

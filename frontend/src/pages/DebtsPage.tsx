@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useT } from '../i18n'
 import { useBusinessStore } from '../store/businessStore'
 import { getDebts, type Debt, type PaginatedDebts } from '../api/debts'
+import { exportDebtsToPDF, exportDebtsToExcel } from '../lib/export'
 import { formatMoney, formatDate } from '../lib/format'
 import AppLayout from '../components/layout/AppLayout'
 import AddDebtModal from '../components/debts/AddDebtModal'
@@ -60,7 +61,8 @@ function DebtRow({ debt, onClick }: { debt: Debt; onClick: () => void }) {
 
 export default function DebtsPage() {
   const t = useT()
-  const activeBusinessId = useBusinessStore((s) => s.activeBusiness?.id)
+  const activeBusiness = useBusinessStore((s) => s.activeBusiness)
+  const activeBusinessId = activeBusiness?.id
   const [result, setResult] = useState<PaginatedDebts | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -72,6 +74,19 @@ export default function DebtsPage() {
   const [page, setPage] = useState(1)
   const [showAdd, setShowAdd] = useState(false)
   const [selectedDebt, setSelectedDebt] = useState<Debt | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const exportRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function onMouseDown(e: MouseEvent) {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setExportOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onMouseDown)
+    return () => document.removeEventListener('mousedown', onMouseDown)
+  }, [])
 
   const load = useCallback(() => {
     setLoading(true)
@@ -95,6 +110,44 @@ export default function DebtsPage() {
   // Reset to page 1 when any filter changes (not when page itself changes)
   useEffect(() => { setPage(1) }, [tab, search, currency, dateFrom, dateTo])
 
+  async function handleExportPDF() {
+    setExportOpen(false)
+    setExporting(true)
+    try {
+      const filters: Record<string, string | number> = { page: 1, limit: 1000 }
+      if (tab === 'receivable') filters.type = 'receivable'
+      else if (tab === 'payable') filters.type = 'payable'
+      else if (tab === 'overdue') filters.status = 'overdue'
+      if (search.trim()) filters.search = search.trim()
+      if (currency) filters.currency = currency
+      if (dateFrom) filters.date_from = dateFrom
+      if (dateTo)   filters.date_to   = dateTo
+      const res = await getDebts(filters)
+      await exportDebtsToPDF(res.data, activeBusiness?.name ?? 'Daftarcha')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  async function handleExportExcel() {
+    setExportOpen(false)
+    setExporting(true)
+    try {
+      const filters: Record<string, string | number> = { page: 1, limit: 1000 }
+      if (tab === 'receivable') filters.type = 'receivable'
+      else if (tab === 'payable') filters.type = 'payable'
+      else if (tab === 'overdue') filters.status = 'overdue'
+      if (search.trim()) filters.search = search.trim()
+      if (currency) filters.currency = currency
+      if (dateFrom) filters.date_from = dateFrom
+      if (dateTo)   filters.date_to   = dateTo
+      const res = await getDebts(filters)
+      exportDebtsToExcel(res.data)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   const tabs: { key: FilterTab; label: string }[] = [
     { key: 'all',        label: t.filterAll },
     { key: 'receivable', label: t.receivable },
@@ -114,9 +167,49 @@ export default function DebtsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6 md:mb-8">
           <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">{t.debts}</h1>
-          <Button onClick={() => setShowAdd(true)} className="text-sm md:text-base px-4 md:px-5 py-2 md:py-2.5">
-            {t.addDebt}
-          </Button>
+          <div className="flex items-center gap-2 print:hidden">
+            {/* Export dropdown */}
+            <div className="relative" ref={exportRef}>
+              <button
+                onClick={() => setExportOpen((o) => !o)}
+                disabled={exporting}
+                className="flex items-center gap-1.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+              >
+                {exporting ? (
+                  <span className="w-4 h-4 border-2 border-gray-300 border-t-indigo-500 rounded-full animate-spin" />
+                ) : (
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                )}
+                <span className="hidden sm:inline">{t.exportBtn}</span>
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {exportOpen && (
+                <div className="absolute right-0 top-full mt-1 z-50 w-44 rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg py-1">
+                  <button
+                    onClick={handleExportPDF}
+                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <span>📄</span>{t.exportPDF}
+                  </button>
+                  <button
+                    onClick={handleExportExcel}
+                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <span>📊</span>{t.exportExcel}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <Button onClick={() => setShowAdd(true)} className="text-sm md:text-base px-4 md:px-5 py-2 md:py-2.5">
+              {t.addDebt}
+            </Button>
+          </div>
         </div>
 
         {/* Search */}

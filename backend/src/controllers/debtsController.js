@@ -22,7 +22,7 @@ async function list(req, res, next) {
   try {
     const { status, type, search, currency, date_from, date_to } = req.query;
     const page   = Math.max(1, parseInt(req.query.page)  || 1);
-    const limit  = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const limit  = Math.min(1000, Math.max(1, parseInt(req.query.limit) || 20));
     const offset = (page - 1) * limit;
 
     const params = [req.businessId];
@@ -138,4 +138,80 @@ async function remove(req, res, next) {
   }
 }
 
-module.exports = { list, getOne, create, update, remove };
+async function exportDebts(req, res, next) {
+  try {
+    const ExcelJS = require('exceljs');
+    const bid = req.businessId;
+    const { type, status, search, currency, date_from, date_to } = req.query;
+
+    const params = [bid];
+    let whereExtra = '';
+    if (type)      { params.push(type);          whereExtra += ` AND d.type = $${params.length}`; }
+    if (search)    { params.push(`%${search}%`); whereExtra += ` AND c.full_name ILIKE $${params.length}`; }
+    if (currency)  { params.push(currency);       whereExtra += ` AND d.currency = $${params.length}`; }
+    if (date_from) { params.push(date_from);      whereExtra += ` AND d.created_at >= $${params.length}::date`; }
+    if (date_to)   { params.push(date_to);        whereExtra += ` AND d.created_at < ($${params.length}::date + INTERVAL '1 day')`; }
+
+    let statusClause = '';
+    if (status === 'paid')    statusClause = ` AND d.status = 'paid'`;
+    if (status === 'overdue') statusClause = ` AND d.status != 'paid' AND d.due_date IS NOT NULL AND d.due_date < CURRENT_DATE`;
+    if (status === 'active')  statusClause = ` AND d.status != 'paid' AND (d.due_date IS NULL OR d.due_date >= CURRENT_DATE)`;
+
+    const whereClause = `WHERE d.business_id = $1 AND d.deleted_at IS NULL${whereExtra}${statusClause}`;
+    const { rows } = await pool.query(
+      `${WITH_COMPUTED} ${whereClause} ORDER BY d.created_at DESC`,
+      params
+    );
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Daftarcha';
+    workbook.created = new Date();
+    const sheet = workbook.addWorksheet('Долги');
+    sheet.columns = [
+      { header: 'Клиент',        key: 'client_name',  width: 25 },
+      { header: 'Телефон',       key: 'phone',         width: 16 },
+      { header: 'Тип',           key: 'type_label',    width: 14 },
+      { header: 'Сумма',         key: 'amount',        width: 14 },
+      { header: 'Валюта',        key: 'currency',      width: 8  },
+      { header: 'Статус',        key: 'status_label',  width: 12 },
+      { header: 'Дата создания', key: 'created_at',    width: 14 },
+      { header: 'Срок оплаты',   key: 'due_date',      width: 13 },
+      { header: 'Оплачено',      key: 'total_paid',    width: 14 },
+      { header: 'Остаток',       key: 'remaining',     width: 14 },
+    ];
+    const headerRow = sheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8EAF6' } };
+
+    const statusMap = { active: 'Активный', paid: 'Оплачен', overdue: 'Просрочен' };
+    for (const row of rows) {
+      const sk = row.status === 'paid' ? 'paid'
+        : (row.due_date && new Date(row.due_date) < new Date() ? 'overdue' : 'active');
+      sheet.addRow({
+        client_name:  row.client_name,
+        phone:        row.client_phone ?? '',
+        type_label:   row.type === 'receivable' ? 'Мне должны' : 'Я должен',
+        amount:       parseFloat(row.amount),
+        currency:     row.currency,
+        status_label: statusMap[sk] ?? sk,
+        created_at:   row.created_at ? new Date(row.created_at).toLocaleDateString('ru-RU') : '',
+        due_date:     row.due_date ? new Date(row.due_date).toLocaleDateString('ru-RU') : '',
+        total_paid:   parseFloat(row.total_paid),
+        remaining:    parseFloat(row.remaining),
+      });
+    }
+    ['amount', 'total_paid', 'remaining'].forEach((col) => {
+      sheet.getColumn(col).numFmt = '#,##0.00';
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="debts-${new Date().toISOString().slice(0, 10)}.xlsx"`);
+    res.setHeader('Cache-Control', 'no-cache');
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { list, getOne, create, update, remove, exportDebts };

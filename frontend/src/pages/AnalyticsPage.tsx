@@ -6,6 +6,7 @@ import {
 import { useT } from '../i18n'
 import { useBusinessStore } from '../store/businessStore'
 import { getAnalytics, type AnalyticsData } from '../api/analytics'
+import { exportAnalyticsToExcel } from '../lib/export'
 import AppLayout from '../components/layout/AppLayout'
 import Spinner from '../components/ui/Spinner'
 import Button from '../components/ui/Button'
@@ -133,26 +134,57 @@ export default function AnalyticsPage() {
     ? '0'
     : Object.entries(repaidThisMonth).map(([c, v]) => `${fmt(v)} ${c}`).join(' · ')
 
+  function handleExportExcel() {
+    if (data) exportAnalyticsToExcel(data, period)
+  }
+
+  function handlePrint() {
+    window.print()
+  }
+
   return (
     <AppLayout>
       <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-8 space-y-6">
 
         {/* Header + period */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">{t.analytics}</h1>
-          <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 self-start sm:self-auto">
-            {periods.map((p) => (
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white print:text-black">{t.analytics}</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 print:hidden">
+              {periods.map((p) => (
+                <button
+                  key={p.value}
+                  onClick={() => setPeriod(p.value)}
+                  className={['rounded-lg px-3 py-1.5 text-sm font-semibold transition-all',
+                    period === p.value
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'].join(' ')}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2 print:hidden">
               <button
-                key={p.value}
-                onClick={() => setPeriod(p.value)}
-                className={['rounded-lg px-3 py-1.5 text-sm font-semibold transition-all',
-                  period === p.value
-                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'].join(' ')}
+                onClick={handleExportExcel}
+                disabled={!data}
+                className="flex items-center gap-1.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
               >
-                {p.label}
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span className="hidden sm:inline">{t.exportExcel}</span>
               </button>
-            ))}
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-1.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                <span className="hidden sm:inline">{t.printBtn}</span>
+              </button>
+            </div>
           </div>
         </div>
 

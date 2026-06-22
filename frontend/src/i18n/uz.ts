@@ -111,4 +111,8 @@ export const uz: Translations = {
   businessDeleted: "Biznes o'chirildi",
   noBusiness: "Biznes yo'q",
   businessHasDebts: "O'chirib bo'lmaydi: faol qarzlar mavjud",
+  exportBtn: 'Eksport',
+  exportPDF: 'PDF yuklab olish',
+  exportExcel: 'Excel yuklab olish',
+  printBtn: 'Chop etish',
 }

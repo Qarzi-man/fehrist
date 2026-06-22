@@ -43,7 +43,7 @@ export default function BottomNav() {
      isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500'].join(' ')
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 flex bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 flex bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 md:hidden print:hidden">
       {links.map((l) => (
         <NavLink key={l.to} to={l.to} className={cls} end={l.to === '/dashboard'}>
           {l.icon}

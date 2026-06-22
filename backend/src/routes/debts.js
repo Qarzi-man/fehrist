@@ -6,6 +6,7 @@ const { list: listRepayments, create: createRepayment } = require('../controller
 
 router.use(auth);
 router.use(business);
+router.get('/export', d.exportDebts);
 router.get('/',      d.list);
 router.post('/',     d.create);
 router.get('/:id',   d.getOne);

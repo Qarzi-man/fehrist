@@ -118,6 +118,10 @@ export const ru = {
   businessDeleted: 'Бизнес удалён',
   noBusiness: 'Нет бизнесов',
   businessHasDebts: 'Нельзя удалить: есть активные долги',
+  exportBtn: 'Экспорт',
+  exportPDF: 'Скачать PDF',
+  exportExcel: 'Скачать Excel',
+  printBtn: 'Печать',
 }
 
 export type Translations = typeof ru
