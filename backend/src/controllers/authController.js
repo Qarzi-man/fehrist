@@ -88,6 +88,19 @@ async function register(req, res, next) {
       [user.id, bizName]
     );
 
+    // Link any phone-based pending invites to this new user
+    // Skip if the user is already a member of that business (avoid unique conflict)
+    await client.query(`
+      UPDATE business_members bm
+      SET user_id = $1
+      WHERE bm.phone = $2
+        AND bm.user_id IS NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM business_members bm2
+          WHERE bm2.business_id = bm.business_id AND bm2.user_id = $1
+        )
+    `, [user.id, phone]);
+
     await client.query('COMMIT');
     res.status(201).json({ token: signToken(user.id), user });
   } catch (err) {

@@ -90,12 +90,15 @@ CREATE TABLE IF NOT EXISTS business_members (
   id          SERIAL PRIMARY KEY,
   business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
   user_id     INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  phone       VARCHAR(20),
   role        VARCHAR(20) DEFAULT 'employee',
   invited_by  INTEGER REFERENCES users(id),
   status      VARCHAR(20) DEFAULT 'pending',
   created_at  TIMESTAMP DEFAULT NOW(),
   UNIQUE(business_id, user_id)
 );
+-- Add phone column to existing installations
+ALTER TABLE business_members ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_debts_user_id        ON debts(user_id);
@@ -104,3 +107,6 @@ CREATE INDEX IF NOT EXISTS idx_repayments_debt      ON repayments(debt_id);
 CREATE INDEX IF NOT EXISTS idx_otp_phone            ON otp_codes(phone);
 CREATE INDEX IF NOT EXISTS idx_business_members_user ON business_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_business_members_biz  ON business_members(business_id);
+-- Prevent duplicate phone invites for unregistered users within the same business
+CREATE UNIQUE INDEX IF NOT EXISTS idx_bm_business_phone
+  ON business_members(business_id, phone) WHERE user_id IS NULL;

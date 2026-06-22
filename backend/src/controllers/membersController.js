@@ -5,9 +5,10 @@ async function list(req, res, next) {
   try {
     const { rows } = await pool.query(`
       SELECT bm.id, bm.role, bm.status, bm.created_at,
-             u.full_name, u.phone
+             u.full_name,
+             COALESCE(u.phone, bm.phone) AS phone
       FROM business_members bm
-      JOIN users u ON u.id = bm.user_id
+      LEFT JOIN users u ON u.id = bm.user_id
       WHERE bm.business_id = $1
       ORDER BY bm.created_at
     `, [req.businessId]);
@@ -35,18 +36,9 @@ async function invite(req, res, next) {
   try {
     const { phone } = req.body;
     if (!phone) return res.status(400).json({ error: 'phone required' });
+    const trimmed = phone.trim();
 
-    const userRes = await pool.query(
-      'SELECT id, full_name FROM users WHERE phone = $1',
-      [phone.trim()]
-    );
-    if (!userRes.rows.length) return res.status(404).json({ error: 'User not found' });
-    const target = userRes.rows[0];
-
-    if (target.id === req.user.userId) {
-      return res.status(400).json({ error: 'Cannot invite yourself' });
-    }
-
+    // Check member limit
     const countRes = await pool.query(
       "SELECT COUNT(*) FROM business_members WHERE business_id = $1 AND status != 'declined'",
       [req.businessId]
@@ -58,20 +50,63 @@ async function invite(req, res, next) {
     const bizRes = await pool.query('SELECT name FROM businesses WHERE id = $1', [req.businessId]);
     const bizName = bizRes.rows[0]?.name ?? 'Daftarcha';
 
-    const { rows } = await pool.query(`
-      INSERT INTO business_members (business_id, user_id, role, invited_by, status)
-      VALUES ($1, $2, 'employee', $3, 'pending')
-      ON CONFLICT (business_id, user_id) DO UPDATE SET status = 'pending', invited_by = $3
-      RETURNING *
-    `, [req.businessId, target.id, req.user.userId]);
+    // Look up user by phone
+    const userRes = await pool.query('SELECT id, full_name FROM users WHERE phone = $1', [trimmed]);
 
-    try {
-      await sendSms(phone.trim(), `Вас пригласили в бизнес "${bizName}" в Daftarcha. Войдите в приложение чтобы принять приглашение.`);
-    } catch (smsErr) {
-      console.error('[Members] SMS failed:', smsErr.message);
+    let row;
+
+    if (userRes.rows.length) {
+      // --- Path A: user already registered ---
+      const target = userRes.rows[0];
+      if (target.id === req.user.userId) {
+        return res.status(400).json({ error: 'Cannot invite yourself' });
+      }
+
+      const { rows } = await pool.query(`
+        INSERT INTO business_members (business_id, user_id, phone, role, invited_by, status)
+        VALUES ($1, $2, $3, 'employee', $4, 'pending')
+        ON CONFLICT (business_id, user_id) DO UPDATE SET status = 'pending', invited_by = $4
+        RETURNING *
+      `, [req.businessId, target.id, trimmed, req.user.userId]);
+      row = { ...rows[0], full_name: target.full_name };
+
+      try {
+        await sendSms(trimmed, `Вас пригласили в бизнес "${bizName}" в Daftarcha. Войдите в приложение чтобы принять приглашение.`);
+      } catch (smsErr) {
+        console.error('[Members] SMS failed:', smsErr.message);
+      }
+    } else {
+      // --- Path B: user not registered yet ---
+      // Upsert by (business_id, phone) for unregistered invites
+      const existing = await pool.query(
+        'SELECT id FROM business_members WHERE business_id = $1 AND phone = $2 AND user_id IS NULL',
+        [req.businessId, trimmed]
+      );
+
+      if (existing.rows.length) {
+        const { rows } = await pool.query(`
+          UPDATE business_members SET status = 'pending', invited_by = $1
+          WHERE business_id = $2 AND phone = $3 AND user_id IS NULL
+          RETURNING *
+        `, [req.user.userId, req.businessId, trimmed]);
+        row = rows[0];
+      } else {
+        const { rows } = await pool.query(`
+          INSERT INTO business_members (business_id, user_id, phone, role, invited_by, status)
+          VALUES ($1, NULL, $2, 'employee', $3, 'pending')
+          RETURNING *
+        `, [req.businessId, trimmed, req.user.userId]);
+        row = rows[0];
+      }
+
+      try {
+        await sendSms(trimmed, `Вас пригласили в бизнес "${bizName}". Зарегистрируйтесь в Daftarcha: daftarcha.tj`);
+      } catch (smsErr) {
+        console.error('[Members] SMS failed:', smsErr.message);
+      }
     }
 
-    res.status(201).json({ ...rows[0], full_name: target.full_name, phone: phone.trim() });
+    res.status(201).json({ ...row, phone: trimmed });
   } catch (err) {
     if (err.code === '23505') return res.status(409).json({ error: 'Already invited' });
     next(err);
