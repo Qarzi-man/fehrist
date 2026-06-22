@@ -12,8 +12,8 @@ export interface RecentDebt {
 }
 
 export interface DashboardStats {
-  receivable: number
-  payable: number
+  receivable: Record<string, number>
+  payable: Record<string, number>
   overdue_count: number
   recent_debts: RecentDebt[]
 }

@@ -77,9 +77,9 @@ export default function DashboardPage() {
           <>
             {/* Stats cards */}
             <div className="grid grid-cols-3 gap-3 md:gap-5 mb-6 md:mb-8">
-              <StatsCard label={t.receivable} value={stats.receivable} color="emerald" />
-              <StatsCard label={t.payable}    value={stats.payable}    color="rose" />
-              <StatsCard label={t.overdue}    value={stats.overdue_count} color="amber" isCount />
+              <StatsCard label={t.receivable} amounts={stats.receivable} color="emerald" />
+              <StatsCard label={t.payable}    amounts={stats.payable}    color="rose" />
+              <StatsCard label={t.overdue}    count={stats.overdue_count} color="amber" />
             </div>
 
             {/* Recent debts */}

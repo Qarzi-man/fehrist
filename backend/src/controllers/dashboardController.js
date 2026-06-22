@@ -6,19 +6,21 @@ async function stats(req, res, next) {
 
     const [receivable, payable, overdue, recent] = await Promise.all([
       pool.query(
-        `SELECT COALESCE(SUM(d.amount - COALESCE(r.paid, 0)), 0) AS total
+        `SELECT d.currency, COALESCE(SUM(d.amount - COALESCE(r.paid, 0)), 0) AS total
          FROM debts d
          LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
            ON r.debt_id = d.id
-         WHERE d.user_id = $1 AND d.type = 'receivable' AND d.status = 'active'`,
+         WHERE d.user_id = $1 AND d.type = 'receivable' AND d.status = 'active'
+         GROUP BY d.currency`,
         [uid]
       ),
       pool.query(
-        `SELECT COALESCE(SUM(d.amount - COALESCE(r.paid, 0)), 0) AS total
+        `SELECT d.currency, COALESCE(SUM(d.amount - COALESCE(r.paid, 0)), 0) AS total
          FROM debts d
          LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
            ON r.debt_id = d.id
-         WHERE d.user_id = $1 AND d.type = 'payable' AND d.status = 'active'`,
+         WHERE d.user_id = $1 AND d.type = 'payable' AND d.status = 'active'
+         GROUP BY d.currency`,
         [uid]
       ),
       pool.query(
@@ -37,11 +39,14 @@ async function stats(req, res, next) {
       ),
     ]);
 
+    const toByCurrency = (rows) =>
+      Object.fromEntries(rows.map((r) => [r.currency, parseFloat(r.total)]));
+
     res.json({
-      receivable: parseFloat(receivable.rows[0].total),
-      payable:    parseFloat(payable.rows[0].total),
+      receivable:    toByCurrency(receivable.rows),
+      payable:       toByCurrency(payable.rows),
       overdue_count: parseInt(overdue.rows[0].count),
-      recent_debts: recent.rows,
+      recent_debts:  recent.rows,
     });
   } catch (err) {
     next(err);
