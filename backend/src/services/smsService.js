@@ -17,8 +17,9 @@ async function sendSms(phone, message) {
   // Strip leading "+" — Payomchi expects digits only (e.g. 992901234567)
   const cleanPhone = phone.replace(/^\+/, '');
 
-  const bodyObj = { phone: cleanPhone, message, channel: 'sms' };
-  if (sender) bodyObj.senderId = sender;
+  // senderId: prefer env var, fall back to 'Daftarcha'
+  const senderId = (sender && sender.trim()) ? sender.trim() : 'Daftarcha';
+  const bodyObj = { phone: cleanPhone, message, senderId, channel: 'sms' };
 
   const body = JSON.stringify(bodyObj);
   const url = `${BASE_URL}/user/sms`;
@@ -37,7 +38,8 @@ async function sendSms(phone, message) {
     },
   };
 
-  console.log(`[SMS] POST ${url} — phone=${cleanPhone}`);
+  console.log(`[SMS] POST ${url}`);
+  console.log(`[SMS] Request body: ${body}`);
 
   return new Promise((resolve, reject) => {
     const lib = parsed.protocol === 'https:' ? https : http;

@@ -71,9 +71,10 @@ async function invite(req, res, next) {
       row = { ...rows[0], full_name: target.full_name };
 
       try {
-        await sendSms(trimmed, `Вас пригласили в бизнес "${bizName}" в Daftarcha. Войдите в приложение чтобы принять приглашение.`);
+        const smsResult = await sendSms(trimmed, `Вас пригласили в бизнес "${bizName}" в Daftarcha. Войдите в приложение чтобы принять приглашение.`);
+        console.log('[Members/invite] SMS result (registered):', JSON.stringify(smsResult));
       } catch (smsErr) {
-        console.error('[Members] SMS failed:', smsErr.message);
+        console.error('[Members/invite] SMS error (registered):', smsErr.message, smsErr.code);
       }
     } else {
       // --- Path B: user not registered yet ---
@@ -99,10 +100,12 @@ async function invite(req, res, next) {
         row = rows[0];
       }
 
+      console.log(`[Members/invite] Sending SMS to unregistered phone=${trimmed.replace(/^\+/, '')}`);
       try {
-        await sendSms(trimmed, `Вас пригласили в бизнес "${bizName}". Зарегистрируйтесь в Daftarcha: daftarcha.tj`);
+        const smsResult = await sendSms(trimmed, `Вас пригласили в бизнес "${bizName}". Зарегистрируйтесь в Daftarcha: daftarcha.tj`);
+        console.log('[Members/invite] SMS result (unregistered):', JSON.stringify(smsResult));
       } catch (smsErr) {
-        console.error('[Members] SMS failed:', smsErr.message);
+        console.error('[Members/invite] SMS error (unregistered):', smsErr.message, smsErr.code);
       }
     }
 
