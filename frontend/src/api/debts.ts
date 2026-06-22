@@ -43,12 +43,27 @@ export interface UpdateDebtPayload {
   type?: 'receivable' | 'payable'
 }
 
-export async function getDebts(filters?: {
+export interface DebtsFilters {
   status?: string
   type?: string
   search?: string
-}): Promise<Debt[]> {
-  const { data } = await api.get<Debt[]>('/debts', { params: filters })
+  currency?: string
+  date_from?: string
+  date_to?: string
+  page?: number
+  limit?: number
+}
+
+export interface PaginatedDebts {
+  data: Debt[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export async function getDebts(filters?: DebtsFilters): Promise<PaginatedDebts> {
+  const { data } = await api.get<PaginatedDebts>('/debts', { params: filters })
   return data
 }
 

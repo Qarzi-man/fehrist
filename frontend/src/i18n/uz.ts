@@ -80,4 +80,7 @@ export const uz: Translations = {
   searchContact: 'Kontakt bo\'yicha qidirish...',
   createdAt: 'Yaratilgan',
   debtDeleted: "Qarz o'chirildi",
+  dateFrom: 'Dan',
+  dateTo: 'Gacha',
+  allCurrencies: 'Barcha valyutalar',
 }

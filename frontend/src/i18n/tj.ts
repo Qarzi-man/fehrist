@@ -80,4 +80,7 @@ export const tj: Translations = {
   searchContact: 'Ҷустуҷӯ аз рӯи тамос...',
   createdAt: 'Таъсис ёфт',
   debtDeleted: 'Қарз ҳазф шуд',
+  dateFrom: 'Аз',
+  dateTo: 'То',
+  allCurrencies: 'Ҳама асъор',
 }

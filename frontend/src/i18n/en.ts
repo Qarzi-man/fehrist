@@ -80,4 +80,7 @@ export const en: Translations = {
   searchContact: 'Search by contact...',
   createdAt: 'Created',
   debtDeleted: 'Debt deleted',
+  dateFrom: 'From',
+  dateTo: 'To',
+  allCurrencies: 'All currencies',
 }

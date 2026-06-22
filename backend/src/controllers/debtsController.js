@@ -1,5 +1,11 @@
 const pool = require('../config/db');
 
+const JOINS = `
+  FROM debts d
+  JOIN clients c ON c.id = d.client_id
+  LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
+    ON r.debt_id = d.id`;
+
 const WITH_COMPUTED = `
   SELECT d.*,
     c.full_name AS client_name, c.phone AS client_phone,
@@ -10,32 +16,47 @@ const WITH_COMPUTED = `
       WHEN d.due_date IS NOT NULL AND d.due_date < CURRENT_DATE AND d.status != 'paid' THEN 'overdue'
       ELSE 'active'
     END AS computed_status
-  FROM debts d
-  JOIN clients c ON c.id = d.client_id
-  LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r
-    ON r.debt_id = d.id`;
+  ${JOINS}`;
 
 async function list(req, res, next) {
   try {
-    const { status, type, search } = req.query;
+    const { status, type, search, currency, date_from, date_to } = req.query;
+    const page   = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit  = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+
     const params = [req.user.userId];
     let whereExtra = '';
 
-    if (type) { params.push(type); whereExtra += ` AND d.type = $${params.length}`; }
-    if (search) { params.push(`%${search}%`); whereExtra += ` AND c.full_name ILIKE $${params.length}`; }
+    if (type)      { params.push(type);          whereExtra += ` AND d.type = $${params.length}`; }
+    if (search)    { params.push(`%${search}%`); whereExtra += ` AND c.full_name ILIKE $${params.length}`; }
+    if (currency)  { params.push(currency);       whereExtra += ` AND d.currency = $${params.length}`; }
+    if (date_from) { params.push(date_from);      whereExtra += ` AND d.created_at >= $${params.length}::date`; }
+    if (date_to)   { params.push(date_to);        whereExtra += ` AND d.created_at < ($${params.length}::date + INTERVAL '1 day')`; }
 
-    // status filter maps to computed_status logic
     let statusClause = '';
     if (status === 'paid')    statusClause = ` AND d.status = 'paid'`;
     if (status === 'overdue') statusClause = ` AND d.status != 'paid' AND d.due_date IS NOT NULL AND d.due_date < CURRENT_DATE`;
     if (status === 'active')  statusClause = ` AND d.status != 'paid' AND (d.due_date IS NULL OR d.due_date >= CURRENT_DATE)`;
 
-    const query = `${WITH_COMPUTED}
-      WHERE d.user_id = $1 AND d.deleted_at IS NULL${whereExtra}${statusClause}
-      ORDER BY d.created_at DESC`;
+    const whereClause = `WHERE d.user_id = $1 AND d.deleted_at IS NULL${whereExtra}${statusClause}`;
 
-    const { rows } = await pool.query(query, params);
-    res.json(rows);
+    const [countResult, dataResult] = await Promise.all([
+      pool.query(`SELECT COUNT(*) AS total ${JOINS} ${whereClause}`, params),
+      pool.query(
+        `${WITH_COMPUTED} ${whereClause} ORDER BY d.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+        [...params, limit, offset]
+      ),
+    ]);
+
+    const total = parseInt(countResult.rows[0].total);
+    res.json({
+      data:       dataResult.rows,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
     next(err);
   }

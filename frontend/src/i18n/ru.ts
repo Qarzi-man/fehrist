@@ -87,6 +87,9 @@ export const ru = {
   searchContact: 'Поиск по контакту...',
   createdAt: 'Создан',
   debtDeleted: 'Долг удалён',
+  dateFrom: 'От',
+  dateTo: 'До',
+  allCurrencies: 'Все валюты',
 }
 
 export type Translations = typeof ru
