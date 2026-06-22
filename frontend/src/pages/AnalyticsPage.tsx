@@ -1,0 +1,281 @@
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis,
+  CartesianGrid, Tooltip, Legend,
+} from 'recharts'
+import { useT } from '../i18n'
+import { getAnalytics, type AnalyticsData } from '../api/analytics'
+import AppLayout from '../components/layout/AppLayout'
+import Spinner from '../components/ui/Spinner'
+import Button from '../components/ui/Button'
+
+type Period = 3 | 6 | 12
+
+const COLORS = {
+  recv:  '#10b981', // emerald-500
+  pabl:  '#f43f5e', // rose-500
+  rpd:   '#6366f1', // indigo-500
+}
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('ru-TJ', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n)
+
+function monthShort(ym: string): string {
+  const [y, m] = ym.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleString('ru', { month: 'short' })
+}
+
+function CurrencyTabs({ currencies, active, onChange }: {
+  currencies: string[]
+  active: string
+  onChange: (c: string) => void
+}) {
+  if (currencies.length <= 1) return null
+  return (
+    <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 self-start">
+      {currencies.map((c) => (
+        <button
+          key={c}
+          onClick={() => onChange(c)}
+          className={['rounded-lg px-3 py-1.5 text-xs font-semibold transition-all',
+            active === c
+              ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'].join(' ')}
+        >
+          {c}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function SummaryCard({ label, value, sub, color }: {
+  label: string
+  value: string | number
+  sub?: string
+  color: 'indigo' | 'rose' | 'emerald'
+}) {
+  const cls = {
+    indigo:  { bg: 'bg-indigo-50 dark:bg-indigo-900/20', text: 'text-indigo-600 dark:text-indigo-400', border: 'border-indigo-100 dark:border-indigo-800' },
+    rose:    { bg: 'bg-rose-50 dark:bg-rose-900/20',     text: 'text-rose-600 dark:text-rose-400',     border: 'border-rose-100 dark:border-rose-800' },
+    emerald: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-800' },
+  }[color]
+  return (
+    <div className={`rounded-2xl border ${cls.border} ${cls.bg} p-4 md:p-5 flex flex-col gap-1`}>
+      <span className={`text-xs md:text-sm font-medium ${cls.text} opacity-80`}>{label}</span>
+      <span className={`text-2xl md:text-3xl font-bold ${cls.text} leading-none`}>{value}</span>
+      {sub && <span className={`text-xs ${cls.text} opacity-60`}>{sub}</span>}
+    </div>
+  )
+}
+
+export default function AnalyticsPage() {
+  const t = useT()
+  const [period, setPeriod] = useState<Period>(6)
+  const [data, setData] = useState<AnalyticsData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [activeCurrency, setActiveCurrency] = useState<string>('')
+
+  const load = useCallback(() => {
+    setLoading(true)
+    setError(false)
+    getAnalytics(period)
+      .then((d) => {
+        setData(d)
+        // Auto-select first available currency
+        const currencies = deriveCurrencies(d)
+        if (currencies.length && !currencies.includes(activeCurrency)) {
+          setActiveCurrency(currencies[0])
+        }
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }, [period]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { load() }, [load])
+
+  function deriveCurrencies(d: AnalyticsData): string[] {
+    const set = new Set<string>()
+    for (const m of d.monthly) {
+      Object.keys(m.new_receivable).forEach((c) => set.add(c))
+      Object.keys(m.new_payable).forEach((c) => set.add(c))
+      Object.keys(m.repaid).forEach((c) => set.add(c))
+    }
+    return Array.from(set).sort()
+  }
+
+  const currencies = useMemo(() => (data ? deriveCurrencies(data) : []), [data])
+
+  const cur = activeCurrency || currencies[0] || 'TJS'
+
+  const chartData = useMemo(() => {
+    if (!data) return []
+    return data.monthly.map((m) => ({
+      label: monthShort(m.month),
+      recv:  m.new_receivable[cur] ?? 0,
+      pabl:  m.new_payable[cur]    ?? 0,
+      rpd:   m.repaid[cur]         ?? 0,
+    }))
+  }, [data, cur])
+
+  const hasChartData = chartData.some((d) => d.recv > 0 || d.pabl > 0 || d.rpd > 0)
+
+  const periods: { value: Period; label: string }[] = [
+    { value: 3,  label: t.period3m },
+    { value: 6,  label: t.period6m },
+    { value: 12, label: t.period1y },
+  ]
+
+  const repaidThisMonth = data?.summary.repaid_this_month ?? {}
+  const repaidStr = Object.entries(repaidThisMonth).length === 0
+    ? '0'
+    : Object.entries(repaidThisMonth).map(([c, v]) => `${fmt(v)} ${c}`).join(' · ')
+
+  return (
+    <AppLayout>
+      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-8 space-y-6">
+
+        {/* Header + period */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">{t.analytics}</h1>
+          <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 self-start sm:self-auto">
+            {periods.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setPeriod(p.value)}
+                className={['rounded-lg px-3 py-1.5 text-sm font-semibold transition-all',
+                  period === p.value
+                    ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'].join(' ')}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {loading && (
+          <div className="flex justify-center py-20 text-indigo-400">
+            <Spinner size={36} />
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="flex flex-col items-center gap-3 py-20 text-gray-400">
+            <p className="text-sm">{t.errNetwork}</p>
+            <Button variant="ghost" onClick={load}>{t.tryAgain}</Button>
+          </div>
+        )}
+
+        {data && !loading && (
+          <>
+            {/* Summary cards */}
+            <div className="grid grid-cols-3 gap-3 md:gap-5">
+              <SummaryCard
+                label={t.totalActiveDebts}
+                value={data.summary.total_active}
+                color="indigo"
+              />
+              <SummaryCard
+                label={t.overdue}
+                value={data.summary.overdue_count}
+                color="rose"
+              />
+              <SummaryCard
+                label={t.repaidThisMonth}
+                value={repaidStr}
+                color="emerald"
+              />
+            </div>
+
+            {/* Chart */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 md:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t.debts}</h2>
+                <CurrencyTabs
+                  currencies={currencies}
+                  active={cur}
+                  onChange={setActiveCurrency}
+                />
+              </div>
+
+              {!hasChartData ? (
+                <div className="flex items-center justify-center py-16 text-gray-400 dark:text-gray-500 text-sm">
+                  {t.noData}
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart data={chartData} barCategoryGap="30%" barGap={2}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" className="dark:stroke-gray-700" />
+                    <XAxis
+                      dataKey="label"
+                      tick={{ fontSize: 12, fill: '#9ca3af' }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 11, fill: '#9ca3af' }}
+                      axisLine={false}
+                      tickLine={false}
+                      tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}
+                      width={42}
+                    />
+                    <Tooltip
+                      formatter={(value, name) => [
+                        `${fmt(Number(value ?? 0))} ${cur}`,
+                        name,
+                      ]}
+                      contentStyle={{
+                        borderRadius: '12px',
+                        border: '1px solid #e5e7eb',
+                        fontSize: '12px',
+                      }}
+                    />
+                    <Legend
+                      wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
+                    />
+                    <Bar dataKey="recv" name={t.newReceivable} fill={COLORS.recv} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="pabl" name={t.newPayable}    fill={COLORS.pabl} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="rpd"  name={t.repaid}        fill={COLORS.rpd}  radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+
+            {/* Top clients */}
+            {data.top_clients.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div className="px-4 md:px-6 py-4 border-b border-gray-50 dark:border-gray-700">
+                  <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t.topClients}</h2>
+                </div>
+                <ul className="divide-y divide-gray-50 dark:divide-gray-700">
+                  {data.top_clients.map((client, idx) => (
+                    <li key={client.client_id} className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4">
+                      <span className="text-sm font-bold text-gray-300 dark:text-gray-600 w-5 shrink-0">
+                        {idx + 1}
+                      </span>
+                      <div className="h-9 w-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-sm font-bold text-indigo-700 dark:text-indigo-300 shrink-0">
+                        {client.full_name[0].toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{client.full_name}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-0.5 shrink-0">
+                        {Object.entries(client.by_currency).map(([currency, amount]) => (
+                          <span key={currency} className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                            {fmt(amount)} {currency}
+                          </span>
+                        ))}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </AppLayout>
+  )
+}
