@@ -4,11 +4,11 @@ import { useBusinessStore } from '../store/businessStore'
 import { getDebts, type Debt, type PaginatedDebts } from '../api/debts'
 import { exportDebtsToPDF, exportDebtsToExcel } from '../lib/export'
 import { formatMoney, formatDate } from '../lib/format'
+import { avatarGradient } from '../lib/avatar'
 import AppLayout from '../components/layout/AppLayout'
 import AddDebtModal from '../components/debts/AddDebtModal'
 import DebtDetailModal from '../components/debts/DebtDetailModal'
 import Button from '../components/ui/Button'
-import Spinner from '../components/ui/Spinner'
 
 type FilterTab = 'all' | 'receivable' | 'payable' | 'overdue'
 
@@ -23,36 +23,38 @@ function DebtRow({ debt, onClick }: { debt: Debt; onClick: () => void }) {
   const status = debt.computed_status
 
   const statusCls = {
-    active:  'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-    paid:    'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
-    overdue: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-  }[status] ?? 'bg-gray-50 text-gray-500'
+    active:  'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+    paid:    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+    overdue: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+  }[status] ?? 'bg-gray-100 text-gray-500'
 
   const statusLabel = { active: t.statusActive, paid: t.statusPaid, overdue: t.statusOverdue }[status]
 
   return (
     <li
       onClick={onClick}
-      className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+      className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 hover:bg-gray-50/80 dark:hover:bg-gray-700/40 cursor-pointer transition-all duration-150 group"
     >
-      <div className={`h-10 w-10 md:h-11 md:w-11 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${isReceivable ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300' : 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300'}`}>
+      <div
+        className={`h-10 w-10 md:h-11 md:w-11 rounded-full bg-gradient-to-br ${avatarGradient(debt.client_name)} flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-150`}
+      >
         {debt.client_name[0].toUpperCase()}
       </div>
 
       <div className="flex-1 min-w-0">
         <p className="text-sm md:text-base font-semibold text-gray-900 dark:text-white truncate">{debt.client_name}</p>
-        <p className="text-xs md:text-sm text-gray-400 dark:text-gray-500">{formatDate(debt.due_date ?? debt.created_at)}</p>
+        <p className="text-xs md:text-sm text-gray-400 dark:text-gray-500 mt-0.5">{formatDate(debt.due_date ?? debt.created_at)}</p>
       </div>
 
-      <div className="flex flex-col items-end gap-1 shrink-0">
-        <span className={`text-sm md:text-base font-bold ${isReceivable ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+      <div className="flex flex-col items-end gap-1.5 shrink-0">
+        <span className={`text-sm md:text-base font-bold ${isReceivable ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
           {isReceivable ? '+' : '−'}{formatMoney(debt.amount, debt.currency)}
         </span>
         <div className="flex gap-1">
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${isReceivable ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' : 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300'}`}>
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isReceivable ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'}`}>
             {isReceivable ? t.receivable : t.payable}
           </span>
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${statusCls}`}>{statusLabel}</span>
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusCls}`}>{statusLabel}</span>
         </div>
       </div>
     </li>
@@ -285,8 +287,22 @@ export default function DebtsPage() {
 
         {/* Content */}
         {loading && (
-          <div className="flex justify-center py-20 text-indigo-400">
-            <Spinner size={36} />
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <ul>
+              {(['w-40', 'w-32', 'w-44', 'w-36', 'w-28', 'w-40'] as const).map((w, i) => (
+                <li key={i} className={`flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 ${i ? 'border-t border-gray-50 dark:border-gray-700' : ''}`}>
+                  <div className="h-10 w-10 md:h-11 md:w-11 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className={`h-3.5 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse ${w}`} />
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse w-24" />
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="h-3.5 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse w-24" />
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse w-20" />
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

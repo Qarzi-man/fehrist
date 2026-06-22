@@ -7,8 +7,8 @@ import { useT } from '../i18n'
 import { useBusinessStore } from '../store/businessStore'
 import { getAnalytics, type AnalyticsData } from '../api/analytics'
 import { exportAnalyticsToExcel } from '../lib/export'
+import { avatarGradient } from '../lib/avatar'
 import AppLayout from '../components/layout/AppLayout'
-import Spinner from '../components/ui/Spinner'
 import Button from '../components/ui/Button'
 
 type Period = 3 | 6 | 12
@@ -57,16 +57,18 @@ function SummaryCard({ label, value, sub, color }: {
   sub?: string
   color: 'indigo' | 'rose' | 'emerald'
 }) {
-  const cls = {
-    indigo:  { bg: 'bg-indigo-50 dark:bg-indigo-900/20', text: 'text-indigo-600 dark:text-indigo-400', border: 'border-indigo-100 dark:border-indigo-800' },
-    rose:    { bg: 'bg-rose-50 dark:bg-rose-900/20',     text: 'text-rose-600 dark:text-rose-400',     border: 'border-rose-100 dark:border-rose-800' },
-    emerald: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-800' },
-  }[color]
+  const gradients = {
+    indigo:  'from-[#4f46e5] to-[#4338ca]',
+    rose:    'from-[#dc2626] to-[#b91c1c]',
+    emerald: 'from-[#16a34a] to-[#15803d]',
+  }
+  const gradient = gradients[color]
   return (
-    <div className={`rounded-2xl border ${cls.border} ${cls.bg} p-4 md:p-5 flex flex-col gap-1`}>
-      <span className={`text-xs md:text-sm font-medium ${cls.text} opacity-80`}>{label}</span>
-      <span className={`text-2xl md:text-3xl font-bold ${cls.text} leading-none`}>{value}</span>
-      {sub && <span className={`text-xs ${cls.text} opacity-60`}>{sub}</span>}
+    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-4 md:p-5 flex flex-col gap-1.5 shadow-lg`}>
+      <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/10 pointer-events-none" />
+      <span className="text-xs md:text-sm font-semibold text-white/85 relative z-10">{label}</span>
+      <span className="text-2xl md:text-3xl font-bold text-white leading-none relative z-10">{value}</span>
+      {sub && <span className="text-xs text-white/60 relative z-10">{sub}</span>}
     </div>
   )
 }
@@ -189,9 +191,14 @@ export default function AnalyticsPage() {
         </div>
 
         {loading && (
-          <div className="flex justify-center py-20 text-indigo-400">
-            <Spinner size={36} />
-          </div>
+          <>
+            <div className="grid grid-cols-3 gap-3 md:gap-5">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="rounded-2xl bg-gray-200 dark:bg-gray-700 h-24 md:h-28 animate-pulse" />
+              ))}
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 md:p-6 h-80 animate-pulse" />
+          </>
         )}
 
         {error && !loading && (
@@ -288,7 +295,7 @@ export default function AnalyticsPage() {
                       <span className="text-sm font-bold text-gray-300 dark:text-gray-600 w-5 shrink-0">
                         {idx + 1}
                       </span>
-                      <div className="h-9 w-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-sm font-bold text-indigo-700 dark:text-indigo-300 shrink-0">
+                      <div className={`h-9 w-9 rounded-full bg-gradient-to-br ${avatarGradient(client.full_name)} flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm`}>
                         {client.full_name[0].toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">

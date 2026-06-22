@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { useT } from '../i18n'
 import { useBusinessStore } from '../store/businessStore'
 import { getClients, type Client, type PaginatedClients, type ClientDebtSummary } from '../api/clients'
+import { avatarGradient } from '../lib/avatar'
 import AppLayout from '../components/layout/AppLayout'
 import ClientFormModal from '../components/clients/ClientFormModal'
 import ClientDetailModal from '../components/clients/ClientDetailModal'
 import Button from '../components/ui/Button'
-import Spinner from '../components/ui/Spinner'
 
 const LIMIT = 20
 
@@ -34,9 +34,9 @@ function ClientRow({ client, onClick }: { client: Client; onClick: () => void })
   return (
     <li
       onClick={onClick}
-      className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+      className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 hover:bg-gray-50/80 dark:hover:bg-gray-700/40 cursor-pointer transition-all duration-150 group"
     >
-      <div className="h-10 w-10 md:h-11 md:w-11 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-sm font-bold text-indigo-700 dark:text-indigo-300 shrink-0">
+      <div className={`h-10 w-10 md:h-11 md:w-11 rounded-full bg-gradient-to-br ${avatarGradient(client.full_name)} flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-150`}>
         {client.full_name[0].toUpperCase()}
       </div>
 
@@ -119,8 +119,19 @@ export default function ClientsPage() {
 
         {/* Content */}
         {loading && (
-          <div className="flex justify-center py-20 text-indigo-400">
-            <Spinner size={36} />
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <ul>
+              {(['w-36', 'w-44', 'w-28', 'w-40', 'w-32'] as const).map((w, i) => (
+                <li key={i} className={`flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 ${i ? 'border-t border-gray-50 dark:border-gray-700' : ''}`}>
+                  <div className="h-10 w-10 md:h-11 md:w-11 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className={`h-3.5 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse ${w}`} />
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse w-20" />
+                  </div>
+                  <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

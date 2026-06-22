@@ -47,10 +47,10 @@ export default function Sidebar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     [
-      'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+      'flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium transition-all duration-150',
       isActive
-        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
-        : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200',
+        ? 'border-l-[3px] border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 pl-[9px] pr-3'
+        : 'px-3 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200',
     ].join(' ')
 
   function handleLogout() {
@@ -60,16 +60,18 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden md:flex print:hidden flex-col fixed left-0 top-0 h-full w-56 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 z-30">
+      <aside className="hidden md:flex print:hidden flex-col fixed left-0 top-0 h-full w-56 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 shadow-[2px_0_16px_rgba(0,0,0,0.05)] z-30">
         {/* Logo */}
-        <div className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100 dark:border-gray-700">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-violet-600">
-            <svg width="16" height="16" viewBox="0 0 36 36" fill="none">
-              <path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fillOpacity="0.9"/>
+        <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 shadow-md shadow-indigo-500/30">
+            <svg width="18" height="18" viewBox="0 0 36 36" fill="none">
+              <path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fillOpacity="0.95"/>
               <path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round"/>
             </svg>
           </div>
-          <span className="text-base font-bold text-gray-900 dark:text-white">{t.appName}</span>
+          <div>
+            <span className="text-[17px] font-extrabold tracking-tight text-gray-900 dark:text-white">{t.appName}</span>
+          </div>
         </div>
 
         {/* Business switcher */}
