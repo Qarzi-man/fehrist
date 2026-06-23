@@ -9,6 +9,8 @@ router.use(business);
 router.get('/export', d.exportDebts);
 router.get('/',      d.list);
 router.post('/',     d.create);
+router.patch('/schedule/:scheduleId/pay', d.payScheduleItem);
+router.get('/:id/schedule', d.getSchedule);
 router.get('/:id',   d.getOne);
 router.put('/:id',   d.update);
 router.delete('/:id', d.remove);

@@ -142,4 +142,18 @@ export const uz: Translations = {
   memberNotFound: 'Bu telefon raqamli foydalanuvchi topilmadi',
   removeMember: "O'chirish",
   noMembers: 'Xodimlar hali yo\'q',
+  // Installment / Nasiya
+  standardKind: 'Oddiy',
+  installmentKind: 'Nasiya',
+  partsCount: 'Qismlar soni',
+  firstDueDate: 'Birinchi muddat',
+  intervalDays: 'Interval (kun)',
+  schedulePreview: 'Jadval ko\'rinishi',
+  schedulePart: 'Qism',
+  installmentSchedule: 'Nasiya jadvali',
+  markAsPaid: 'To\'landi',
+  schedulePending: 'Kutilmoqda',
+  schedulePaid: 'To\'langan',
+  scheduleOverdue: 'Muddati o\'tgan',
+  paidParts: 'to\'langan',
 }

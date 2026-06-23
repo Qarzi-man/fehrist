@@ -142,4 +142,18 @@ export const tj: Translations = {
   memberNotFound: 'Корбар бо ин рақам ёфт нашуд',
   removeMember: 'Хориҷ кардан',
   noMembers: 'Кормандон ҳанӯз нест',
+  // Installment / Nasiya
+  standardKind: 'Одӣ',
+  installmentKind: 'Насия',
+  partsCount: 'Шумораи қисмҳо',
+  firstDueDate: 'Мӯҳлати аввал',
+  intervalDays: 'Фосила (рӯз)',
+  schedulePreview: 'Ҷадвали пешбинӣ',
+  schedulePart: 'Қисм',
+  installmentSchedule: 'Ҷадвали насия',
+  markAsPaid: 'Пардохт шуд',
+  schedulePending: 'Интизор',
+  schedulePaid: 'Пардохта шуд',
+  scheduleOverdue: 'Мӯҳлаташ гузашт',
+  paidParts: 'пардохта шуд',
 }

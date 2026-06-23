@@ -142,4 +142,18 @@ export const en: Translations = {
   memberNotFound: 'No user found with that phone number',
   removeMember: 'Remove',
   noMembers: 'No employees yet',
+  // Installment / Nasiya
+  standardKind: 'Standard',
+  installmentKind: 'Installment',
+  partsCount: 'Number of parts',
+  firstDueDate: 'First due date',
+  intervalDays: 'Interval (days)',
+  schedulePreview: 'Payment schedule',
+  schedulePart: 'Part',
+  installmentSchedule: 'Installment schedule',
+  markAsPaid: 'Mark paid',
+  schedulePending: 'Pending',
+  schedulePaid: 'Paid',
+  scheduleOverdue: 'Overdue',
+  paidParts: 'paid',
 }

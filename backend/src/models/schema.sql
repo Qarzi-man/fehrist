@@ -100,13 +100,28 @@ CREATE TABLE IF NOT EXISTS business_members (
 -- Add phone column to existing installations
 ALTER TABLE business_members ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
 
+-- Installment / Nasiya
+ALTER TABLE debts ADD COLUMN IF NOT EXISTS kind VARCHAR(20) DEFAULT 'standard';
+
+CREATE TABLE IF NOT EXISTS debt_schedules (
+  id          SERIAL PRIMARY KEY,
+  debt_id     INTEGER REFERENCES debts(id) ON DELETE CASCADE,
+  part_number INTEGER NOT NULL,
+  amount      NUMERIC(14, 2) NOT NULL,
+  due_date    DATE NOT NULL,
+  status      VARCHAR(20) DEFAULT 'pending',
+  paid_at     TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_debts_user_id        ON debts(user_id);
-CREATE INDEX IF NOT EXISTS idx_debts_client_id      ON debts(client_id);
-CREATE INDEX IF NOT EXISTS idx_repayments_debt      ON repayments(debt_id);
-CREATE INDEX IF NOT EXISTS idx_otp_phone            ON otp_codes(phone);
+CREATE INDEX IF NOT EXISTS idx_debts_user_id         ON debts(user_id);
+CREATE INDEX IF NOT EXISTS idx_debts_client_id       ON debts(client_id);
+CREATE INDEX IF NOT EXISTS idx_repayments_debt       ON repayments(debt_id);
+CREATE INDEX IF NOT EXISTS idx_otp_phone             ON otp_codes(phone);
 CREATE INDEX IF NOT EXISTS idx_business_members_user ON business_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_business_members_biz  ON business_members(business_id);
+CREATE INDEX IF NOT EXISTS idx_debt_schedules_debt   ON debt_schedules(debt_id);
 -- Prevent duplicate phone invites for unregistered users within the same business
 CREATE UNIQUE INDEX IF NOT EXISTS idx_bm_business_phone
   ON business_members(business_id, phone) WHERE user_id IS NULL;

@@ -1,8 +1,9 @@
-import { useState, useEffect, FormEvent } from 'react'
+import { useState, useEffect, useMemo, FormEvent } from 'react'
 import { useT } from '../../i18n'
 import { getClients, createClient, type Client } from '../../api/clients'
 import { createDebt, updateDebt, type Debt } from '../../api/debts'
 import { getApiError } from '../../lib/utils'
+import { formatMoney, formatDate } from '../../lib/format'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 
@@ -19,6 +20,7 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
   const isEdit = !!debtToEdit
 
   const [type, setType] = useState<'receivable' | 'payable'>(debtToEdit?.type ?? 'receivable')
+  const [kind, setKind] = useState<'standard' | 'installment'>('standard')
   const [clients, setClients] = useState<Client[]>([])
   const [clientId, setClientId] = useState<number | null>(debtToEdit?.client_id ?? null)
   const [newName, setNewName] = useState('')
@@ -26,6 +28,9 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
   const [currency, setCurrency] = useState(debtToEdit?.currency ?? 'TJS')
   const [description, setDescription] = useState(debtToEdit?.description ?? '')
   const [dueDate, setDueDate] = useState(debtToEdit?.due_date?.slice(0, 10) ?? '')
+  const [partsCount, setPartsCount] = useState('3')
+  const [firstDueDate, setFirstDueDate] = useState('')
+  const [intervalDays, setIntervalDays] = useState('30')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -33,12 +38,32 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
     if (!isEdit) getClients({ limit: 200 }).then((r) => setClients(r.data)).catch(() => {})
   }, [isEdit])
 
+  const preview = useMemo(() => {
+    if (kind !== 'installment' || !amount || !firstDueDate) return []
+    const total = Number(amount)
+    if (isNaN(total) || total <= 0) return []
+    const pc = Math.max(2, parseInt(partsCount) || 2)
+    const base = Math.floor((total * 100) / pc) / 100
+    const last = parseFloat((total - base * (pc - 1)).toFixed(2))
+    const start = new Date(firstDueDate)
+    const interval = Math.max(1, parseInt(intervalDays) || 30)
+    return Array.from({ length: pc }, (_, i) => {
+      const d = new Date(start)
+      d.setDate(d.getDate() + i * interval)
+      return { part: i + 1, amount: i === pc - 1 ? last : base, date: d.toISOString().slice(0, 10) }
+    })
+  }, [kind, amount, partsCount, firstDueDate, intervalDays])
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
 
     if (!isEdit && !clientId && !newName.trim()) return setError(t.selectContact)
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) return setError(t.amount + ' обязательна')
+    if (!isEdit && kind === 'installment') {
+      if (!firstDueDate) return setError(t.firstDueDate + ' обязательна')
+      if (Number(partsCount) < 2) return setError(t.partsCount + ' мин. 2')
+    }
 
     setLoading(true)
     try {
@@ -61,8 +86,12 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
           amount: Number(amount),
           currency,
           type,
+          kind,
           description: description.trim() || undefined,
-          due_date: dueDate || undefined,
+          due_date: kind === 'installment' ? undefined : (dueDate || undefined),
+          parts_count: kind === 'installment' ? Number(partsCount) : undefined,
+          first_due_date: kind === 'installment' ? firstDueDate : undefined,
+          interval_days: kind === 'installment' ? Number(intervalDays) : undefined,
         })
       }
       onSuccess()
@@ -107,6 +136,26 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
               {t.iOwe}
             </button>
           </div>
+
+          {/* Kind toggle — create mode only */}
+          {!isEdit && (
+            <div className="flex rounded-xl bg-gray-100 dark:bg-gray-700 p-1">
+              <button type="button" onClick={() => setKind('standard')}
+                className={['flex-1 rounded-lg py-2 text-sm font-semibold transition-all',
+                  kind === 'standard'
+                    ? 'bg-white dark:bg-gray-600 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400'].join(' ')}>
+                {t.standardKind}
+              </button>
+              <button type="button" onClick={() => setKind('installment')}
+                className={['flex-1 rounded-lg py-2 text-sm font-semibold transition-all',
+                  kind === 'installment'
+                    ? 'bg-white dark:bg-gray-600 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400'].join(' ')}>
+                {t.installmentKind}
+              </button>
+            </div>
+          )}
 
           {/* Contact — read-only in edit mode */}
           {isEdit ? (
@@ -165,6 +214,74 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
             </div>
           </div>
 
+          {/* Installment fields */}
+          {kind === 'installment' && !isEdit && (
+            <>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    label={t.partsCount}
+                    type="number"
+                    min="2"
+                    max="60"
+                    value={partsCount}
+                    onChange={(e) => setPartsCount(e.target.value)}
+                    placeholder="3"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Input
+                    label={t.intervalDays}
+                    type="number"
+                    min="1"
+                    value={intervalDays}
+                    onChange={(e) => setIntervalDays(e.target.value)}
+                    placeholder="30"
+                  />
+                </div>
+              </div>
+              <Input
+                label={t.firstDueDate}
+                type="date"
+                value={firstDueDate}
+                onChange={(e) => setFirstDueDate(e.target.value)}
+              />
+
+              {/* Preview table */}
+              {preview.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                    {t.schedulePreview}
+                  </p>
+                  <div className="rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden max-h-44 overflow-y-auto">
+                    <table className="w-full text-xs">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                          <th className="px-3 py-2 text-left font-medium text-gray-500 dark:text-gray-400">{t.schedulePart}</th>
+                          <th className="px-3 py-2 text-right font-medium text-gray-500 dark:text-gray-400">{t.amount}</th>
+                          <th className="px-3 py-2 text-right font-medium text-gray-500 dark:text-gray-400">{t.dueDate.split(' ')[0]}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                        {preview.map((row) => (
+                          <tr key={row.part} className="bg-white dark:bg-gray-800">
+                            <td className="px-3 py-2 text-gray-700 dark:text-gray-300 font-medium">{row.part}</td>
+                            <td className="px-3 py-2 text-right text-indigo-700 dark:text-indigo-300 font-semibold">
+                              {formatMoney(row.amount, currency)}
+                            </td>
+                            <td className="px-3 py-2 text-right text-gray-500 dark:text-gray-400">
+                              {formatDate(row.date)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
           <Input
             label={t.description}
             value={description}
@@ -172,12 +289,14 @@ export default function AddDebtModal({ onClose, onSuccess, debtToEdit }: Props) 
             placeholder="Комментарий..."
           />
 
-          <Input
-            label={t.dueDate}
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-          />
+          {kind === 'standard' && (
+            <Input
+              label={t.dueDate}
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+          )}
 
           {error && <p className="rounded-lg bg-red-50 dark:bg-red-900/20 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
 

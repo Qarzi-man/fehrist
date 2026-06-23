@@ -1,8 +1,8 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { useT } from '../../i18n'
 import {
-  type Debt, type Repayment,
-  getRepayments, addRepayment, deleteDebt,
+  type Debt, type Repayment, type ScheduleItem,
+  getRepayments, addRepayment, deleteDebt, getSchedule, payScheduleItem,
 } from '../../api/debts'
 import { formatMoney, formatDate } from '../../lib/format'
 import { getApiError } from '../../lib/utils'
@@ -31,6 +31,9 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
   const [showEdit, setShowEdit] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [schedule, setSchedule] = useState<ScheduleItem[]>([])
+  const [loadingSchedule, setLoadingSchedule] = useState(false)
+  const [payingId, setPayingId] = useState<number | null>(null)
 
   const isReceivable = debt.type === 'receivable'
   const status = debt.computed_status
@@ -41,6 +44,28 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
       .catch(() => {})
       .finally(() => setLoadingR(false))
   }, [debt.id])
+
+  useEffect(() => {
+    if (debt.kind !== 'installment') return
+    setLoadingSchedule(true)
+    getSchedule(debt.id)
+      .then(setSchedule)
+      .catch(() => {})
+      .finally(() => setLoadingSchedule(false))
+  }, [debt.id, debt.kind])
+
+  async function handlePaySchedule(scheduleId: number) {
+    setPayingId(scheduleId)
+    try {
+      const updated = await payScheduleItem(scheduleId)
+      setSchedule((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
+      onUpdated()
+    } catch {
+      // ignore
+    } finally {
+      setPayingId(null)
+    }
+  }
 
   async function handleAddPayment(e: FormEvent) {
     e.preventDefault()
@@ -217,6 +242,65 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
               </ul>
             )}
           </div>
+
+          {/* Installment schedule */}
+          {debt.kind === 'installment' && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t.installmentSchedule}</p>
+                {schedule.length > 0 && (
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                    {schedule.filter((s) => s.status === 'paid').length}/{schedule.length} {t.paidParts}
+                  </span>
+                )}
+              </div>
+              {schedule.length > 0 && (
+                <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full mb-3 overflow-hidden">
+                  <div
+                    className="h-full bg-emerald-400 rounded-full transition-all duration-500"
+                    style={{ width: `${(schedule.filter((s) => s.status === 'paid').length / schedule.length) * 100}%` }}
+                  />
+                </div>
+              )}
+              {loadingSchedule ? (
+                <p className="text-sm text-gray-400 text-center py-2">{t.loading}</p>
+              ) : (
+                <ul className="flex flex-col gap-2">
+                  {schedule.map((s) => (
+                    <li key={s.id} className="flex items-center justify-between rounded-xl bg-gray-50 dark:bg-gray-700 px-3 py-2.5">
+                      <div>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">{t.schedulePart} {s.part_number}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatMoney(s.amount, debt.currency)}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(s.due_date)}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {s.status === 'paid' ? (
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
+                            {t.schedulePaid}
+                          </span>
+                        ) : (
+                          <>
+                            {s.status === 'overdue' && (
+                              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+                                {t.scheduleOverdue}
+                              </span>
+                            )}
+                            <button
+                              onClick={() => handlePaySchedule(s.id)}
+                              disabled={payingId === s.id}
+                              className="text-xs font-semibold text-white bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 px-3 py-1.5 rounded-lg transition"
+                            >
+                              {payingId === s.id ? '...' : t.markAsPaid}
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">

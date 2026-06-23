@@ -11,10 +11,22 @@ export interface Debt {
   description: string | null
   due_date: string | null
   type: 'receivable' | 'payable'
+  kind?: 'standard' | 'installment'
   status: 'active' | 'paid' | 'overdue'
   computed_status: 'active' | 'paid' | 'overdue'
   total_paid: number
   remaining: number
+  created_at: string
+}
+
+export interface ScheduleItem {
+  id: number
+  debt_id: number
+  part_number: number
+  amount: number
+  due_date: string
+  status: 'pending' | 'paid' | 'overdue'
+  paid_at: string | null
   created_at: string
 }
 
@@ -31,8 +43,12 @@ export interface CreateDebtPayload {
   amount: number
   currency: string
   type: 'receivable' | 'payable'
+  kind?: 'standard' | 'installment'
   description?: string
   due_date?: string
+  parts_count?: number
+  first_due_date?: string
+  interval_days?: number
 }
 
 export interface UpdateDebtPayload {
@@ -88,5 +104,15 @@ export async function getRepayments(debtId: number): Promise<Repayment[]> {
 
 export async function addRepayment(debtId: number, amount: number, note?: string): Promise<Repayment> {
   const { data } = await api.post<Repayment>(`/debts/${debtId}/repayments`, { amount, note })
+  return data
+}
+
+export async function getSchedule(debtId: number): Promise<ScheduleItem[]> {
+  const { data } = await api.get<ScheduleItem[]>(`/debts/${debtId}/schedule`)
+  return data
+}
+
+export async function payScheduleItem(scheduleId: number): Promise<ScheduleItem> {
+  const { data } = await api.patch<ScheduleItem>(`/debts/schedule/${scheduleId}/pay`)
   return data
 }

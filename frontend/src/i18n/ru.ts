@@ -149,6 +149,20 @@ export const ru = {
   memberNotFound: 'Пользователь с таким телефоном не найден',
   removeMember: 'Удалить',
   noMembers: 'Сотрудников пока нет',
+  // Installment / Nasiya
+  standardKind: 'Обычный',
+  installmentKind: 'Рассрочка',
+  partsCount: 'Кол-во частей',
+  firstDueDate: 'Первый срок',
+  intervalDays: 'Интервал (дней)',
+  schedulePreview: 'Предварительный план',
+  schedulePart: 'Часть',
+  installmentSchedule: 'График рассрочки',
+  markAsPaid: 'Оплатить',
+  schedulePending: 'Ожидает',
+  schedulePaid: 'Оплачено',
+  scheduleOverdue: 'Просрочено',
+  paidParts: 'оплачено',
 }
 
 export type Translations = typeof ru
