@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useT } from '../../i18n'
 import { useIsOwner } from '../../lib/useIsOwner'
+import { avatarGradient } from '../../lib/avatar'
 import BusinessSwitcher from './BusinessSwitcher'
 
 const HomeIcon = () => (
@@ -93,15 +94,22 @@ export default function Sidebar() {
 
         {/* User + logout */}
         <div className="p-3 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-2 rounded-xl px-3 py-2 mb-1">
-            <div className="h-7 w-7 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300 shrink-0">
-              {(user?.full_name ?? user?.phone ?? '?')[0].toUpperCase()}
-            </div>
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-full flex items-center gap-2 rounded-xl px-3 py-2 mb-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
+          >
+            {user?.avatar ? (
+              <img src={user.avatar} alt="avatar" className="h-7 w-7 rounded-full object-cover shrink-0" />
+            ) : (
+              <div className={`h-7 w-7 rounded-full bg-gradient-to-br ${avatarGradient(user?.full_name ?? user?.phone ?? '?')} flex items-center justify-center text-xs font-bold text-white shrink-0`}>
+                {(user?.full_name ?? user?.phone ?? '?')[0].toUpperCase()}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate block">{user?.full_name ?? user?.phone}</span>
               <span className="text-[10px] font-semibold text-indigo-500 dark:text-indigo-400">{isOwner ? t.ownerLabel : t.employeeLabel}</span>
             </div>
-          </div>
+          </button>
           <button
             onClick={() => setShowConfirm(true)}
             className="w-full flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"

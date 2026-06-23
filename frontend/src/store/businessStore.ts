@@ -5,6 +5,7 @@ export interface Business {
   id: number
   owner_id: number
   name: string
+  logo?: string | null
   created_at: string
   my_role?: 'owner' | 'employee'
 }

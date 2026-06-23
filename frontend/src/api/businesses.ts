@@ -11,7 +11,7 @@ export async function createBusiness(payload: { name: string }): Promise<Busines
   return r.data
 }
 
-export async function updateBusiness(id: number, payload: { name: string }): Promise<Business> {
+export async function updateBusiness(id: number, payload: { name?: string; logo?: string | null }): Promise<Business> {
   const r = await api.put(`/businesses/${id}`, payload)
   return r.data
 }

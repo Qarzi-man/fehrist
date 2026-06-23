@@ -174,4 +174,15 @@ export const tj: Translations = {
   schedulePaid: 'Пардохта шуд',
   scheduleOverdue: 'Мӯҳлаташ гузашт',
   paidParts: 'пардохта шуд',
+  // Profile page
+  profile: 'Профил',
+  uploadPhoto: 'Аксро бор кардан',
+  profileSaved: 'Профил сохира шуд',
+  deleteAccount: 'Ҳисобро ҳазф кардан',
+  deleteAccountConfirm: 'Ҳисобро ҳазф кунем? Ҳамаи маълумотҳо хат мешаванд.',
+  deleteAccountYes: 'Ҳа, ҳазф кардан',
+  // Business settings
+  businessSettings: 'Танзимоти тиҷорат',
+  businessLogo: 'Логотип',
+  uploadLogo: 'Логотипро бор кардан',
 }

@@ -6,6 +6,7 @@ import DebtsPage from './pages/DebtsPage'
 import ClientsPage from './pages/ClientsPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import SettingsPage from './pages/SettingsPage'
+import ProfilePage from './pages/ProfilePage'
 import OfertaPage from './pages/OfertaPage'
 import PrivacyPage from './pages/PrivacyPage'
 
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/clients"   element={<RequireAuth><ClientsPage /></RequireAuth>} />
         <Route path="/analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
         <Route path="/settings"  element={<RequireAuth><SettingsPage /></RequireAuth>} />
+        <Route path="/profile"   element={<RequireAuth><ProfilePage /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

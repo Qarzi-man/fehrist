@@ -174,4 +174,15 @@ export const uz: Translations = {
   schedulePaid: 'To\'langan',
   scheduleOverdue: 'Muddati o\'tgan',
   paidParts: 'to\'langan',
+  // Profile page
+  profile: 'Profil',
+  uploadPhoto: 'Rasm yuklash',
+  profileSaved: 'Profil saqlandi',
+  deleteAccount: 'Hisobni o\'chirish',
+  deleteAccountConfirm: 'Hisobni o\'chirasizmi? Barcha ma\'lumotlar butunlay o\'chirib tashlanadi.',
+  deleteAccountYes: 'Ha, hisobni o\'chirish',
+  // Business settings
+  businessSettings: 'Biznes sozlamalari',
+  businessLogo: 'Logotip',
+  uploadLogo: 'Logotip yuklash',
 }

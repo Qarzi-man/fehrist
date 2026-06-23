@@ -30,11 +30,21 @@ async function create(req, res, next) {
 async function update(req, res, next) {
   try {
     const { id } = req.params;
-    const { name } = req.body;
-    if (!name || !name.trim()) return res.status(400).json({ error: 'name required' });
+    const { name, logo } = req.body;
+
+    const updates = [];
+    const params = [];
+    let i = 1;
+
+    if (name && name.trim()) { updates.push(`name = $${i++}`); params.push(name.trim()); }
+    if (logo !== undefined)  { updates.push(`logo = $${i++}`); params.push(logo || null); }
+
+    if (!updates.length) return res.status(400).json({ error: 'name required' });
+
+    params.push(id, req.user.userId);
     const { rows } = await pool.query(
-      'UPDATE businesses SET name = $1 WHERE id = $2 AND owner_id = $3 RETURNING *',
-      [name.trim(), id, req.user.userId]
+      `UPDATE businesses SET ${updates.join(', ')} WHERE id = $${i} AND owner_id = $${i + 1} RETURNING *`,
+      params
     );
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
     res.json(rows[0]);

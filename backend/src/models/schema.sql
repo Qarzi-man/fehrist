@@ -127,6 +127,10 @@ CREATE TABLE IF NOT EXISTS debt_schedules (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Profile & logo
+ALTER TABLE users      ADD COLUMN IF NOT EXISTS avatar TEXT;
+ALTER TABLE businesses ADD COLUMN IF NOT EXISTS logo   TEXT;
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_debts_user_id         ON debts(user_id);
 CREATE INDEX IF NOT EXISTS idx_debts_client_id       ON debts(client_id);

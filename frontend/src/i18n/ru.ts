@@ -181,6 +181,17 @@ export const ru = {
   schedulePaid: 'Оплачено',
   scheduleOverdue: 'Просрочено',
   paidParts: 'оплачено',
+  // Profile page
+  profile: 'Профиль',
+  uploadPhoto: 'Загрузить фото',
+  profileSaved: 'Профиль сохранён',
+  deleteAccount: 'Удалить аккаунт',
+  deleteAccountConfirm: 'Удалить аккаунт? Все данные будут удалены без возможности восстановления.',
+  deleteAccountYes: 'Да, удалить аккаунт',
+  // Business settings
+  businessSettings: 'Настройки бизнеса',
+  businessLogo: 'Логотип',
+  uploadLogo: 'Загрузить логотип',
 }
 
 export type Translations = typeof ru

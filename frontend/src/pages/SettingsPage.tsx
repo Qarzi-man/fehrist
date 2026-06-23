@@ -1,11 +1,14 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useT } from '../i18n'
 import { useAuthStore } from '../store/authStore'
+import { useBusinessStore } from '../store/businessStore'
 import { useLangStore, type Lang } from '../store/langStore'
 import { useThemeStore } from '../store/themeStore'
 import { useIsOwner } from '../lib/useIsOwner'
+import { avatarGradient } from '../lib/avatar'
 import { getMembers, removeMember, type Member } from '../api/members'
+import { updateBusiness, deleteBusiness } from '../api/businesses'
 import AppLayout from '../components/layout/AppLayout'
 import InviteModal from '../components/members/InviteModal'
 
@@ -37,10 +40,21 @@ export default function SettingsPage() {
   const t = useT()
   const navigate = useNavigate()
   const { user, logout } = useAuthStore()
+  const { activeBusiness, setActiveBusiness } = useBusinessStore()
   const { lang, setLang } = useLangStore()
   const { theme, toggle: toggleTheme } = useThemeStore()
   const isOwner = useIsOwner()
   const [showConfirm, setShowConfirm] = useState(false)
+  const logoFileRef = useRef<HTMLInputElement>(null)
+
+  // Business settings state
+  const [bizName, setBizName] = useState(activeBusiness?.name ?? '')
+  const [bizLogo, setBizLogo] = useState<string | null>(activeBusiness?.logo ?? null)
+  const [bizSaving, setBizSaving] = useState(false)
+  const [bizSaved, setBizSaved] = useState(false)
+  const [showDeleteBizConfirm, setShowDeleteBizConfirm] = useState(false)
+  const [deletingBiz, setDeletingBiz] = useState(false)
+  const [deleteBizError, setDeleteBizError] = useState('')
 
   // Members state
   const [members, setMembers] = useState<Member[]>([])
@@ -49,6 +63,11 @@ export default function SettingsPage() {
   const [inviteSuccess, setInviteSuccess] = useState(false)
   const [removeConfirmId, setRemoveConfirmId] = useState<number | null>(null)
   const [removing, setRemoving] = useState(false)
+
+  useEffect(() => {
+    setBizName(activeBusiness?.name ?? '')
+    setBizLogo(activeBusiness?.logo ?? null)
+  }, [activeBusiness])
 
   const loadMembers = useCallback(() => {
     if (!isOwner) return
@@ -86,28 +105,80 @@ export default function SettingsPage() {
     }
   }
 
+  function handleLogoFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => setBizLogo(reader.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  async function handleSaveBusiness() {
+    if (!activeBusiness) return
+    setBizSaving(true)
+    setBizSaved(false)
+    try {
+      const updated = await updateBusiness(activeBusiness.id, {
+        name: bizName.trim() || activeBusiness.name,
+        logo: bizLogo,
+      })
+      setActiveBusiness({ ...activeBusiness, ...updated })
+      setBizSaved(true)
+      setTimeout(() => setBizSaved(false), 2500)
+    } catch {
+      // ignore
+    } finally {
+      setBizSaving(false)
+    }
+  }
+
+  async function handleDeleteBusiness() {
+    if (!activeBusiness) return
+    setDeletingBiz(true)
+    setDeleteBizError('')
+    try {
+      await deleteBusiness(activeBusiness.id)
+      setShowDeleteBizConfirm(false)
+      navigate('/dashboard')
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? ''
+      setDeleteBizError(msg || t.errNetwork)
+      setDeletingBiz(false)
+    }
+  }
+
   const atLimit = members.length >= 3
+  const displayName = user?.full_name ?? user?.phone ?? '?'
+  const gradientClass = avatarGradient(displayName)
 
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-8">
         <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6 md:mb-8">{t.settings}</h1>
 
-        {/* Profile */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-lg font-bold text-indigo-600 dark:text-indigo-300">
-              {(user?.full_name ?? user?.phone ?? '?')[0].toUpperCase()}
+        {/* Profile — clickable card */}
+        <button
+          onClick={() => navigate('/profile')}
+          className="w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-4 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-750 transition text-left"
+        >
+          {user?.avatar ? (
+            <img src={user.avatar} alt="avatar" className="h-12 w-12 rounded-full object-cover shrink-0" />
+          ) : (
+            <div className={`h-12 w-12 rounded-full bg-gradient-to-br ${gradientClass} flex items-center justify-center text-lg font-bold text-white shrink-0`}>
+              {displayName[0].toUpperCase()}
             </div>
-            <div>
-              <p className="font-semibold text-gray-900 dark:text-white">{user?.full_name ?? '—'}</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">{user?.phone}</p>
-              <span className="text-xs font-semibold text-indigo-500 dark:text-indigo-400">
-                {isOwner ? t.ownerLabel : t.employeeLabel}
-              </span>
-            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-gray-900 dark:text-white truncate">{user?.full_name ?? '—'}</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">{user?.phone}</p>
+            <span className="text-xs font-semibold text-indigo-500 dark:text-indigo-400">
+              {isOwner ? t.ownerLabel : t.employeeLabel}
+            </span>
           </div>
-        </div>
+          <svg className="text-gray-300 dark:text-gray-600 shrink-0" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
 
         {/* Language */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-4">
@@ -151,6 +222,90 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
+
+        {/* Business settings — owner only */}
+        {isOwner && activeBusiness && (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-4">
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">{t.businessSettings}</p>
+
+            {/* Logo */}
+            <div className="flex items-center gap-3 mb-3">
+              <button
+                type="button"
+                onClick={() => logoFileRef.current?.click()}
+                className="relative group"
+              >
+                {bizLogo ? (
+                  <img src={bizLogo} alt="logo" className="h-14 w-14 rounded-xl object-cover shadow" />
+                ) : (
+                  <div className="h-14 w-14 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 border-2 border-dashed border-indigo-200 dark:border-indigo-700 flex items-center justify-center">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="text-indigo-300 dark:text-indigo-500">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                  </div>
+                )}
+              </button>
+              <div>
+                <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">{t.businessLogo}</p>
+                <button
+                  type="button"
+                  onClick={() => logoFileRef.current?.click()}
+                  className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition"
+                >
+                  {t.uploadLogo}
+                </button>
+              </div>
+              <input ref={logoFileRef} type="file" accept="image/*" className="hidden" onChange={handleLogoFileChange} />
+            </div>
+
+            {/* Business name */}
+            <input
+              type="text"
+              value={bizName}
+              onChange={(e) => setBizName(e.target.value)}
+              placeholder={activeBusiness.name}
+              className="w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 mb-3"
+            />
+
+            <button
+              onClick={handleSaveBusiness}
+              disabled={bizSaving}
+              className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 px-4 py-2.5 text-sm font-semibold text-white transition mb-3"
+            >
+              {bizSaving ? '...' : bizSaved ? `✓ ${t.save}` : t.save}
+            </button>
+
+            {/* Delete business */}
+            {showDeleteBizConfirm ? (
+              <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3">
+                <p className="text-xs text-red-600 dark:text-red-400 mb-2 font-medium">{t.confirmDeleteBusiness}</p>
+                {deleteBizError && <p className="text-xs text-red-500 mb-2">{deleteBizError}</p>}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { setShowDeleteBizConfirm(false); setDeleteBizError('') }}
+                    className="flex-1 rounded-lg border border-gray-200 dark:border-gray-600 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  >
+                    {t.cancel}
+                  </button>
+                  <button
+                    onClick={handleDeleteBusiness}
+                    disabled={deletingBiz}
+                    className="flex-1 rounded-lg bg-red-600 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-60 transition"
+                  >
+                    {deletingBiz ? '...' : t.deleteBusiness}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowDeleteBizConfirm(true)}
+                className="w-full text-xs font-medium text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition py-1"
+              >
+                {t.deleteBusiness}
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Employees — owner only */}
         {isOwner && (

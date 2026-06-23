@@ -174,4 +174,15 @@ export const en: Translations = {
   schedulePaid: 'Paid',
   scheduleOverdue: 'Overdue',
   paidParts: 'paid',
+  // Profile page
+  profile: 'Profile',
+  uploadPhoto: 'Upload photo',
+  profileSaved: 'Profile saved',
+  deleteAccount: 'Delete account',
+  deleteAccountConfirm: 'Delete account? All your data will be permanently removed.',
+  deleteAccountYes: 'Yes, delete account',
+  // Business settings
+  businessSettings: 'Business settings',
+  businessLogo: 'Logo',
+  uploadLogo: 'Upload logo',
 }
