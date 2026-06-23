@@ -142,6 +142,13 @@ export const tj: Translations = {
   memberNotFound: 'Корбар бо ин рақам ёфт нашуд',
   removeMember: 'Хориҷ кардан',
   noMembers: 'Кормандон ҳанӯз нест',
+  // SMS notifications
+  sendSms: 'SMS фиристодан',
+  smsNotification: 'SMS огоҳӣ',
+  selectTemplate: 'Намунаро интихоб кунед',
+  smsMessage: 'Паём',
+  smsSent: 'SMS бомуваффақият фиристода шуд',
+  sendBtn: 'Фиристодан',
   // Installment / Nasiya
   standardKind: 'Одӣ',
   installmentKind: 'Насия',

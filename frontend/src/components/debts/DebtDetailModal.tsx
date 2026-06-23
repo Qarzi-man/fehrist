@@ -10,6 +10,7 @@ import { useIsOwner } from '../../lib/useIsOwner'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
 import AddDebtModal from './AddDebtModal'
+import SendSmsModal from '../sms/SendSmsModal'
 
 interface Props {
   debt: Debt
@@ -29,6 +30,7 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
   const [payError, setPayError] = useState('')
   const [payLoading, setPayLoading] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
+  const [showSms, setShowSms] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [schedule, setSchedule] = useState<ScheduleItem[]>([])
@@ -313,6 +315,15 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
               </svg>
               {t.editDebt}
             </button>
+            <button
+              onClick={() => setShowSms(true)}
+              className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-indigo-100 dark:border-indigo-800 py-2.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition"
+            >
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              {t.sendSms}
+            </button>
             {isOwner && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
@@ -327,6 +338,15 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
           </div>
         </div>
       </div>
+
+      {/* SMS modal */}
+      {showSms && (
+        <SendSmsModal
+          debt={debt}
+          schedule={schedule}
+          onClose={() => setShowSms(false)}
+        />
+      )}
 
       {/* Delete confirm */}
       {showDeleteConfirm && (

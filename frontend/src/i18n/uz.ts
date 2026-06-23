@@ -142,6 +142,13 @@ export const uz: Translations = {
   memberNotFound: 'Bu telefon raqamli foydalanuvchi topilmadi',
   removeMember: "O'chirish",
   noMembers: 'Xodimlar hali yo\'q',
+  // SMS notifications
+  sendSms: 'SMS yuborish',
+  smsNotification: 'SMS xabarnoma',
+  selectTemplate: 'Shablonni tanlang',
+  smsMessage: 'Xabar',
+  smsSent: 'SMS muvaffaqiyatli yuborildi',
+  sendBtn: 'Yuborish',
   // Installment / Nasiya
   standardKind: 'Oddiy',
   installmentKind: 'Nasiya',

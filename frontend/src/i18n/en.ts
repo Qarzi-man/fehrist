@@ -142,6 +142,13 @@ export const en: Translations = {
   memberNotFound: 'No user found with that phone number',
   removeMember: 'Remove',
   noMembers: 'No employees yet',
+  // SMS notifications
+  sendSms: 'Send SMS',
+  smsNotification: 'SMS notification',
+  selectTemplate: 'Choose template',
+  smsMessage: 'Message',
+  smsSent: 'SMS sent successfully',
+  sendBtn: 'Send',
   // Installment / Nasiya
   standardKind: 'Standard',
   installmentKind: 'Installment',

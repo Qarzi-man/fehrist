@@ -149,6 +149,13 @@ export const ru = {
   memberNotFound: 'Пользователь с таким телефоном не найден',
   removeMember: 'Удалить',
   noMembers: 'Сотрудников пока нет',
+  // SMS notifications
+  sendSms: 'Отправить SMS',
+  smsNotification: 'SMS уведомление',
+  selectTemplate: 'Выберите шаблон',
+  smsMessage: 'Сообщение',
+  smsSent: 'SMS отправлено успешно',
+  sendBtn: 'Отправить',
   // Installment / Nasiya
   standardKind: 'Обычный',
   installmentKind: 'Рассрочка',

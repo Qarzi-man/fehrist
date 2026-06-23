@@ -100,6 +100,19 @@ CREATE TABLE IF NOT EXISTS business_members (
 -- Add phone column to existing installations
 ALTER TABLE business_members ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
 
+-- SMS logs
+CREATE TABLE IF NOT EXISTS sms_logs (
+  id          SERIAL PRIMARY KEY,
+  business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+  debt_id     INTEGER REFERENCES debts(id) ON DELETE SET NULL,
+  client_id   INTEGER REFERENCES clients(id) ON DELETE SET NULL,
+  phone       VARCHAR(20) NOT NULL,
+  message     TEXT NOT NULL,
+  template_key VARCHAR(50),
+  status      VARCHAR(20) DEFAULT 'sent',
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+
 -- Installment / Nasiya
 ALTER TABLE debts ADD COLUMN IF NOT EXISTS kind VARCHAR(20) DEFAULT 'standard';
 
