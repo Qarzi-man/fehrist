@@ -131,6 +131,9 @@ CREATE TABLE IF NOT EXISTS debt_schedules (
 ALTER TABLE users      ADD COLUMN IF NOT EXISTS avatar TEXT;
 ALTER TABLE businesses ADD COLUMN IF NOT EXISTS logo   TEXT;
 
+-- Partial schedule payments
+ALTER TABLE debt_schedules ADD COLUMN IF NOT EXISTS paid_amount DECIMAL(15,2);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_debts_user_id         ON debts(user_id);
 CREATE INDEX IF NOT EXISTS idx_debts_client_id       ON debts(client_id);

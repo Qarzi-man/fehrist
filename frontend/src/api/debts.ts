@@ -25,7 +25,8 @@ export interface ScheduleItem {
   part_number: number
   amount: number
   due_date: string
-  status: 'pending' | 'paid' | 'overdue'
+  status: 'pending' | 'paid' | 'overdue' | 'partial'
+  paid_amount: number | null
   paid_at: string | null
   created_at: string
 }
@@ -115,7 +116,10 @@ export async function getSchedule(debtId: number): Promise<ScheduleItem[]> {
   return data
 }
 
-export async function payScheduleItem(scheduleId: number): Promise<ScheduleItem> {
-  const { data } = await api.patch<ScheduleItem>(`/debts/schedule/${scheduleId}/pay`)
+export async function payScheduleItem(scheduleId: number, paidAmount?: number): Promise<ScheduleItem> {
+  const { data } = await api.patch<ScheduleItem>(
+    `/debts/schedule/${scheduleId}/pay`,
+    paidAmount !== undefined ? { paid_amount: paidAmount } : {}
+  )
   return data
 }

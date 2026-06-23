@@ -181,15 +181,29 @@ async function getSchedule(req, res, next) {
 async function payScheduleItem(req, res, next) {
   try {
     const { scheduleId } = req.params;
-    const { rows } = await pool.query(
-      `UPDATE debt_schedules ds
-       SET status = 'paid', paid_at = NOW()
-       FROM debts d
-       WHERE ds.id = $1 AND ds.debt_id = d.id AND d.business_id = $2 AND ds.status != 'paid'
-       RETURNING ds.*`,
+    const { paid_amount } = req.body;
+
+    const existing = await pool.query(
+      `SELECT ds.amount, ds.status FROM debt_schedules ds
+       JOIN debts d ON d.id = ds.debt_id
+       WHERE ds.id = $1 AND d.business_id = $2`,
       [scheduleId, req.businessId]
     );
-    if (!rows.length) return res.status(404).json({ error: 'Not found or already paid' });
+    if (!existing.rows.length) return res.status(404).json({ error: 'Not found' });
+
+    const item = existing.rows[0];
+    if (item.status === 'paid') return res.status(409).json({ error: 'Already fully paid' });
+
+    const fullAmount = parseFloat(item.amount);
+    const paidAmt = paid_amount !== undefined ? parseFloat(paid_amount) : fullAmount;
+    if (isNaN(paidAmt) || paidAmt <= 0) return res.status(400).json({ error: 'Invalid paid_amount' });
+
+    const newStatus = paidAmt >= fullAmount ? 'paid' : 'partial';
+
+    const { rows } = await pool.query(
+      `UPDATE debt_schedules SET status = $1, paid_at = NOW(), paid_amount = $2 WHERE id = $3 RETURNING *`,
+      [newStatus, paidAmt, scheduleId]
+    );
     res.json(rows[0]);
   } catch (err) {
     next(err);

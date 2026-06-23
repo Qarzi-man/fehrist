@@ -174,6 +174,9 @@ export const uz: Translations = {
   schedulePaid: 'To\'langan',
   scheduleOverdue: 'Muddati o\'tgan',
   paidParts: 'to\'langan',
+  schedulePartial: 'Qisman',
+  paymentAmount: 'To\'lov summasi',
+  paidOf: 'dan',
   // Profile page
   profile: 'Profil',
   uploadPhoto: 'Rasm yuklash',

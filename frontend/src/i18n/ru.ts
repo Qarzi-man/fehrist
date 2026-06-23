@@ -181,6 +181,9 @@ export const ru = {
   schedulePaid: 'Оплачено',
   scheduleOverdue: 'Просрочено',
   paidParts: 'оплачено',
+  schedulePartial: 'Частично',
+  paymentAmount: 'Сумма оплаты',
+  paidOf: 'из',
   // Profile page
   profile: 'Профиль',
   uploadPhoto: 'Загрузить фото',

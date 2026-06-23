@@ -174,6 +174,9 @@ export const en: Translations = {
   schedulePaid: 'Paid',
   scheduleOverdue: 'Overdue',
   paidParts: 'paid',
+  schedulePartial: 'Partial',
+  paymentAmount: 'Payment amount',
+  paidOf: 'of',
   // Profile page
   profile: 'Profile',
   uploadPhoto: 'Upload photo',

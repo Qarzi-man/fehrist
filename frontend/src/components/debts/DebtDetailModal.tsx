@@ -35,7 +35,13 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [schedule, setSchedule] = useState<ScheduleItem[]>([])
   const [loadingSchedule, setLoadingSchedule] = useState(false)
-  const [payingId, setPayingId] = useState<number | null>(null)
+
+  // Partial payment modal
+  const [payScheduleModal, setPayScheduleModal] = useState<{
+    item: ScheduleItem
+    inputAmount: string
+    loading: boolean
+  } | null>(null)
 
   const isReceivable = debt.type === 'receivable'
   const status = debt.computed_status
@@ -56,16 +62,22 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
       .finally(() => setLoadingSchedule(false))
   }, [debt.id, debt.kind])
 
-  async function handlePaySchedule(scheduleId: number) {
-    setPayingId(scheduleId)
+  function openPayScheduleModal(item: ScheduleItem) {
+    setPayScheduleModal({ item, inputAmount: String(item.amount), loading: false })
+  }
+
+  async function handleConfirmSchedulePayment() {
+    if (!payScheduleModal) return
+    const amt = parseFloat(payScheduleModal.inputAmount)
+    if (isNaN(amt) || amt <= 0) return
+    setPayScheduleModal((m) => m ? { ...m, loading: true } : null)
     try {
-      const updated = await payScheduleItem(scheduleId)
+      const updated = await payScheduleItem(payScheduleModal.item.id, amt)
       setSchedule((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
       onUpdated()
+      setPayScheduleModal(null)
     } catch {
-      // ignore
-    } finally {
-      setPayingId(null)
+      setPayScheduleModal((m) => m ? { ...m, loading: false } : null)
     }
   }
 
@@ -107,6 +119,15 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
   }[status] ?? 'bg-gray-50 text-gray-600'
 
   const statusLabel = { active: t.statusActive, paid: t.statusPaid, overdue: t.statusOverdue }[status]
+
+  const totalScheduled = schedule.reduce((sum, s) => sum + Number(s.amount), 0)
+  const totalSchedulePaid = schedule.reduce((sum, s) => {
+    if (s.status === 'paid') return sum + Number(s.amount)
+    if (s.status === 'partial') return sum + Number(s.paid_amount ?? 0)
+    return sum
+  }, 0)
+  const scheduleProgress = totalScheduled > 0 ? totalSchedulePaid / totalScheduled : 0
+  const paidPartsCount = schedule.filter((s) => s.status === 'paid').length
 
   if (showEdit) {
     return (
@@ -252,7 +273,7 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
                 <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t.installmentSchedule}</p>
                 {schedule.length > 0 && (
                   <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {schedule.filter((s) => s.status === 'paid').length}/{schedule.length} {t.paidParts}
+                    {paidPartsCount}/{schedule.length} {t.paidParts}
                   </span>
                 )}
               </div>
@@ -260,7 +281,7 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
                 <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full mb-3 overflow-hidden">
                   <div
                     className="h-full bg-emerald-400 rounded-full transition-all duration-500"
-                    style={{ width: `${(schedule.filter((s) => s.status === 'paid').length / schedule.length) * 100}%` }}
+                    style={{ width: `${scheduleProgress * 100}%` }}
                   />
                 </div>
               )}
@@ -273,26 +294,35 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
                       <div>
                         <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">{t.schedulePart} {s.part_number}</p>
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatMoney(s.amount, debt.currency)}</p>
+                        {s.status === 'partial' && s.paid_amount != null && (
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                            {t.paidAmount}: {formatMoney(s.paid_amount, debt.currency)} {t.paidOf} {formatMoney(s.amount, debt.currency)}
+                          </p>
+                        )}
                         <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(s.due_date)}</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 shrink-0">
                         {s.status === 'paid' ? (
                           <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
                             {t.schedulePaid}
                           </span>
                         ) : (
                           <>
+                            {s.status === 'partial' && (
+                              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400">
+                                {t.schedulePartial}
+                              </span>
+                            )}
                             {s.status === 'overdue' && (
                               <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
                                 {t.scheduleOverdue}
                               </span>
                             )}
                             <button
-                              onClick={() => handlePaySchedule(s.id)}
-                              disabled={payingId === s.id}
-                              className="text-xs font-semibold text-white bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 px-3 py-1.5 rounded-lg transition"
+                              onClick={() => openPayScheduleModal(s)}
+                              className="text-xs font-semibold text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded-lg transition"
                             >
-                              {payingId === s.id ? '...' : t.markAsPaid}
+                              {t.markAsPaid}
                             </button>
                           </>
                         )}
@@ -346,6 +376,63 @@ export default function DebtDetailModal({ debt, onClose, onUpdated, onDeleted }:
           schedule={schedule}
           onClose={() => setShowSms(false)}
         />
+      )}
+
+      {/* Pay schedule item modal */}
+      {payScheduleModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-sm">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+              {t.schedulePart} {payScheduleModal.item.part_number}
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+              {t.totalDebt}: {formatMoney(payScheduleModal.item.amount, debt.currency)}
+            </p>
+            <div className="mb-4">
+              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                {t.paymentAmount}
+              </label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0.01"
+                  step="0.01"
+                  value={payScheduleModal.inputAmount}
+                  onChange={(e) =>
+                    setPayScheduleModal((m) => m ? { ...m, inputAmount: e.target.value } : null)
+                  }
+                  className="flex-1 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30"
+                />
+                <span className="text-sm font-semibold text-gray-500 dark:text-gray-400 shrink-0">
+                  {debt.currency}
+                </span>
+              </div>
+              {parseFloat(payScheduleModal.inputAmount) < payScheduleModal.item.amount &&
+               parseFloat(payScheduleModal.inputAmount) > 0 && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5 flex items-center gap-1">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                  {t.schedulePartial} — {t.paidAmount.toLowerCase()} {formatMoney(parseFloat(payScheduleModal.inputAmount), debt.currency)} {t.paidOf} {formatMoney(payScheduleModal.item.amount, debt.currency)}
+                </p>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPayScheduleModal(null)}
+                className="flex-1 rounded-xl border border-gray-200 dark:border-gray-600 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={handleConfirmSchedulePayment}
+                disabled={payScheduleModal.loading || !parseFloat(payScheduleModal.inputAmount)}
+                className="flex-1 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 py-2.5 text-sm font-semibold text-white transition"
+              >
+                {payScheduleModal.loading ? '...' : t.save}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Delete confirm */}
