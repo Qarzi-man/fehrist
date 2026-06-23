@@ -8,12 +8,21 @@ import AnalyticsPage from './pages/AnalyticsPage'
 import SettingsPage from './pages/SettingsPage'
 import ProfilePage from './pages/ProfilePage'
 import BillingPage from './pages/BillingPage'
+import AdminPage from './pages/AdminPage'
 import OfertaPage from './pages/OfertaPage'
 import PrivacyPage from './pages/PrivacyPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token)
   return token ? <>{children}</> : <Navigate to="/auth" replace />
+}
+
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const token = useAuthStore((s) => s.token)
+  const user  = useAuthStore((s) => s.user)
+  if (!token) return <Navigate to="/auth" replace />
+  if (!user?.is_admin) return <Navigate to="/dashboard" replace />
+  return <>{children}</>
 }
 
 function RequireGuest({ children }: { children: React.ReactNode }) {
@@ -35,6 +44,7 @@ export default function App() {
         <Route path="/settings"  element={<RequireAuth><SettingsPage /></RequireAuth>} />
         <Route path="/profile"   element={<RequireAuth><ProfilePage /></RequireAuth>} />
         <Route path="/billing"   element={<RequireAuth><BillingPage /></RequireAuth>} />
+        <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

@@ -6,6 +6,7 @@ interface User {
   phone: string
   full_name: string | null
   avatar?: string | null
+  is_admin?: boolean
 }
 
 interface AuthState {

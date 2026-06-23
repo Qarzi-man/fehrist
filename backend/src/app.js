@@ -21,6 +21,7 @@ const smsRouter        = require('./routes/sms');
 const profileRouter        = require('./routes/profile');
 const notificationsRouter  = require('./routes/notifications');
 const billingRouter        = require('./routes/billing');
+const adminRouter          = require('./routes/admin');
 
 // v1 — primary
 app.use('/api/v1/auth',             authRouter);
@@ -34,6 +35,7 @@ app.use('/api/v1/sms',              smsRouter);
 app.use('/api/v1/profile',          profileRouter);
 app.use('/api/v1/notifications',    notificationsRouter);
 app.use('/api/v1/billing',          billingRouter);
+app.use('/api/v1/admin',            adminRouter);
 
 // legacy aliases (kept for backward compatibility)
 app.use('/api/auth',             authRouter);

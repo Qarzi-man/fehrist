@@ -123,8 +123,12 @@ async function login(req, res, next) {
     const valid = await bcrypt.compare(password, rows[0].password);
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
-    const { id, phone: p, full_name } = rows[0];
-    res.json({ token: signToken(id), user: { id, phone: p, full_name } });
+    if (rows[0].is_blocked) {
+      return res.status(403).json({ error: 'Аккаунт заблокирован. Свяжитесь с поддержкой: niyatorzuzoda@gmail.com' });
+    }
+
+    const { id, phone: p, full_name, is_admin } = rows[0];
+    res.json({ token: signToken(id), user: { id, phone: p, full_name, is_admin: !!is_admin } });
   } catch (err) {
     next(err);
   }
@@ -134,7 +138,7 @@ async function login(req, res, next) {
 async function me(req, res, next) {
   try {
     const { rows } = await pool.query(
-      `SELECT id, phone, full_name, created_at FROM users WHERE id = $1`,
+      `SELECT id, phone, full_name, is_admin, created_at FROM users WHERE id = $1`,
       [req.user.userId]
     );
     if (!rows.length) return res.status(404).json({ error: 'User not found' });

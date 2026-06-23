@@ -148,6 +148,10 @@ ALTER TABLE businesses ADD COLUMN IF NOT EXISTS logo   TEXT;
 -- Partial schedule payments
 ALTER TABLE debt_schedules ADD COLUMN IF NOT EXISTS paid_amount DECIMAL(15,2);
 
+-- Admin access
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin   BOOLEAN DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN DEFAULT FALSE;
+
 -- Monetization: subscription & billing
 ALTER TABLE businesses ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(20) DEFAULT 'free';
 ALTER TABLE businesses ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ;
