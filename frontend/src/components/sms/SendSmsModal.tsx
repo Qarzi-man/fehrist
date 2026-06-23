@@ -9,9 +9,9 @@ import Button from '../ui/Button'
 type Lang = 'ru' | 'tj' | 'uz' | 'en'
 
 const LANGS: { key: Lang; label: string }[] = [
-  { key: 'ru', label: 'РУ' },
-  { key: 'tj', label: 'ТЖ' },
-  { key: 'uz', label: 'УЗ' },
+  { key: 'tj', label: 'TJ' },
+  { key: 'ru', label: 'RU' },
+  { key: 'uz', label: 'UZ' },
   { key: 'en', label: 'EN' },
 ]
 
