@@ -3,6 +3,8 @@ import { useAuthStore } from '../../store/authStore'
 import { useBusinessStore, type Business } from '../../store/businessStore'
 import { getBusinesses, createBusiness, updateBusiness, deleteBusiness } from '../../api/businesses'
 import { useT } from '../../i18n'
+import { getLimitError, type LimitError } from '../../lib/utils'
+import LimitModal from '../ui/LimitModal'
 
 const BuildingIcon = () => (
   <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="shrink-0">
@@ -47,6 +49,7 @@ export default function BusinessSwitcher({ isMobile }: { isMobile?: boolean }) {
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [limitError, setLimitError] = useState<LimitError | null>(null)
 
   function resetForm() {
     setEditingId(null)
@@ -105,8 +108,9 @@ export default function BusinessSwitcher({ isMobile }: { isMobile?: boolean }) {
         setEditingId(null)
         setNameInput('')
       }
-    } catch {
-      setError(t.errNetwork)
+    } catch (err) {
+      const limit = getLimitError(err)
+      if (limit) { setLimitError(limit) } else { setError(t.errNetwork) }
     } finally {
       setSaving(false)
     }
@@ -131,6 +135,7 @@ export default function BusinessSwitcher({ isMobile }: { isMobile?: boolean }) {
 
   return (
     <>
+      {limitError && <LimitModal type={limitError} onClose={() => setLimitError(null)} />}
       {/* Trigger button */}
       <button
         onClick={() => setOpen(true)}

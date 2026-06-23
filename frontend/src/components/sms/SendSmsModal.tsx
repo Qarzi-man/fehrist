@@ -3,8 +3,9 @@ import { useT } from '../../i18n'
 import { type Debt, type ScheduleItem } from '../../api/debts'
 import { sendSmsToClient } from '../../api/sms'
 import { SMS_TEMPLATES, fillTemplate } from '../../lib/smsTemplates'
-import { getApiError } from '../../lib/utils'
+import { getApiError, getLimitError, type LimitError } from '../../lib/utils'
 import Button from '../ui/Button'
+import LimitModal from '../ui/LimitModal'
 
 type Lang = 'ru' | 'tj' | 'uz' | 'en'
 
@@ -30,6 +31,7 @@ export default function SendSmsModal({ debt, schedule = [], onClose }: Props) {
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [limitError, setLimitError] = useState<LimitError | null>(null)
 
   useEffect(() => {
     if (!selectedTemplate) return
@@ -51,13 +53,16 @@ export default function SendSmsModal({ debt, schedule = [], onClose }: Props) {
       setSent(true)
       setTimeout(onClose, 1800)
     } catch (err) {
-      setError(getApiError(err, t.errNetwork))
+      const limit = getLimitError(err)
+      if (limit) { setLimitError(limit) } else { setError(getApiError(err, t.errNetwork)) }
     } finally {
       setSending(false)
     }
   }
 
   return (
+    <>
+    {limitError && <LimitModal type={limitError} onClose={() => { setLimitError(null); onClose() }} />}
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
@@ -178,5 +183,6 @@ export default function SendSmsModal({ debt, schedule = [], onClose }: Props) {
         )}
       </div>
     </div>
+    </>
   )
 }

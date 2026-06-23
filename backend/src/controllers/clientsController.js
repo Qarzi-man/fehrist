@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { checkClientLimit } = require('../services/limitsService');
 
 const CLIENT_SORT_MAP = {
   name:  'c.full_name',
@@ -111,6 +112,9 @@ async function create(req, res, next) {
   try {
     const { full_name, phone, note, notes } = req.body;
     if (!full_name) return res.status(400).json({ error: 'full_name required' });
+
+    const limitCheck = await checkClientLimit(req.businessId);
+    if (!limitCheck.allowed) return res.status(402).json(limitCheck);
 
     const { rows } = await pool.query(
       `INSERT INTO clients (user_id, business_id, full_name, phone, note)

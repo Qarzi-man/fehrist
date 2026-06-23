@@ -7,6 +7,7 @@ import ClientsPage from './pages/ClientsPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import SettingsPage from './pages/SettingsPage'
 import ProfilePage from './pages/ProfilePage'
+import BillingPage from './pages/BillingPage'
 import OfertaPage from './pages/OfertaPage'
 import PrivacyPage from './pages/PrivacyPage'
 
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
         <Route path="/settings"  element={<RequireAuth><SettingsPage /></RequireAuth>} />
         <Route path="/profile"   element={<RequireAuth><ProfilePage /></RequireAuth>} />
+        <Route path="/billing"   element={<RequireAuth><BillingPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

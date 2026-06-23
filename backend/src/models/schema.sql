@@ -148,6 +148,32 @@ ALTER TABLE businesses ADD COLUMN IF NOT EXISTS logo   TEXT;
 -- Partial schedule payments
 ALTER TABLE debt_schedules ADD COLUMN IF NOT EXISTS paid_amount DECIMAL(15,2);
 
+-- Monetization: subscription & billing
+ALTER TABLE businesses ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(20) DEFAULT 'free';
+ALTER TABLE businesses ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ;
+
+CREATE TABLE IF NOT EXISTS sms_balance (
+  id             SERIAL PRIMARY KEY,
+  business_id    INTEGER UNIQUE REFERENCES businesses(id) ON DELETE CASCADE,
+  total_sent     INTEGER DEFAULT 0,
+  monthly_sent   INTEGER DEFAULT 0,
+  month_reset_at TIMESTAMPTZ DEFAULT NOW(),
+  purchased_sms  INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS payment_requests (
+  id          SERIAL PRIMARY KEY,
+  business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+  user_id     INTEGER REFERENCES users(id),
+  type        VARCHAR(50) NOT NULL,
+  amount      NUMERIC(10,2),
+  sms_count   INTEGER,
+  status      VARCHAR(20) DEFAULT 'pending',
+  note        TEXT,
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  approved_at TIMESTAMPTZ
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_debts_user_id         ON debts(user_id);
 CREATE INDEX IF NOT EXISTS idx_debts_client_id       ON debts(client_id);

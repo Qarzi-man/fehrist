@@ -1,9 +1,10 @@
 import { useState, FormEvent } from 'react'
 import { useT } from '../../i18n'
 import { createClient, updateClient, type Client } from '../../api/clients'
-import { getApiError } from '../../lib/utils'
+import { getApiError, getLimitError, type LimitError } from '../../lib/utils'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
+import LimitModal from '../ui/LimitModal'
 
 interface Props {
   clientToEdit?: Client
@@ -20,6 +21,7 @@ export default function ClientFormModal({ clientToEdit, onClose, onSuccess }: Pr
   const [note, setNote]   = useState(clientToEdit?.note ?? '')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [limitError, setLimitError] = useState<LimitError | null>(null)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -42,13 +44,16 @@ export default function ClientFormModal({ clientToEdit, onClose, onSuccess }: Pr
       }
       onSuccess()
     } catch (err) {
-      setError(getApiError(err, t.errNetwork))
+      const limit = getLimitError(err)
+      if (limit) { setLimitError(limit) } else { setError(getApiError(err, t.errNetwork)) }
     } finally {
       setLoading(false)
     }
   }
 
   return (
+    <>
+    {limitError && <LimitModal type={limitError} onClose={() => setLimitError(null)} />}
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
@@ -99,5 +104,6 @@ export default function ClientFormModal({ clientToEdit, onClose, onSuccess }: Pr
         </form>
       </div>
     </div>
+    </>
   )
 }

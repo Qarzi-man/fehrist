@@ -1,10 +1,14 @@
 const pool = require('../config/db');
 const { sendSms: sendViaSms } = require('../services/smsService');
+const { checkAndDeductSms } = require('../services/limitsService');
 
 async function send(req, res, next) {
   try {
     const { debt_id, phone, message, template_key } = req.body;
     if (!phone || !message) return res.status(400).json({ error: 'phone and message required' });
+
+    const smsCheck = await checkAndDeductSms(req.businessId);
+    if (!smsCheck.allowed) return res.status(402).json(smsCheck);
 
     let client_id = null;
     if (debt_id) {

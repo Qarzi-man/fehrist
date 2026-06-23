@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { checkBusinessLimit } = require('../services/limitsService');
 
 async function list(req, res, next) {
   try {
@@ -19,6 +20,10 @@ async function create(req, res, next) {
   try {
     const { name } = req.body;
     if (!name || !name.trim()) return res.status(400).json({ error: 'name required' });
+
+    const limitCheck = await checkBusinessLimit(req.user.userId);
+    if (!limitCheck.allowed) return res.status(402).json(limitCheck);
+
     const { rows } = await pool.query(
       'INSERT INTO businesses (owner_id, name) VALUES ($1, $2) RETURNING *',
       [req.user.userId, name.trim()]
