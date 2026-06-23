@@ -6,6 +6,8 @@ import DebtsPage from './pages/DebtsPage'
 import ClientsPage from './pages/ClientsPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import SettingsPage from './pages/SettingsPage'
+import OfertaPage from './pages/OfertaPage'
+import PrivacyPage from './pages/PrivacyPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token)
@@ -21,12 +23,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/auth" element={<RequireGuest><AuthPage /></RequireGuest>} />
+        <Route path="/auth"     element={<RequireGuest><AuthPage /></RequireGuest>} />
+        <Route path="/oferta"   element={<OfertaPage />} />
+        <Route path="/privacy"  element={<PrivacyPage />} />
         <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
         <Route path="/debts"     element={<RequireAuth><DebtsPage /></RequireAuth>} />
-        <Route path="/clients"    element={<RequireAuth><ClientsPage /></RequireAuth>} />
-        <Route path="/analytics"  element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
-        <Route path="/settings"   element={<RequireAuth><SettingsPage /></RequireAuth>} />
+        <Route path="/clients"   element={<RequireAuth><ClientsPage /></RequireAuth>} />
+        <Route path="/analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
+        <Route path="/settings"  element={<RequireAuth><SettingsPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

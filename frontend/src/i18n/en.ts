@@ -118,6 +118,12 @@ export const en: Translations = {
   exportPDF: 'Download PDF',
   exportExcel: 'Download Excel',
   printBtn: 'Print',
+  // Legal
+  agreeToTerms: 'I accept the terms',
+  termsPrefix: 'By registering, you agree to the',
+  termsAnd: 'and',
+  ofertaLink: 'Public Offer',
+  privacyLink: 'Privacy Policy',
   // Employees
   employees: 'Employees',
   inviteEmployee: 'Invite',

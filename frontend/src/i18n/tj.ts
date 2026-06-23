@@ -118,6 +118,12 @@ export const tj: Translations = {
   exportPDF: 'PDF зеркашӣ',
   exportExcel: 'Excel зеркашӣ',
   printBtn: 'Чоп кардан',
+  // Legal
+  agreeToTerms: 'Ман шартҳоро қабул мекунам',
+  termsPrefix: 'Бо сабти ном шумо розӣ мешавед бо',
+  termsAnd: 'ва',
+  ofertaLink: 'Оферта',
+  privacyLink: 'Сиёсати махфият',
   // Employees
   employees: 'Кормандон',
   inviteEmployee: 'Даъват кардан',

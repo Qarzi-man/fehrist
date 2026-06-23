@@ -118,6 +118,12 @@ export const uz: Translations = {
   exportPDF: 'PDF yuklab olish',
   exportExcel: 'Excel yuklab olish',
   printBtn: 'Chop etish',
+  // Legal
+  agreeToTerms: "Shartlarni qabul qilaman",
+  termsPrefix: "Ro'yxatdan o'tish orqali siz rozisiz",
+  termsAnd: 'va',
+  ofertaLink: 'Oferta',
+  privacyLink: 'Maxfiylik siyosati',
   // Employees
   employees: 'Xodimlar',
   inviteEmployee: 'Taklif qilish',

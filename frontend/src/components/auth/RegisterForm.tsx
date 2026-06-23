@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../../api/client'
 import { useAuthStore } from '../../store/authStore'
 import { useT } from '../../i18n'
@@ -47,6 +47,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
   const [businessName, setBusinessName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -182,6 +183,26 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
         autoComplete="new-password"
       />
 
+      {/* Terms checkbox */}
+      <label className="flex items-start gap-2.5 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={termsAccepted}
+          onChange={(e) => setTermsAccepted(e.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 shrink-0"
+        />
+        <span className="text-xs text-gray-500 leading-relaxed">
+          {t.termsPrefix}{' '}
+          <Link to="/oferta" target="_blank" className="font-semibold text-indigo-600 hover:underline">
+            {t.ofertaLink}
+          </Link>
+          {' '}{t.termsAnd}{' '}
+          <Link to="/privacy" target="_blank" className="font-semibold text-indigo-600 hover:underline">
+            {t.privacyLink}
+          </Link>
+        </span>
+      </label>
+
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
       <div className="flex gap-2 mt-1">
@@ -193,7 +214,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
         >
           ←
         </Button>
-        <Button type="submit" loading={loading} className="flex-[3]">
+        <Button type="submit" loading={loading} disabled={!termsAccepted} className="flex-[3]">
           {t.verifyAndRegister}
         </Button>
       </div>

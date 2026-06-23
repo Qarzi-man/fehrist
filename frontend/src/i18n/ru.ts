@@ -125,6 +125,12 @@ export const ru = {
   exportPDF: 'Скачать PDF',
   exportExcel: 'Скачать Excel',
   printBtn: 'Печать',
+  // Legal
+  agreeToTerms: 'Я принимаю условия',
+  termsPrefix: 'Регистрируясь, вы соглашаетесь с',
+  termsAnd: 'и',
+  ofertaLink: 'Офертой',
+  privacyLink: 'Политикой конфиденциальности',
   // Employees
   employees: 'Сотрудники',
   inviteEmployee: 'Пригласить',
