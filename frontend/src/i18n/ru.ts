@@ -184,6 +184,14 @@ export const ru = {
   schedulePartial: 'Частично',
   paymentAmount: 'Сумма оплаты',
   paidOf: 'из',
+  // Notifications
+  notifications: 'Уведомления',
+  noNotifications: 'Всё чисто 🎉',
+  markAllRead: 'Прочитать все',
+  justNow: 'Только что',
+  minuteAgo: 'мин. назад',
+  hourAgo: 'ч. назад',
+  dayAgo: 'д. назад',
   // Profile page
   profile: 'Профиль',
   uploadPhoto: 'Загрузить фото',

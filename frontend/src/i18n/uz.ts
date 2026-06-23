@@ -177,6 +177,14 @@ export const uz: Translations = {
   schedulePartial: 'Qisman',
   paymentAmount: 'To\'lov summasi',
   paidOf: 'dan',
+  // Notifications
+  notifications: 'Bildirishnomalar',
+  noNotifications: 'Hamma narsa yaxshi 🎉',
+  markAllRead: 'Barchasini o\'qildi',
+  justNow: 'Hozir',
+  minuteAgo: 'daq. oldin',
+  hourAgo: 'soat oldin',
+  dayAgo: 'kun oldin',
   // Profile page
   profile: 'Profil',
   uploadPhoto: 'Rasm yuklash',

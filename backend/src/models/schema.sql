@@ -127,6 +127,20 @@ CREATE TABLE IF NOT EXISTS debt_schedules (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- In-app notifications
+CREATE TABLE IF NOT EXISTS notifications (
+  id          SERIAL PRIMARY KEY,
+  user_id     INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  business_id INTEGER REFERENCES businesses(id) ON DELETE CASCADE,
+  type        VARCHAR(50) NOT NULL,
+  title       VARCHAR(255) NOT NULL,
+  body        TEXT,
+  is_read     BOOLEAN DEFAULT FALSE,
+  data        JSONB,
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, created_at DESC);
+
 -- Profile & logo
 ALTER TABLE users      ADD COLUMN IF NOT EXISTS avatar TEXT;
 ALTER TABLE businesses ADD COLUMN IF NOT EXISTS logo   TEXT;

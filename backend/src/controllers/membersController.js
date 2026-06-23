@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const { sendSms } = require('../services/smsService');
+const { createNotification } = require('../services/notificationsService');
 
 async function list(req, res, next) {
   try {
@@ -70,6 +71,15 @@ async function invite(req, res, next) {
       `, [req.businessId, target.id, trimmed, req.user.userId]);
       row = { ...rows[0], full_name: target.full_name };
 
+      createNotification({
+        userId: target.id,
+        businessId: req.businessId,
+        type: 'invite_received',
+        title: `Приглашение в бизнес "${bizName}"`,
+        body: 'Войдите в приложение чтобы принять приглашение',
+        data: { business_id: req.businessId, business_name: bizName, member_id: rows[0].id },
+      });
+
       try {
         const smsResult = await sendSms(trimmed, `Вас пригласили в бизнес "${bizName}" в Daftarcha. Войдите в приложение чтобы принять приглашение.`);
         console.log('[Members/invite] SMS result (registered):', JSON.stringify(smsResult));
@@ -126,7 +136,23 @@ async function accept(req, res, next) {
       RETURNING *
     `, [id, req.user.userId]);
     if (!rows.length) return res.status(404).json({ error: 'Invitation not found' });
-    res.json(rows[0]);
+    const member = rows[0];
+
+    // Notify business owner
+    const biz = await pool.query('SELECT owner_id, name FROM businesses WHERE id = $1', [member.business_id]);
+    if (biz.rows.length) {
+      const accepter = await pool.query('SELECT full_name FROM users WHERE id = $1', [req.user.userId]);
+      createNotification({
+        userId: biz.rows[0].owner_id,
+        businessId: member.business_id,
+        type: 'invite_accepted',
+        title: 'Сотрудник принял приглашение',
+        body: `${accepter.rows[0]?.full_name ?? 'Новый сотрудник'} присоединился к "${biz.rows[0].name}"`,
+        data: { business_id: member.business_id, user_id: req.user.userId },
+      });
+    }
+
+    res.json(member);
   } catch (err) { next(err); }
 }
 

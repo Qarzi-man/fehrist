@@ -177,6 +177,14 @@ export const tj: Translations = {
   schedulePartial: 'Қисман',
   paymentAmount: 'Маблағи пардохт',
   paidOf: 'аз',
+  // Notifications
+  notifications: 'Огоҳиҳо',
+  noNotifications: 'Ҳама чиз тоза аст 🎉',
+  markAllRead: 'Ҳамаро хондам',
+  justNow: 'Ҳозир',
+  minuteAgo: 'дақ. пеш',
+  hourAgo: 'соат пеш',
+  dayAgo: 'рӯз пеш',
   // Profile page
   profile: 'Профил',
   uploadPhoto: 'Аксро бор кардан',

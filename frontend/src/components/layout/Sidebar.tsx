@@ -5,6 +5,7 @@ import { useT } from '../../i18n'
 import { useIsOwner } from '../../lib/useIsOwner'
 import { avatarGradient } from '../../lib/avatar'
 import BusinessSwitcher from './BusinessSwitcher'
+import NotificationBell from './NotificationBell'
 
 const HomeIcon = () => (
   <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -91,6 +92,14 @@ export default function Sidebar() {
             </NavLink>
           ))}
         </nav>
+
+        {/* Notifications */}
+        <div className="px-3 py-1 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-2 rounded-xl px-3 py-2">
+            <NotificationBell />
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t.notifications}</span>
+          </div>
+        </div>
 
         {/* User + logout */}
         <div className="p-3 border-t border-gray-100 dark:border-gray-700">

@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { createNotification } = require('../services/notificationsService');
 
 const JOINS = `
   FROM debts d
@@ -60,6 +61,26 @@ async function list(req, res, next) {
     ]);
 
     const total = parseInt(countResult.rows[0].total);
+
+    // Fire-and-forget: create overdue_debt notifications for newly-overdue debts
+    pool.query(`
+      INSERT INTO notifications (user_id, business_id, type, title, body, data)
+      SELECT $2, d.business_id, 'overdue_debt',
+        'Просроченный долг: ' || c.full_name,
+        'Долг ' || d.amount || ' ' || d.currency || ' просрочен',
+        jsonb_build_object('debt_id', d.id, 'client_name', c.full_name, 'amount', d.amount, 'currency', d.currency)
+      FROM debts d
+      JOIN clients c ON c.id = d.client_id
+      WHERE d.business_id = $1 AND d.deleted_at IS NULL
+        AND d.status != 'paid'
+        AND d.due_date IS NOT NULL AND d.due_date < CURRENT_DATE
+        AND NOT EXISTS (
+          SELECT 1 FROM notifications n
+          WHERE n.user_id = $2 AND n.type = 'overdue_debt'
+            AND (n.data->>'debt_id')::int = d.id
+        )
+    `, [req.businessId, req.user.userId]).catch(() => {});
+
     res.json({
       data:       dataResult.rows,
       total,

@@ -177,6 +177,14 @@ export const en: Translations = {
   schedulePartial: 'Partial',
   paymentAmount: 'Payment amount',
   paidOf: 'of',
+  // Notifications
+  notifications: 'Notifications',
+  noNotifications: 'All clear 🎉',
+  markAllRead: 'Mark all read',
+  justNow: 'Just now',
+  minuteAgo: 'min ago',
+  hourAgo: 'hr ago',
+  dayAgo: 'd ago',
   // Profile page
   profile: 'Profile',
   uploadPhoto: 'Upload photo',

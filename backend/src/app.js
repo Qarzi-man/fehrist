@@ -18,7 +18,8 @@ const debtsRouter      = require('./routes/debts');
 const analyticsRouter  = require('./routes/analytics');
 const membersRouter    = require('./routes/members');
 const smsRouter        = require('./routes/sms');
-const profileRouter    = require('./routes/profile');
+const profileRouter        = require('./routes/profile');
+const notificationsRouter  = require('./routes/notifications');
 
 // v1 — primary
 app.use('/api/v1/auth',             authRouter);
@@ -30,6 +31,7 @@ app.use('/api/v1/analytics',        analyticsRouter);
 app.use('/api/v1/business/members', membersRouter);
 app.use('/api/v1/sms',              smsRouter);
 app.use('/api/v1/profile',          profileRouter);
+app.use('/api/v1/notifications',    notificationsRouter);
 
 // legacy aliases (kept for backward compatibility)
 app.use('/api/auth',             authRouter);
