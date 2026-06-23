@@ -67,7 +67,17 @@ export default function ProfilePage() {
   return (
     <AppLayout>
       <div className="max-w-lg mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-8">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6">{t.profile}</h1>
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 -ml-2 rounded-xl text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">{t.profile}</h1>
+        </div>
 
         {/* Avatar */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 mb-4">
