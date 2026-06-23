@@ -215,7 +215,7 @@ export const uz: Translations = {
   paymentInstruction: '{amount} somoniy Alif Mobi hamyoniga o\'tkazing: 939307070. To\'lovdan so\'ng bizga yozing: niyatorzuzoda@gmail.com chek bilan. 24 soat ichida faollashtirамиз.',
   paymentRequested: 'So\'rov yuborildi! Siz bilan bog\'lanamiz.',
   limitReachedTitle: 'Limit tugadi',
-  limitBusiness: 'bepul tarif bizneslar (maksimal 1)',
+  limitBusiness: 'bepul tarif bizneslar (maksimal 2)',
   limitClient: 'bepul tarif mijozlar (maksimal 50)',
   limitSms: 'bu oy bepul SMS (maksimal 10)',
   goToBilling: 'Tariflarga o\'tish',

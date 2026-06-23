@@ -11,9 +11,9 @@ import {
 } from '../api/billing'
 
 const SMS_PACKAGES = [
-  { count: 50,  price: 35 },
-  { count: 100, price: 70 },
-  { count: 300, price: 210 },
+  { count: 50,  price: 25 },
+  { count: 100, price: 50 },
+  { count: 300, price: 150 },
 ]
 
 interface PayModal {
@@ -160,6 +160,23 @@ export default function BillingPage() {
                     <span className="mt-1 text-[10px] font-semibold text-white bg-indigo-500 rounded-full px-2 py-0.5">{t.buyBtn}</span>
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Subscription */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-4">{t.billing}</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">29 {t.billing === 'Тарифы' ? 'сомони' : 'som.'} / мес.</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Безлимит клиентов и бизнесов</p>
+                </div>
+                <button
+                  onClick={() => { setSuccess(false); setPayModal({ type: 'subscription', amount: 29, label: 'Подписка — 29 сом./мес.' }) }}
+                  className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition"
+                >
+                  {t.buyBtn}
+                </button>
               </div>
             </div>
 

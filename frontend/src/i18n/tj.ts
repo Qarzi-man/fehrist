@@ -215,7 +215,7 @@ export const tj: Translations = {
   paymentInstruction: '{amount} сомониро ба ҳамёни Алиф Моби: 939307070 интиқол диҳед. Пас аз пардохт, ба мо нависед: niyatorzuzoda@gmail.com бо чек. Дар давоми 24 соат фаъол мекунем.',
   paymentRequested: 'Дархост фиристода шуд! Бо шумо тамос мегирем.',
   limitReachedTitle: 'Лимит тамом шуд',
-  limitBusiness: 'тиҷорат дар тарифи ройгон (ҳадди аксар 1)',
+  limitBusiness: 'тиҷорат дар тарифи ройгон (ҳадди аксар 2)',
   limitClient: 'муштарӣ дар тарифи ройгон (ҳадди аксар 50)',
   limitSms: 'SMS-и ройгон дар моҳ (ҳадди аксар 10)',
   goToBilling: 'Ба тарифҳо гузаштан',

@@ -215,7 +215,7 @@ export const en: Translations = {
   paymentInstruction: 'Transfer {amount} somoni to Alif Mobi wallet: 939307070. After payment, email us: niyatorzuzoda@gmail.com with your receipt. We will activate within 24 hours.',
   paymentRequested: 'Request sent! We will contact you.',
   limitReachedTitle: 'Limit reached',
-  limitBusiness: 'businesses on the free plan (max 1)',
+  limitBusiness: 'businesses on the free plan (max 2)',
   limitClient: 'clients on the free plan (max 50)',
   limitSms: 'free SMS this month (max 10)',
   goToBilling: 'View plans',

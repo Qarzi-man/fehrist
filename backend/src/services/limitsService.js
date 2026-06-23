@@ -1,6 +1,6 @@
 const pool = require('../config/db');
 
-const FREE_BUSINESSES  = 1;
+const FREE_BUSINESSES  = 2;
 const FREE_CLIENTS     = 50;
 const FREE_SMS_MONTHLY = 10;
 
