@@ -69,6 +69,8 @@ export default function ClientsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [search, setSearch] = useState('')
+  const [sort, setSort] = useState('name')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [page, setPage] = useState(1)
   const [showAdd, setShowAdd] = useState(false)
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
@@ -77,20 +79,26 @@ export default function ClientsPage() {
   const load = useCallback(() => {
     setLoading(true)
     setError(false)
-    getClients({ search: search.trim() || undefined, page, limit: LIMIT })
+    getClients({ search: search.trim() || undefined, sort, order: sortOrder, page, limit: LIMIT })
       .then(setResult)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [search, page, activeBusinessId])
+  }, [search, sort, sortOrder, page, activeBusinessId])
 
   useEffect(() => { load() }, [load])
-  useEffect(() => { setPage(1) }, [search])
+  useEffect(() => { setPage(1) }, [search, sort, sortOrder])
 
   const clients    = result?.data ?? []
   const total      = result?.total ?? 0
   const totalPages = result?.totalPages ?? 1
   const from = total === 0 ? 0 : (page - 1) * LIMIT + 1
   const to   = Math.min(page * LIMIT, total)
+
+  const sortOptions = [
+    { value: 'name',  label: t.sortName },
+    { value: 'date',  label: t.sortDate },
+    { value: 'debts', label: t.sortDebts },
+  ]
 
   return (
     <AppLayout>
@@ -104,7 +112,7 @@ export default function ClientsPage() {
         </div>
 
         {/* Search */}
-        <div className="relative mb-5">
+        <div className="relative mb-3">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -115,6 +123,37 @@ export default function ClientsPage() {
             placeholder={t.searchContact}
             className="w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 pl-9 pr-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30"
           />
+        </div>
+
+        {/* Sort controls */}
+        <div className="flex items-center gap-2 mb-5">
+          <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{t.sortBy}:</span>
+          <div className="flex gap-1 flex-wrap">
+            {sortOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  if (sort === opt.value) {
+                    setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'))
+                  } else {
+                    setSort(opt.value)
+                    setSortOrder('asc')
+                  }
+                }}
+                className={[
+                  'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1',
+                  sort === opt.value
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600',
+                ].join(' ')}
+              >
+                {opt.label}
+                {sort === opt.value && (
+                  <span className="font-bold">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Content */}
@@ -159,27 +198,11 @@ export default function ClientsPage() {
 
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between px-4 md:px-6 py-3 border-t border-gray-100 dark:border-gray-700">
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      {from}–{to} / {total}
-                    </span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">{from}–{to} / {total}</span>
                     <div className="flex items-center gap-2">
-                      <button
-                        disabled={page <= 1}
-                        onClick={() => setPage((p) => p - 1)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 disabled:opacity-30 hover:enabled:bg-gray-50 dark:hover:enabled:bg-gray-700 transition-colors"
-                      >
-                        ←
-                      </button>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 min-w-[60px] text-center">
-                        {page} / {totalPages}
-                      </span>
-                      <button
-                        disabled={page >= totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 disabled:opacity-30 hover:enabled:bg-gray-50 dark:hover:enabled:bg-gray-700 transition-colors"
-                      >
-                        →
-                      </button>
+                      <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 disabled:opacity-30 hover:enabled:bg-gray-50 dark:hover:enabled:bg-gray-700 transition-colors">←</button>
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 min-w-[60px] text-center">{page} / {totalPages}</span>
+                      <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 disabled:opacity-30 hover:enabled:bg-gray-50 dark:hover:enabled:bg-gray-700 transition-colors">→</button>
                     </div>
                   </div>
                 )}
@@ -190,12 +213,8 @@ export default function ClientsPage() {
       </div>
 
       {showAdd && (
-        <ClientFormModal
-          onClose={() => setShowAdd(false)}
-          onSuccess={() => { setShowAdd(false); load() }}
-        />
+        <ClientFormModal onClose={() => setShowAdd(false)} onSuccess={() => { setShowAdd(false); load() }} />
       )}
-
       {selectedClient && (
         <ClientDetailModal
           client={selectedClient}
@@ -204,7 +223,6 @@ export default function ClientsPage() {
           onDeleted={() => { setSelectedClient(null); load() }}
         />
       )}
-
       {editingClient && (
         <ClientFormModal
           clientToEdit={editingClient}

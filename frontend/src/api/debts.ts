@@ -62,10 +62,13 @@ export interface UpdateDebtPayload {
 export interface DebtsFilters {
   status?: string
   type?: string
+  kind?: string
   search?: string
   currency?: string
   date_from?: string
   date_to?: string
+  sort?: string
+  order?: string
   page?: number
   limit?: number
 }

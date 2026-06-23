@@ -31,6 +31,8 @@ export interface PaginatedClients {
 
 export async function getClients(params?: {
   search?: string
+  sort?: string
+  order?: string
   page?: number
   limit?: number
 }): Promise<PaginatedClients> {

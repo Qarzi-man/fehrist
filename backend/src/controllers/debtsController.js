@@ -18,17 +18,27 @@ const WITH_COMPUTED = `
     END AS computed_status
   ${JOINS}`;
 
+const DEBT_SORT_MAP = {
+  amount: 'd.amount',
+  date:   'd.created_at',
+  name:   'c.full_name',
+};
+
 async function list(req, res, next) {
   try {
-    const { status, type, search, currency, date_from, date_to } = req.query;
+    const { status, type, kind, search, currency, date_from, date_to, sort, order } = req.query;
     const page   = Math.max(1, parseInt(req.query.page)  || 1);
     const limit  = Math.min(1000, Math.max(1, parseInt(req.query.limit) || 20));
     const offset = (page - 1) * limit;
+
+    const sortCol = DEBT_SORT_MAP[sort] ?? 'd.created_at';
+    const sortDir = order === 'asc' ? 'ASC' : 'DESC';
 
     const params = [req.businessId];
     let whereExtra = '';
 
     if (type)      { params.push(type);          whereExtra += ` AND d.type = $${params.length}`; }
+    if (kind)      { params.push(kind);           whereExtra += ` AND d.kind = $${params.length}`; }
     if (search)    { params.push(`%${search}%`); whereExtra += ` AND c.full_name ILIKE $${params.length}`; }
     if (currency)  { params.push(currency);       whereExtra += ` AND d.currency = $${params.length}`; }
     if (date_from) { params.push(date_from);      whereExtra += ` AND d.created_at >= $${params.length}::date`; }
@@ -44,7 +54,7 @@ async function list(req, res, next) {
     const [countResult, dataResult] = await Promise.all([
       pool.query(`SELECT COUNT(*) AS total ${JOINS} ${whereClause}`, params),
       pool.query(
-        `${WITH_COMPUTED} ${whereClause} ORDER BY d.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+        `${WITH_COMPUTED} ${whereClause} ORDER BY ${sortCol} ${sortDir} LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
         [...params, limit, offset]
       ),
     ]);
@@ -229,11 +239,15 @@ async function exportDebts(req, res, next) {
   try {
     const ExcelJS = require('exceljs');
     const bid = req.businessId;
-    const { type, status, search, currency, date_from, date_to } = req.query;
+    const { type, kind, status, search, currency, date_from, date_to, sort, order } = req.query;
+
+    const sortCol = DEBT_SORT_MAP[sort] ?? 'd.created_at';
+    const sortDir = order === 'asc' ? 'ASC' : 'DESC';
 
     const params = [bid];
     let whereExtra = '';
     if (type)      { params.push(type);          whereExtra += ` AND d.type = $${params.length}`; }
+    if (kind)      { params.push(kind);           whereExtra += ` AND d.kind = $${params.length}`; }
     if (search)    { params.push(`%${search}%`); whereExtra += ` AND c.full_name ILIKE $${params.length}`; }
     if (currency)  { params.push(currency);       whereExtra += ` AND d.currency = $${params.length}`; }
     if (date_from) { params.push(date_from);      whereExtra += ` AND d.created_at >= $${params.length}::date`; }
@@ -246,7 +260,7 @@ async function exportDebts(req, res, next) {
 
     const whereClause = `WHERE d.business_id = $1 AND d.deleted_at IS NULL${whereExtra}${statusClause}`;
     const { rows } = await pool.query(
-      `${WITH_COMPUTED} ${whereClause} ORDER BY d.created_at DESC`,
+      `${WITH_COMPUTED} ${whereClause} ORDER BY ${sortCol} ${sortDir}`,
       params
     );
 

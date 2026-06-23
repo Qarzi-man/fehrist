@@ -142,6 +142,17 @@ export const tj: Translations = {
   memberNotFound: 'Корбар бо ин рақам ёфт нашуд',
   removeMember: 'Хориҷ кардан',
   noMembers: 'Кормандон ҳанӯз нест',
+  // Filters & sorting
+  filters: 'Филтрҳо',
+  sortBy: 'Мураттаб',
+  sortAmount: 'Аз рӯи маблағ',
+  sortDate: 'Аз рӯи сана',
+  sortName: 'Аз рӯи ном',
+  sortDebts: 'Аз рӯи қарзҳо',
+  sortAsc: 'Афзоишёбанда',
+  sortDesc: 'Коҳишёбанда',
+  allKinds: 'Ҳама навъ',
+  resetAll: 'Тозакунӣ',
   // SMS notifications
   sendSms: 'SMS фиристодан',
   smsNotification: 'SMS огоҳӣ',

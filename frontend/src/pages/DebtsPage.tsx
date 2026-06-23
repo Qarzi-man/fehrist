@@ -15,7 +15,8 @@ type FilterTab = 'all' | 'receivable' | 'payable' | 'overdue'
 const CURRENCIES = ['TJS', 'USD', 'EUR', 'RUB']
 const LIMIT = 20
 
-const selectCls = 'rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
+const selectCls = 'w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30'
+const labelCls = 'block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1'
 
 function DebtRow({ debt, onClick }: { debt: Debt; onClick: () => void }) {
   const t = useT()
@@ -35,9 +36,7 @@ function DebtRow({ debt, onClick }: { debt: Debt; onClick: () => void }) {
       onClick={onClick}
       className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4 hover:bg-gray-50/80 dark:hover:bg-gray-700/40 cursor-pointer transition-all duration-150 group"
     >
-      <div
-        className={`h-10 w-10 md:h-11 md:w-11 rounded-full bg-gradient-to-br ${avatarGradient(debt.client_name)} flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-150`}
-      >
+      <div className={`h-10 w-10 md:h-11 md:w-11 rounded-full bg-gradient-to-br ${avatarGradient(debt.client_name)} flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-150`}>
         {debt.client_name[0].toUpperCase()}
       </div>
 
@@ -55,6 +54,11 @@ function DebtRow({ debt, onClick }: { debt: Debt; onClick: () => void }) {
             {isReceivable ? t.receivable : t.payable}
           </span>
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusCls}`}>{statusLabel}</span>
+          {debt.kind === 'installment' && (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+              {t.installmentKind}
+            </span>
+          )}
         </div>
       </div>
     </li>
@@ -65,90 +69,100 @@ export default function DebtsPage() {
   const t = useT()
   const activeBusiness = useBusinessStore((s) => s.activeBusiness)
   const activeBusinessId = activeBusiness?.id
+
   const [result, setResult] = useState<PaginatedDebts | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [tab, setTab] = useState<FilterTab>('all')
   const [search, setSearch] = useState('')
   const [currency, setCurrency] = useState('')
+  const [kind, setKind] = useState('')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [sort, setSort] = useState('date')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [page, setPage] = useState(1)
   const [showAdd, setShowAdd] = useState(false)
   const [selectedDebt, setSelectedDebt] = useState<Debt | null>(null)
   const [exportOpen, setExportOpen] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
   const [exporting, setExporting] = useState(false)
   const exportRef = useRef<HTMLDivElement>(null)
+  const filterRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function onMouseDown(e: MouseEvent) {
-      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
-        setExportOpen(false)
-      }
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) setExportOpen(false)
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) setShowFilters(false)
     }
     document.addEventListener('mousedown', onMouseDown)
     return () => document.removeEventListener('mousedown', onMouseDown)
   }, [])
 
+  function buildFilters(pg: number, lim: number): Record<string, string | number> {
+    const f: Record<string, string | number> = { page: pg, limit: lim }
+    if (tab === 'receivable') f.type = 'receivable'
+    else if (tab === 'payable') f.type = 'payable'
+    else if (tab === 'overdue') f.status = 'overdue'
+    if (search.trim()) f.search = search.trim()
+    if (currency) f.currency = currency
+    if (kind)     f.kind     = kind
+    if (dateFrom) f.date_from = dateFrom
+    if (dateTo)   f.date_to   = dateTo
+    f.sort  = sort
+    f.order = sortOrder
+    return f
+  }
+
   const load = useCallback(() => {
     setLoading(true)
     setError(false)
-    const filters: Record<string, string | number> = { page, limit: LIMIT }
-    if (tab === 'receivable') filters.type = 'receivable'
-    else if (tab === 'payable') filters.type = 'payable'
-    else if (tab === 'overdue') filters.status = 'overdue'
-    if (search.trim()) filters.search = search.trim()
-    if (currency) filters.currency = currency
-    if (dateFrom) filters.date_from = dateFrom
-    if (dateTo)   filters.date_to   = dateTo
-    getDebts(filters)
+    getDebts(buildFilters(page, LIMIT))
       .then(setResult)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [tab, search, currency, dateFrom, dateTo, page, activeBusinessId])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, search, currency, kind, dateFrom, dateTo, sort, sortOrder, page, activeBusinessId])
 
   useEffect(() => { load() }, [load])
-
-  // Reset to page 1 when any filter changes (not when page itself changes)
-  useEffect(() => { setPage(1) }, [tab, search, currency, dateFrom, dateTo])
+  useEffect(() => { setPage(1) }, [tab, search, currency, kind, dateFrom, dateTo, sort, sortOrder])
 
   async function handleExportPDF() {
     setExportOpen(false)
     setExporting(true)
     try {
-      const filters: Record<string, string | number> = { page: 1, limit: 1000 }
-      if (tab === 'receivable') filters.type = 'receivable'
-      else if (tab === 'payable') filters.type = 'payable'
-      else if (tab === 'overdue') filters.status = 'overdue'
-      if (search.trim()) filters.search = search.trim()
-      if (currency) filters.currency = currency
-      if (dateFrom) filters.date_from = dateFrom
-      if (dateTo)   filters.date_to   = dateTo
-      const res = await getDebts(filters)
+      const res = await getDebts(buildFilters(1, 1000))
       await exportDebtsToPDF(res.data, activeBusiness?.name ?? 'Daftarcha')
-    } finally {
-      setExporting(false)
-    }
+    } finally { setExporting(false) }
   }
 
   async function handleExportExcel() {
     setExportOpen(false)
     setExporting(true)
     try {
-      const filters: Record<string, string | number> = { page: 1, limit: 1000 }
-      if (tab === 'receivable') filters.type = 'receivable'
-      else if (tab === 'payable') filters.type = 'payable'
-      else if (tab === 'overdue') filters.status = 'overdue'
-      if (search.trim()) filters.search = search.trim()
-      if (currency) filters.currency = currency
-      if (dateFrom) filters.date_from = dateFrom
-      if (dateTo)   filters.date_to   = dateTo
-      const res = await getDebts(filters)
+      const res = await getDebts(buildFilters(1, 1000))
       exportDebtsToExcel(res.data)
-    } finally {
-      setExporting(false)
-    }
+    } finally { setExporting(false) }
   }
+
+  function resetFilters() {
+    setCurrency('')
+    setKind('')
+    setDateFrom('')
+    setDateTo('')
+    setSort('date')
+    setSortOrder('desc')
+  }
+
+  const pills = [
+    currency ? { key: 'currency', label: currency,                                              clear: () => setCurrency('') } : null,
+    kind     ? { key: 'kind',     label: kind === 'standard' ? t.standardKind : t.installmentKind, clear: () => setKind('') } : null,
+    dateFrom ? { key: 'df',       label: `${t.dateFrom}: ${dateFrom}`,                          clear: () => setDateFrom('') } : null,
+    dateTo   ? { key: 'dt',       label: `${t.dateTo}: ${dateTo}`,                              clear: () => setDateTo('') } : null,
+    sort !== 'date' || sortOrder !== 'desc'
+             ? { key: 'sort',     label: `${sort === 'amount' ? t.sortAmount : sort === 'name' ? t.sortName : t.sortDate} ${sortOrder === 'asc' ? '↑' : '↓'}`, clear: () => { setSort('date'); setSortOrder('desc') } }
+             : null,
+  ].filter(Boolean) as { key: string; label: string; clear: () => void }[]
 
   const tabs: { key: FilterTab; label: string }[] = [
     { key: 'all',        label: t.filterAll },
@@ -163,6 +177,12 @@ export default function DebtsPage() {
   const from = total === 0 ? 0 : (page - 1) * LIMIT + 1
   const to = Math.min(page * LIMIT, total)
 
+  const sortOptions = [
+    { value: 'date',   label: t.sortDate },
+    { value: 'amount', label: t.sortAmount },
+    { value: 'name',   label: t.sortName },
+  ]
+
   return (
     <AppLayout>
       <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-8">
@@ -170,7 +190,6 @@ export default function DebtsPage() {
         <div className="flex items-center justify-between mb-6 md:mb-8">
           <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">{t.debts}</h1>
           <div className="flex items-center gap-2 print:hidden">
-            {/* Export dropdown */}
             <div className="relative" ref={exportRef}>
               <button
                 onClick={() => setExportOpen((o) => !o)}
@@ -189,43 +208,124 @@ export default function DebtsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-
               {exportOpen && (
                 <div className="absolute right-0 top-full mt-1 z-50 w-44 rounded-xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg py-1">
-                  <button
-                    onClick={handleExportPDF}
-                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
+                  <button onClick={handleExportPDF} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <span>📄</span>{t.exportPDF}
                   </button>
-                  <button
-                    onClick={handleExportExcel}
-                    className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
+                  <button onClick={handleExportExcel} className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <span>📊</span>{t.exportExcel}
                   </button>
                 </div>
               )}
             </div>
-
             <Button onClick={() => setShowAdd(true)} className="text-sm md:text-base px-4 md:px-5 py-2 md:py-2.5">
               {t.addDebt}
             </Button>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="relative mb-3">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t.searchContact}
-            className="w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 pl-9 pr-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30"
-          />
+        {/* Search + Filters button */}
+        <div className="flex gap-2 mb-3">
+          <div className="relative flex-1">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t.searchContact}
+              className="w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 pl-9 pr-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900/30"
+            />
+          </div>
+
+          {/* Filters button */}
+          <div className="relative" ref={filterRef}>
+            <button
+              onClick={() => setShowFilters((o) => !o)}
+              className={[
+                'flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors',
+                pills.length > 0
+                  ? 'border-indigo-300 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                  : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700',
+              ].join(' ')}
+            >
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0014 13.828V19a1 1 0 01-1.447.894l-4-2A1 1 0 018 17v-3.172a1 1 0 00-.293-.707L1.293 6.707A1 1 0 011 6V4z" />
+              </svg>
+              <span className="hidden sm:inline">{t.filters}</span>
+              {pills.length > 0 && (
+                <span className="h-4 min-w-[16px] px-1 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center">
+                  {pills.length}
+                </span>
+              )}
+            </button>
+
+            {/* Filter panel */}
+            {showFilters && (
+              <div className="absolute right-0 top-full mt-2 z-50 w-72 rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-4 flex flex-col gap-3">
+                {/* Currency */}
+                <div>
+                  <label className={labelCls}>{t.currency}</label>
+                  <select value={currency} onChange={(e) => setCurrency(e.target.value)} className={selectCls}>
+                    <option value="">{t.allCurrencies}</option>
+                    {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+
+                {/* Kind */}
+                <div>
+                  <label className={labelCls}>{t.debtType}</label>
+                  <select value={kind} onChange={(e) => setKind(e.target.value)} className={selectCls}>
+                    <option value="">{t.allKinds}</option>
+                    <option value="standard">{t.standardKind}</option>
+                    <option value="installment">{t.installmentKind}</option>
+                  </select>
+                </div>
+
+                {/* Date range */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className={labelCls}>{t.dateFrom}</label>
+                    <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={selectCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>{t.dateTo}</label>
+                    <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={selectCls} />
+                  </div>
+                </div>
+
+                {/* Sort */}
+                <div>
+                  <label className={labelCls}>{t.sortBy}</label>
+                  <div className="flex gap-2">
+                    <select value={sort} onChange={(e) => setSort(e.target.value)} className={`${selectCls} flex-1`}>
+                      {sortOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'))}
+                      className="h-9 w-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-sm font-bold"
+                      title={sortOrder === 'asc' ? t.sortAsc : t.sortDesc}
+                    >
+                      {sortOrder === 'asc' ? '↑' : '↓'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Reset */}
+                {pills.length > 0 && (
+                  <button
+                    onClick={resetFilters}
+                    className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-colors text-left"
+                  >
+                    {t.resetAll}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Tabs */}
@@ -244,46 +344,20 @@ export default function DebtsPage() {
           ))}
         </div>
 
-        {/* Extra filters */}
-        <div className="flex flex-wrap gap-2 mb-5">
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            className={selectCls}
-          >
-            <option value="">{t.allCurrencies}</option>
-            {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-
-          <div className="flex items-center gap-1">
-            <label className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{t.dateFrom}</label>
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className={selectCls}
-            />
+        {/* Active filter pills */}
+        {pills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {pills.map((pill) => (
+              <span
+                key={pill.key}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 text-xs font-medium text-indigo-700 dark:text-indigo-300"
+              >
+                {pill.label}
+                <button onClick={pill.clear} className="hover:text-indigo-900 dark:hover:text-indigo-100 transition-colors leading-none">×</button>
+              </span>
+            ))}
           </div>
-
-          <div className="flex items-center gap-1">
-            <label className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{t.dateTo}</label>
-            <input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className={selectCls}
-            />
-          </div>
-
-          {(currency || dateFrom || dateTo) && (
-            <button
-              onClick={() => { setCurrency(''); setDateFrom(''); setDateTo('') }}
-              className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+        )}
 
         {/* Content */}
         {loading && (
@@ -328,30 +402,13 @@ export default function DebtsPage() {
                   ))}
                 </ul>
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between px-4 md:px-6 py-3 border-t border-gray-100 dark:border-gray-700">
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      {from}–{to} / {total}
-                    </span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">{from}–{to} / {total}</span>
                     <div className="flex items-center gap-2">
-                      <button
-                        disabled={page <= 1}
-                        onClick={() => setPage((p) => p - 1)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 disabled:opacity-30 hover:enabled:bg-gray-50 dark:hover:enabled:bg-gray-700 transition-colors"
-                      >
-                        ←
-                      </button>
-                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 min-w-[60px] text-center">
-                        {page} / {totalPages}
-                      </span>
-                      <button
-                        disabled={page >= totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 disabled:opacity-30 hover:enabled:bg-gray-50 dark:hover:enabled:bg-gray-700 transition-colors"
-                      >
-                        →
-                      </button>
+                      <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 disabled:opacity-30 hover:enabled:bg-gray-50 dark:hover:enabled:bg-gray-700 transition-colors">←</button>
+                      <span className="text-xs font-medium text-gray-700 dark:text-gray-300 min-w-[60px] text-center">{page} / {totalPages}</span>
+                      <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="h-8 w-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 disabled:opacity-30 hover:enabled:bg-gray-50 dark:hover:enabled:bg-gray-700 transition-colors">→</button>
                     </div>
                   </div>
                 )}
@@ -362,12 +419,8 @@ export default function DebtsPage() {
       </div>
 
       {showAdd && (
-        <AddDebtModal
-          onClose={() => setShowAdd(false)}
-          onSuccess={() => { setShowAdd(false); load() }}
-        />
+        <AddDebtModal onClose={() => setShowAdd(false)} onSuccess={() => { setShowAdd(false); load() }} />
       )}
-
       {selectedDebt && (
         <DebtDetailModal
           debt={selectedDebt}

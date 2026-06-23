@@ -142,6 +142,17 @@ export const uz: Translations = {
   memberNotFound: 'Bu telefon raqamli foydalanuvchi topilmadi',
   removeMember: "O'chirish",
   noMembers: 'Xodimlar hali yo\'q',
+  // Filters & sorting
+  filters: 'Filtrlar',
+  sortBy: 'Saralash',
+  sortAmount: "Summa bo'yicha",
+  sortDate: "Sana bo'yicha",
+  sortName: "Ism bo'yicha",
+  sortDebts: "Qarzlar bo'yicha",
+  sortAsc: "O'sish tartibida",
+  sortDesc: 'Kamayish tartibida',
+  allKinds: 'Barcha turlar',
+  resetAll: 'Tozalash',
   // SMS notifications
   sendSms: 'SMS yuborish',
   smsNotification: 'SMS xabarnoma',

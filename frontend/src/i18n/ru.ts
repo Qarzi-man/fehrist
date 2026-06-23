@@ -149,6 +149,17 @@ export const ru = {
   memberNotFound: 'Пользователь с таким телефоном не найден',
   removeMember: 'Удалить',
   noMembers: 'Сотрудников пока нет',
+  // Filters & sorting
+  filters: 'Фильтры',
+  sortBy: 'Сортировка',
+  sortAmount: 'По сумме',
+  sortDate: 'По дате',
+  sortName: 'По имени',
+  sortDebts: 'По долгам',
+  sortAsc: 'По возрастанию',
+  sortDesc: 'По убыванию',
+  allKinds: 'Все виды',
+  resetAll: 'Сбросить',
   // SMS notifications
   sendSms: 'Отправить SMS',
   smsNotification: 'SMS уведомление',

@@ -1,5 +1,11 @@
 const pool = require('../config/db');
 
+const CLIENT_SORT_MAP = {
+  name:  'c.full_name',
+  date:  'c.created_at',
+  debts: 'COALESCE(dstats.active_count, 0)',
+};
+
 async function list(req, res, next) {
   try {
     const bid    = req.businessId;
@@ -7,6 +13,9 @@ async function list(req, res, next) {
     const page   = Math.max(1, parseInt(req.query.page)  || 1);
     const limit  = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
     const offset = (page - 1) * limit;
+
+    const sortCol = CLIENT_SORT_MAP[req.query.sort] ?? 'c.full_name';
+    const sortDir = req.query.order === 'desc' ? 'DESC' : 'ASC';
 
     const [countResult, dataResult] = await Promise.all([
       pool.query(
@@ -44,7 +53,7 @@ async function list(req, res, next) {
          ) cstats ON true
          WHERE c.business_id = $1 AND c.deleted_at IS NULL
            AND ($2 = '' OR c.full_name ILIKE '%' || $2 || '%' OR c.phone ILIKE '%' || $2 || '%')
-         ORDER BY c.full_name
+         ORDER BY ${sortCol} ${sortDir}
          LIMIT $3 OFFSET $4`,
         [bid, search, limit, offset]
       ),

@@ -142,6 +142,17 @@ export const en: Translations = {
   memberNotFound: 'No user found with that phone number',
   removeMember: 'Remove',
   noMembers: 'No employees yet',
+  // Filters & sorting
+  filters: 'Filters',
+  sortBy: 'Sort by',
+  sortAmount: 'By amount',
+  sortDate: 'By date',
+  sortName: 'By name',
+  sortDebts: 'By debts',
+  sortAsc: 'Ascending',
+  sortDesc: 'Descending',
+  allKinds: 'All types',
+  resetAll: 'Reset all',
   // SMS notifications
   sendSms: 'Send SMS',
   smsNotification: 'SMS notification',
