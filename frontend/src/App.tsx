@@ -22,6 +22,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 function RequireAdmin({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token)
   const user  = useAuthStore((s) => s.user)
+  console.log('[RequireAdmin] token:', !!token, '| user:', user)
   if (!token) return <Navigate to="/auth" replace />
   if (!user?.is_admin) return <Navigate to="/dashboard" replace />
   return <>{children}</>
@@ -34,14 +35,18 @@ function RequireGuest({ children }: { children: React.ReactNode }) {
 
 function AppWithRefresh({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token)
+  const user  = useAuthStore((s) => s.user)
   const updateUser = useAuthStore((s) => s.updateUser)
   const [ready, setReady] = useState(!token)
 
   useEffect(() => {
+    console.log('[AppWithRefresh] token:', token ? token.slice(0, 20) + '...' : null)
+    console.log('[AppWithRefresh] user from store:', user)
     if (!token) { setReady(true); return }
     api.get('/auth/me')
       .then((r) => {
         console.log('[App] /me response:', r.data)
+        console.log('[App] user from store after /me:', { ...user, is_admin: r.data?.is_admin })
         if (typeof r.data?.is_admin === 'boolean') {
           updateUser({ is_admin: r.data.is_admin })
         }
