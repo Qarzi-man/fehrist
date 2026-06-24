@@ -25,11 +25,15 @@ export const oferta: Record<Lang, LegalDoc> = {
         text: 'Базовый тариф Сервиса предоставляется бесплатно. Дополнительные платные функции могут быть введены с предварительным уведомлением Пользователей не менее чем за 14 дней. Продолжение использования Сервиса после введения платных тарифов означает согласие с новыми условиями.',
       },
       {
-        title: '5. Ответственность',
+        title: '5. Стоимость услуг',
+        text: 'Бесплатный план:\n— 2 бизнеса, 50 клиентов на каждый бизнес, 3 сотрудника, 10 SMS в месяц.\n\nПодписка — 29 сомони/месяц:\n— Безлимитные бизнесы, клиенты и сотрудники.\n— 10 SMS бесплатно + дешёвые пакеты SMS.\n\nSMS пакеты (без подписки):\n— 50 SMS — 20 сомони\n— 100 SMS — 40 сомони\n— 300 SMS — 120 сомони\n\nSMS пакеты (с подпиской):\n— 50 SMS — 15 сомони\n— 100 SMS — 30 сомони\n— 300 SMS — 90 сомони',
+      },
+      {
+        title: '6. Ответственность',
         text: 'Исполнитель прилагает все усилия для обеспечения бесперебойной работы Сервиса, однако не гарантирует его непрерывную доступность. Исполнитель не несёт ответственности за косвенные убытки, возникшие в результате использования или невозможности использования Сервиса. Сервис предоставляется «как есть». Пользователь самостоятельно несёт ответственность за достоверность вводимых данных.',
       },
       {
-        title: '6. Реквизиты',
+        title: '7. Реквизиты',
         text: 'ИП Исмонов Ғафур Фарҳодович\nЕИН: 0331564805\nEmail: niyatorzuzoda@gmail.com\nСайт: daftarcha.tj\nРеспублика Таджикистан',
       },
     ],
@@ -56,11 +60,15 @@ export const oferta: Record<Lang, LegalDoc> = {
         text: 'Тарифи асосии Хизматрасонӣ ройгон пешниҳод карда мешавад. Функсияҳои иловагии пулакӣ метавонанд бо огоҳкунии пешакии на камтар аз 14 рӯз ҷорӣ карда шаванд.',
       },
       {
-        title: '5. Масъулият',
+        title: '5. Арзиши хизматҳо',
+        text: 'Нақшаи ройгон:\n— 2 тиҷорат, 50 муштарӣ дар ҳар тиҷорат, 3 корманд, 10 SMS дар моҳ.\n\nОбуна — 29 сомонӣ/моҳ:\n— Тиҷоратҳо, муштариён ва кормандони беҳудуд.\n— 10 SMS ройгон + пакетҳои SMS арзон.\n\nПакетҳои SMS (бе обуна):\n— 50 SMS — 20 сомонӣ\n— 100 SMS — 40 сомонӣ\n— 300 SMS — 120 сомонӣ\n\nПакетҳои SMS (бо обуна):\n— 50 SMS — 15 сомонӣ\n— 100 SMS — 30 сомонӣ\n— 300 SMS — 90 сомонӣ',
+      },
+      {
+        title: '6. Масъулият',
         text: 'Иҷрокунанда барои зараровариҳои ғайримустақим, ки дар натиҷаи истифода ё ғайриимкон будани истифодаи Хизматрасонӣ ба миён омадаанд, масъул нест. Хизматрасонӣ «чунон ки ҳаст» пешниҳод карда мешавад.',
       },
       {
-        title: '6. Маълумоти тамос',
+        title: '7. Маълумоти тамос',
         text: 'ЯФ Исмонов Ғафур Фарҳодович\nРМС: 0331564805\nEmail: niyatorzuzoda@gmail.com\nСомона: daftarcha.tj\nҶумҳурии Тоҷикистон',
       },
     ],
@@ -87,11 +95,15 @@ export const oferta: Record<Lang, LegalDoc> = {
         text: 'Xizmatning asosiy tarifi bepul taqdim etiladi. Qo\'shimcha pullik funksiyalar kamida 14 kun oldin foydalanuvchilarni oldindan xabardor qilgan holda kiritilishi mumkin.',
       },
       {
-        title: '5. Javobgarlik',
+        title: '5. Xizmat narxlari',
+        text: 'Bepul tarif:\n— 2 ta biznes, har biznesdа 50 ta mijoz, 3 ta xodim, oyiga 10 ta SMS.\n\nObuna — 29 somoniy/oy:\n— Cheksiz bizneslar, mijozlar va xodimlar.\n— 10 ta bepul SMS + arzon SMS paketlar.\n\nSMS paketlar (obunasiz):\n— 50 SMS — 20 somoniy\n— 100 SMS — 40 somoniy\n— 300 SMS — 120 somoniy\n\nSMS paketlar (obuna bilan):\n— 50 SMS — 15 somoniy\n— 100 SMS — 30 somoniy\n— 300 SMS — 90 somoniy',
+      },
+      {
+        title: '6. Javobgarlik',
         text: 'Ijrochi Xizmatdan foydalanish yoki undan foydalanib bo\'lmasligi natijasida kelib chiqqan bilvosita zararlar uchun javobgar emas. Xizmat "bor holida" taqdim etiladi.',
       },
       {
-        title: '6. Rekvizitlar',
+        title: '7. Rekvizitlar',
         text: 'YaTT Ismonov G\'afur Farhodovich\nSTIR: 0331564805\nEmail: niyatorzuzoda@gmail.com\nSayt: daftarcha.tj\nTojikiston Respublikasi',
       },
     ],
@@ -118,11 +130,15 @@ export const oferta: Record<Lang, LegalDoc> = {
         text: 'The basic tier of the Service is provided free of charge. Additional paid features may be introduced with at least 14 days\' prior notice to Users. Continued use of the Service after the introduction of paid tiers constitutes acceptance of the new terms.',
       },
       {
-        title: '5. Liability',
+        title: '5. Pricing',
+        text: 'Free plan:\n— 2 businesses, 50 clients per business, 3 employees, 10 SMS per month.\n\nSubscription — 29 somoni/month:\n— Unlimited businesses, clients and employees.\n— 10 free SMS + discounted SMS packages.\n\nSMS packages (without subscription):\n— 50 SMS — 20 somoni\n— 100 SMS — 40 somoni\n— 300 SMS — 120 somoni\n\nSMS packages (with subscription):\n— 50 SMS — 15 somoni\n— 100 SMS — 30 somoni\n— 300 SMS — 90 somoni',
+      },
+      {
+        title: '6. Liability',
         text: 'The Provider makes best efforts to ensure uninterrupted operation of the Service but does not guarantee continuous availability. The Provider is not liable for indirect damages arising from use or inability to use the Service. The Service is provided "as is". Users are solely responsible for the accuracy of data entered.',
       },
       {
-        title: '6. Details',
+        title: '7. Details',
         text: 'IE Ismonov Ghafur Farhodovich\nTIN: 0331564805\nEmail: niyatorzuzoda@gmail.com\nWebsite: daftarcha.tj\nRepublic of Tajikistan',
       },
     ],
