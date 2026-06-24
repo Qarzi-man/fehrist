@@ -207,6 +207,8 @@ export const tj: Translations = {
   freeSmsUsed: 'истифода шуд',
   purchasedSms: 'SMS-и харидашуда',
   smsPackages: 'Пакетҳои SMS',
+  subscriberPrice: 'Нарх барои обунашудагон 🎉',
+  subscriberPriceHint: 'Обуна харед ва барои SMS камтар пардохт кунед',
   buyBtn: 'Харидан',
   billingRequests: 'Дархостҳои пардохт',
   requestPending: 'Интизор',

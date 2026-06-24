@@ -4,6 +4,10 @@ const FREE_BUSINESSES  = 2;
 const FREE_CLIENTS     = 50;
 const FREE_SMS_MONTHLY = 10;
 
+// Price per SMS unit (сомони) depending on subscription
+const SMS_PRICE_FREE       = 0.4;  // free plan: 50 SMS = 20 som
+const SMS_PRICE_SUBSCRIBED = 0.3;  // active plan: 50 SMS = 15 som
+
 async function isSubscribed(businessId) {
   const { rows } = await pool.query(
     `SELECT subscription_status, subscription_expires_at FROM businesses WHERE id = $1`,
@@ -101,4 +105,4 @@ async function checkAndDeductSms(businessId) {
   }
 }
 
-module.exports = { checkBusinessLimit, checkClientLimit, checkAndDeductSms, isSubscribed, FREE_BUSINESSES, FREE_CLIENTS, FREE_SMS_MONTHLY };
+module.exports = { checkBusinessLimit, checkClientLimit, checkAndDeductSms, isSubscribed, FREE_BUSINESSES, FREE_CLIENTS, FREE_SMS_MONTHLY, SMS_PRICE_FREE, SMS_PRICE_SUBSCRIBED };

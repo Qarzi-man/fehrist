@@ -10,10 +10,16 @@ import {
   type PaymentRequest,
 } from '../api/billing'
 
-const SMS_PACKAGES = [
-  { count: 50,  price: 25 },
-  { count: 100, price: 50 },
-  { count: 300, price: 150 },
+const SMS_PACKAGES_FREE = [
+  { count: 50,  price: 20 },
+  { count: 100, price: 40 },
+  { count: 300, price: 120 },
+]
+
+const SMS_PACKAGES_SUB = [
+  { count: 50,  price: 15 },
+  { count: 100, price: 30 },
+  { count: 300, price: 90 },
 ]
 
 interface PayModal {
@@ -59,7 +65,7 @@ export default function BillingPage() {
     }
   }
 
-  function openSmsPackage(pkg: typeof SMS_PACKAGES[0]) {
+  function openSmsPackage(pkg: { count: number; price: number }) {
     setSuccess(false)
     setPayModal({
       type: 'sms',
@@ -209,23 +215,40 @@ export default function BillingPage() {
             })()}
 
             {/* SMS packages */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-4">{t.smsPackages}</p>
-              <div className="grid grid-cols-3 gap-3">
-                {SMS_PACKAGES.map((pkg) => (
-                  <button
-                    key={pkg.count}
-                    onClick={() => openSmsPackage(pkg)}
-                    className="flex flex-col items-center gap-1 rounded-xl border-2 border-gray-100 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500 p-3 transition group"
-                  >
-                    <span className="text-xl font-extrabold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">{pkg.count}</span>
-                    <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">SMS</span>
-                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">{pkg.price} сом.</span>
-                    <span className="mt-1 text-[10px] font-semibold text-white bg-indigo-500 rounded-full px-2 py-0.5">{t.buyBtn}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {(() => {
+              const isActive   = status?.subscription_status === 'active'
+              const smsPackages = isActive ? SMS_PACKAGES_SUB : SMS_PACKAGES_FREE
+              return (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">{t.smsPackages}</p>
+                    {isActive && (
+                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 rounded-full px-2 py-0.5">
+                        {t.subscriberPrice}
+                      </span>
+                    )}
+                  </div>
+                  {!isActive && (
+                    <p className="text-[11px] text-indigo-500 dark:text-indigo-400 mb-3">{t.subscriberPriceHint}</p>
+                  )}
+                  {isActive && <div className="mb-3" />}
+                  <div className="grid grid-cols-3 gap-3">
+                    {smsPackages.map((pkg) => (
+                      <button
+                        key={pkg.count}
+                        onClick={() => openSmsPackage(pkg)}
+                        className="flex flex-col items-center gap-1 rounded-xl border-2 border-gray-100 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500 p-3 transition group"
+                      >
+                        <span className="text-xl font-extrabold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">{pkg.count}</span>
+                        <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">SMS</span>
+                        <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">{pkg.price} сом.</span>
+                        <span className="mt-1 text-[10px] font-semibold text-white bg-indigo-500 rounded-full px-2 py-0.5">{t.buyBtn}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Subscription */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">

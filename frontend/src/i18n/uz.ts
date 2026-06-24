@@ -207,6 +207,8 @@ export const uz: Translations = {
   freeSmsUsed: 'ishlatildi',
   purchasedSms: 'Sotib olingan SMS',
   smsPackages: 'SMS paketlar',
+  subscriberPrice: 'Obuna narxi 🎉',
+  subscriberPriceHint: 'Obuna oling va SMS uchun kamroq to\'lang',
   buyBtn: 'Sotib olish',
   billingRequests: 'To\'lov so\'rovlari',
   requestPending: 'Kutilmoqda',

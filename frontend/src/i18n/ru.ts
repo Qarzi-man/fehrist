@@ -214,6 +214,8 @@ export const ru = {
   freeSmsUsed: 'использовано',
   purchasedSms: 'Куплено SMS',
   smsPackages: 'SMS пакеты',
+  subscriberPrice: 'Цена для подписчиков 🎉',
+  subscriberPriceHint: 'Купите подписку и платите меньше за SMS',
   buyBtn: 'Купить',
   billingRequests: 'Заявки на оплату',
   requestPending: 'Ожидает',

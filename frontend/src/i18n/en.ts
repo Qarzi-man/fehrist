@@ -207,6 +207,8 @@ export const en: Translations = {
   freeSmsUsed: 'used',
   purchasedSms: 'Purchased SMS',
   smsPackages: 'SMS packages',
+  subscriberPrice: 'Subscriber pricing 🎉',
+  subscriberPriceHint: 'Subscribe to pay less for SMS',
   buyBtn: 'Buy',
   billingRequests: 'Payment requests',
   requestPending: 'Pending',
