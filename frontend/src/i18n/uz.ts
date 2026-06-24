@@ -90,6 +90,7 @@ export const uz: Translations = {
   topClients: 'Top mijozlar',
   period1d: '1 kun',
   period1w: '1 hafta',
+  period1m: '1 oy',
   period3m: '3 oy',
   period6m: '6 oy',
   period1y: 'Yil',

@@ -116,10 +116,10 @@ export function exportAnalyticsToExcel(data: AnalyticsData, period: string | num
       ...Object.keys(m.repaid),
     ])
     if (!currencies.size) {
-      return [{ Месяц: m.month, Валюта: '', 'Мне должны': 0, 'Я должен': 0, Погашено: 0 }]
+      return [{ Месяц: m.label, Валюта: '', 'Мне должны': 0, 'Я должен': 0, Погашено: 0 }]
     }
     return Array.from(currencies).map((cur) => ({
-      Месяц: m.month,
+      Месяц: m.label,
       Валюта: cur,
       'Мне должны': m.new_receivable[cur] ?? 0,
       'Я должен': m.new_payable[cur] ?? 0,

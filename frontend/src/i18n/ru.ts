@@ -97,6 +97,7 @@ export const ru = {
   topClients: 'Топ клиентов',
   period1d: '1 день',
   period1w: '1 нед.',
+  period1m: '1 мес',
   period3m: '3 мес',
   period6m: '6 мес',
   period1y: 'Год',

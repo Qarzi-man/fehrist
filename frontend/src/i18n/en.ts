@@ -90,6 +90,7 @@ export const en: Translations = {
   topClients: 'Top clients',
   period1d: '1 day',
   period1w: '1 week',
+  period1m: '1 mo',
   period3m: '3 mo',
   period6m: '6 mo',
   period1y: 'Year',

@@ -1,7 +1,7 @@
 import api from './client'
 
 export interface MonthlyData {
-  month: string                    // "YYYY-MM"
+  label:          string           // chart x-axis label (hour/day/weekday/month depending on period)
   new_receivable: Record<string, number>
   new_payable:    Record<string, number>
   repaid:         Record<string, number>
@@ -34,7 +34,7 @@ export interface AnalyticsData {
   summary:     AnalyticsSummary
 }
 
-export type Period = '1d' | '1w' | '3m' | '6m' | '1y'
+export type Period = '1d' | '1w' | '1m' | '3m' | '6m' | '1y'
 
 export async function getAnalytics(period: Period): Promise<AnalyticsData> {
   const { data } = await api.get<AnalyticsData>('/analytics', { params: { period } })

@@ -41,11 +41,6 @@ function fmtByCurrency(map: Record<string, number>): string {
     .join(' · ')
 }
 
-function monthShort(ym: string): string {
-  const [y, m] = ym.split('-').map(Number)
-  return new Date(y, m - 1, 1).toLocaleString('ru', { month: 'short' })
-}
-
 function CurrencyTabs({ currencies, active, onChange }: {
   currencies: string[]
   active: string
@@ -136,7 +131,7 @@ export default function AnalyticsPage() {
   const chartData = useMemo(() => {
     if (!data) return []
     return data.monthly.map((m) => ({
-      label: monthShort(m.month),
+      label: m.label,
       recv:  m.new_receivable[cur] ?? 0,
       pabl:  m.new_payable[cur]    ?? 0,
       rpd:   m.repaid[cur]         ?? 0,
@@ -148,6 +143,7 @@ export default function AnalyticsPage() {
   const periods: { value: Period; label: string }[] = [
     { value: '1d', label: t.period1d },
     { value: '1w', label: t.period1w },
+    { value: '1m', label: t.period1m },
     { value: '3m', label: t.period3m },
     { value: '6m', label: t.period6m },
     { value: '1y', label: t.period1y },
@@ -250,7 +246,7 @@ export default function AnalyticsPage() {
               />
             </div>
 
-            {/* Chart — only for monthly periods */}
+            {/* Chart */}
             {data.monthly.length > 0 && (
               <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 md:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">

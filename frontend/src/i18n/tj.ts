@@ -90,6 +90,7 @@ export const tj: Translations = {
   topClients: 'Беҳтарин муштариён',
   period1d: '1 рӯз',
   period1w: '1 ҳафта',
+  period1m: '1 моҳ',
   period3m: '3 моҳ',
   period6m: '6 моҳ',
   period1y: 'Сол',
