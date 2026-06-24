@@ -105,7 +105,7 @@ export function exportDebtsToExcel(debts: Debt[]): void {
   XLSX.writeFile(wb, `dolgi-${new Date().toISOString().slice(0, 10)}.xlsx`)
 }
 
-export function exportAnalyticsToExcel(data: AnalyticsData, period: number): void {
+export function exportAnalyticsToExcel(data: AnalyticsData, period: string | number): void {
   const wb = XLSX.utils.book_new()
 
   // Sheet 1: Monthly dynamics
@@ -154,5 +154,5 @@ export function exportAnalyticsToExcel(data: AnalyticsData, period: number): voi
   ]
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), 'Сводка')
 
-  XLSX.writeFile(wb, `analytics-${period}m-${new Date().toISOString().slice(0, 10)}.xlsx`)
+  XLSX.writeFile(wb, `analytics-${period}-${new Date().toISOString().slice(0, 10)}.xlsx`)
 }

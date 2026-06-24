@@ -7,10 +7,17 @@ export interface MonthlyData {
   repaid:         Record<string, number>
 }
 
+export interface TopClientDebt {
+  currency: string
+  type:     'receivable' | 'payable'
+  amount:   number
+}
+
 export interface TopClient {
   client_id:       number
   full_name:       string
-  by_currency:     Record<string, number>
+  by_currency:     Record<string, number>   // kept for export compat
+  debts:           TopClientDebt[]
   total_remaining: number
 }
 
@@ -18,6 +25,7 @@ export interface AnalyticsSummary {
   total_active:       number
   overdue_count:      number
   repaid_this_month:  Record<string, number>
+  repaid_in_period:   Record<string, number>
 }
 
 export interface AnalyticsData {
@@ -26,7 +34,9 @@ export interface AnalyticsData {
   summary:     AnalyticsSummary
 }
 
-export async function getAnalytics(months: number): Promise<AnalyticsData> {
-  const { data } = await api.get<AnalyticsData>('/analytics', { params: { months } })
+export type Period = '1d' | '1w' | '3m' | '6m' | '1y'
+
+export async function getAnalytics(period: Period): Promise<AnalyticsData> {
+  const { data } = await api.get<AnalyticsData>('/analytics', { params: { period } })
   return data
 }

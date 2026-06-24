@@ -1,38 +1,28 @@
 const pool = require('../config/db');
 
+const VALID_PERIODS = ['1d', '1w', '3m', '6m', '1y'];
+
+function periodConfig(p) {
+  switch (p) {
+    case '1d': return { sinceInterval: '1 day',    monthly: false };
+    case '1w': return { sinceInterval: '7 days',   monthly: false };
+    case '3m': return { sinceInterval: '3 months', monthly: true,  back: 2 };
+    case '1y': return { sinceInterval: '12 months',monthly: true,  back: 11 };
+    default:   return { sinceInterval: '6 months', monthly: true,  back: 5 };  // 6m
+  }
+}
+
 async function analytics(req, res, next) {
   try {
-    const bid    = req.businessId;
-    const months = Math.min(12, Math.max(1, parseInt(req.query.months) || 6));
-    const back   = months - 1;
+    const bid = req.businessId;
+    const period = VALID_PERIODS.includes(req.query.period) ? req.query.period : '6m';
+    const cfg    = periodConfig(period);
 
-    const [newDebtsRes, repaymentsRes, topClientsRes, summaryRes, repaidMonthRes] = await Promise.all([
+    const queries = [
+      // top clients grouped by type
       pool.query(
         `SELECT
-           to_char(date_trunc('month', created_at), 'YYYY-MM') AS month,
-           currency, type,
-           SUM(amount) AS total
-         FROM debts
-         WHERE business_id = $1 AND deleted_at IS NULL
-           AND created_at >= date_trunc('month', NOW()) - INTERVAL '${back} months'
-         GROUP BY 1, 2, 3 ORDER BY 1`,
-        [bid]
-      ),
-      pool.query(
-        `SELECT
-           to_char(date_trunc('month', r.paid_at), 'YYYY-MM') AS month,
-           d.currency,
-           SUM(r.amount) AS total
-         FROM repayments r
-         JOIN debts d ON d.id = r.debt_id
-         WHERE d.business_id = $1
-           AND r.paid_at >= date_trunc('month', NOW()) - INTERVAL '${back} months'
-         GROUP BY 1, 2 ORDER BY 1`,
-        [bid]
-      ),
-      pool.query(
-        `SELECT
-           c.id AS client_id, c.full_name, d.currency,
+           c.id AS client_id, c.full_name, d.currency, d.type,
            SUM(GREATEST(d.amount - COALESCE(r.paid, 0), 0)) AS remaining
          FROM debts d
          JOIN clients c ON c.id = d.client_id
@@ -40,9 +30,10 @@ async function analytics(req, res, next) {
            ON r.debt_id = d.id
          WHERE d.business_id = $1 AND d.status = 'active'
            AND d.deleted_at IS NULL AND c.deleted_at IS NULL
-         GROUP BY c.id, c.full_name, d.currency`,
+         GROUP BY c.id, c.full_name, d.currency, d.type`,
         [bid]
       ),
+      // summary counts
       pool.query(
         `SELECT
            COUNT(*) FILTER (WHERE status = 'active' AND deleted_at IS NULL)        AS total_active,
@@ -51,6 +42,7 @@ async function analytics(req, res, next) {
          FROM debts WHERE business_id = $1`,
         [bid]
       ),
+      // repaid this calendar month
       pool.query(
         `SELECT d.currency, SUM(r.amount) AS total
          FROM repayments r
@@ -59,29 +51,54 @@ async function analytics(req, res, next) {
          GROUP BY d.currency`,
         [bid]
       ),
-    ]);
+      // repaid in selected period
+      pool.query(
+        `SELECT d.currency, SUM(r.amount) AS total
+         FROM repayments r
+         JOIN debts d ON d.id = r.debt_id
+         WHERE d.business_id = $1
+           AND r.paid_at >= NOW() - $2::interval
+         GROUP BY d.currency`,
+        [bid, cfg.sinceInterval]
+      ),
+    ];
 
-    const monthlyMap = {};
-    const now = new Date();
-    for (let i = back; i >= 0; i--) {
-      const d   = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      monthlyMap[key] = { month: key, new_receivable: {}, new_payable: {}, repaid: {} };
+    // monthly chart queries only when needed
+    if (cfg.monthly) {
+      const back = cfg.back;
+      queries.push(
+        pool.query(
+          `SELECT
+             to_char(date_trunc('month', created_at), 'YYYY-MM') AS month,
+             currency, type,
+             SUM(amount) AS total
+           FROM debts
+           WHERE business_id = $1 AND deleted_at IS NULL
+             AND created_at >= date_trunc('month', NOW()) - INTERVAL '${back} months'
+           GROUP BY 1, 2, 3 ORDER BY 1`,
+          [bid]
+        ),
+        pool.query(
+          `SELECT
+             to_char(date_trunc('month', r.paid_at), 'YYYY-MM') AS month,
+             d.currency,
+             SUM(r.amount) AS total
+           FROM repayments r
+           JOIN debts d ON d.id = r.debt_id
+           WHERE d.business_id = $1
+             AND r.paid_at >= date_trunc('month', NOW()) - INTERVAL '${back} months'
+           GROUP BY 1, 2 ORDER BY 1`,
+          [bid]
+        )
+      );
     }
 
-    for (const row of newDebtsRes.rows) {
-      if (!monthlyMap[row.month]) continue;
-      const dest = row.type === 'receivable' ? 'new_receivable' : 'new_payable';
-      monthlyMap[row.month][dest][row.currency] =
-        (monthlyMap[row.month][dest][row.currency] || 0) + parseFloat(row.total);
-    }
+    const results = await Promise.all(queries);
+    const [topClientsRes, summaryRes, repaidMonthRes, repaidPeriodRes] = results;
+    const newDebtsRes     = cfg.monthly ? results[4] : null;
+    const repaymentsRes   = cfg.monthly ? results[5] : null;
 
-    for (const row of repaymentsRes.rows) {
-      if (!monthlyMap[row.month]) continue;
-      monthlyMap[row.month].repaid[row.currency] =
-        (monthlyMap[row.month].repaid[row.currency] || 0) + parseFloat(row.total);
-    }
-
+    // Build top clients
     const clientMap = {};
     for (const row of topClientsRes.rows) {
       if (!clientMap[row.client_id]) {
@@ -89,11 +106,18 @@ async function analytics(req, res, next) {
           client_id:       row.client_id,
           full_name:       row.full_name,
           by_currency:     {},
+          debts:           [],
           total_remaining: 0,
         };
       }
       const val = parseFloat(row.remaining);
-      clientMap[row.client_id].by_currency[row.currency] = val;
+      clientMap[row.client_id].by_currency[row.currency] =
+        (clientMap[row.client_id].by_currency[row.currency] || 0) + val;
+      clientMap[row.client_id].debts.push({
+        currency: row.currency,
+        type:     row.type,
+        amount:   val,
+      });
       clientMap[row.client_id].total_remaining += val;
     }
 
@@ -101,18 +125,47 @@ async function analytics(req, res, next) {
       .sort((a, b) => b.total_remaining - a.total_remaining)
       .slice(0, 5);
 
+    // Build monthly chart data
+    let monthly = [];
+    if (cfg.monthly) {
+      const back = cfg.back;
+      const monthlyMap = {};
+      const now = new Date();
+      for (let i = back; i >= 0; i--) {
+        const d   = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        monthlyMap[key] = { month: key, new_receivable: {}, new_payable: {}, repaid: {} };
+      }
+      for (const row of newDebtsRes.rows) {
+        if (!monthlyMap[row.month]) continue;
+        const dest = row.type === 'receivable' ? 'new_receivable' : 'new_payable';
+        monthlyMap[row.month][dest][row.currency] =
+          (monthlyMap[row.month][dest][row.currency] || 0) + parseFloat(row.total);
+      }
+      for (const row of repaymentsRes.rows) {
+        if (!monthlyMap[row.month]) continue;
+        monthlyMap[row.month].repaid[row.currency] =
+          (monthlyMap[row.month].repaid[row.currency] || 0) + parseFloat(row.total);
+      }
+      monthly = Object.values(monthlyMap);
+    }
+
     const s = summaryRes.rows[0];
     const repaid_this_month = Object.fromEntries(
       repaidMonthRes.rows.map((r) => [r.currency, parseFloat(r.total)])
     );
+    const repaid_in_period = Object.fromEntries(
+      repaidPeriodRes.rows.map((r) => [r.currency, parseFloat(r.total)])
+    );
 
     res.json({
-      monthly:     Object.values(monthlyMap),
+      monthly,
       top_clients,
       summary: {
         total_active:      parseInt(s.total_active),
         overdue_count:     parseInt(s.overdue_count),
         repaid_this_month,
+        repaid_in_period,
       },
     });
   } catch (err) {
@@ -124,8 +177,9 @@ async function exportAnalytics(req, res, next) {
   try {
     const ExcelJS = require('exceljs');
     const bid    = req.businessId;
-    const months = Math.min(12, Math.max(1, parseInt(req.query.months) || 6));
-    const back   = months - 1;
+    const period = VALID_PERIODS.includes(req.query.period) ? req.query.period : '6m';
+    const cfg    = periodConfig(period);
+    const back   = cfg.monthly ? cfg.back : 0;
 
     const [newDebtsRes, repaymentsRes, topClientsRes, summaryRes, repaidMonthRes] = await Promise.all([
       pool.query(
@@ -142,12 +196,12 @@ async function exportAnalytics(req, res, next) {
            AND r.paid_at >= date_trunc('month', NOW()) - INTERVAL '${back} months'
          GROUP BY 1, 2 ORDER BY 1`, [bid]),
       pool.query(
-        `SELECT c.id AS client_id, c.full_name, d.currency,
+        `SELECT c.id AS client_id, c.full_name, d.currency, d.type,
                 SUM(GREATEST(d.amount - COALESCE(r.paid, 0), 0)) AS remaining
          FROM debts d JOIN clients c ON c.id = d.client_id
          LEFT JOIN (SELECT debt_id, SUM(amount) AS paid FROM repayments GROUP BY debt_id) r ON r.debt_id = d.id
          WHERE d.business_id = $1 AND d.status = 'active' AND d.deleted_at IS NULL AND c.deleted_at IS NULL
-         GROUP BY c.id, c.full_name, d.currency`, [bid]),
+         GROUP BY c.id, c.full_name, d.currency, d.type`, [bid]),
       pool.query(
         `SELECT COUNT(*) FILTER (WHERE status = 'active' AND deleted_at IS NULL) AS total_active,
                 COUNT(*) FILTER (WHERE deleted_at IS NULL AND status != 'paid'
@@ -163,7 +217,6 @@ async function exportAnalytics(req, res, next) {
     workbook.creator = 'Daftarcha';
     workbook.created = new Date();
 
-    // Sheet 1: Monthly dynamics (flat rows per currency)
     const monthlySheet = workbook.addWorksheet('По месяцам');
     monthlySheet.columns = [
       { header: 'Месяц',         key: 'month',  width: 10 },
@@ -203,10 +256,10 @@ async function exportAnalytics(req, res, next) {
     }
     ['recv', 'pabl', 'rpd'].forEach((col) => { monthlySheet.getColumn(col).numFmt = '#,##0.00'; });
 
-    // Sheet 2: Top clients
     const clientSheet = workbook.addWorksheet('Топ клиентов');
     clientSheet.columns = [
       { header: 'Клиент',  key: 'name',   width: 25 },
+      { header: 'Тип',     key: 'type',   width: 14 },
       { header: 'Остаток', key: 'amount', width: 16 },
       { header: 'Валюта',  key: 'cur',    width: 8  },
     ];
@@ -214,20 +267,19 @@ async function exportAnalytics(req, res, next) {
     clientSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8EAF6' } };
     const clientMap = {};
     for (const row of topClientsRes.rows) {
-      if (!clientMap[row.client_id]) clientMap[row.client_id] = { name: row.full_name, totals: {}, total_remaining: 0 };
+      if (!clientMap[row.client_id]) clientMap[row.client_id] = { name: row.full_name, debts: [], total_remaining: 0 };
       const val = parseFloat(row.remaining);
-      clientMap[row.client_id].totals[row.currency] = val;
+      clientMap[row.client_id].debts.push({ cur: row.currency, type: row.type === 'receivable' ? 'Мне должны' : 'Я должен', amount: val });
       clientMap[row.client_id].total_remaining += val;
     }
     const topClients = Object.values(clientMap).sort((a, b) => b.total_remaining - a.total_remaining).slice(0, 10);
     for (const c of topClients) {
-      for (const [cur, amount] of Object.entries(c.totals)) {
-        clientSheet.addRow({ name: c.name, amount, cur });
+      for (const d of c.debts) {
+        clientSheet.addRow({ name: c.name, type: d.type, amount: d.amount, cur: d.cur });
       }
     }
     clientSheet.getColumn('amount').numFmt = '#,##0.00';
 
-    // Sheet 3: Summary
     const summarySheet = workbook.addWorksheet('Сводка');
     summarySheet.columns = [
       { header: 'Показатель', key: 'label', width: 30 },
@@ -235,16 +287,16 @@ async function exportAnalytics(req, res, next) {
     ];
     summarySheet.getRow(1).font = { bold: true };
     const s = summaryRes.rows[0];
-    summarySheet.addRow({ label: `Период (мес)`,    value: months });
-    summarySheet.addRow({ label: 'Активных долгов', value: parseInt(s.total_active) });
-    summarySheet.addRow({ label: 'Просроченных',    value: parseInt(s.overdue_count) });
+    summarySheet.addRow({ label: `Период`,           value: period });
+    summarySheet.addRow({ label: 'Активных долгов',  value: parseInt(s.total_active) });
+    summarySheet.addRow({ label: 'Просроченных',     value: parseInt(s.overdue_count) });
     for (const row of repaidMonthRes.rows) {
       summarySheet.addRow({ label: `Погашено за месяц (${row.currency})`, value: parseFloat(row.total) });
     }
     summarySheet.getColumn('value').numFmt = '#,##0.00';
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="analytics-${months}m-${new Date().toISOString().slice(0, 10)}.xlsx"`);
+    res.setHeader('Content-Disposition', `attachment; filename="analytics-${period}-${new Date().toISOString().slice(0, 10)}.xlsx"`);
     res.setHeader('Cache-Control', 'no-cache');
     await workbook.xlsx.write(res);
     res.end();
