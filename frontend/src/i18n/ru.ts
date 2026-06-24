@@ -208,6 +208,7 @@ export const ru = {
   businessLogo: 'Логотип',
   uploadLogo: 'Загрузить логотип',
   // Billing / monetization
+  help: 'Помощь',
   billing: 'Тарифы',
   billingTitle: 'Тарифы и оплата',
   currentPlan: 'Текущий план',

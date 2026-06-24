@@ -201,6 +201,7 @@ export const uz: Translations = {
   businessLogo: 'Logotip',
   uploadLogo: 'Logotip yuklash',
   // Billing / monetization
+  help: 'Yordam',
   billing: 'Tariflar',
   billingTitle: 'Tariflar va to\'lov',
   currentPlan: 'Joriy tarif',

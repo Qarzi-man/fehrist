@@ -201,6 +201,7 @@ export const tj: Translations = {
   businessLogo: 'Логотип',
   uploadLogo: 'Логотипро бор кардан',
   // Billing / monetization
+  help: 'Кумак',
   billing: 'Тарифҳо',
   billingTitle: 'Тарифҳо ва пардохт',
   currentPlan: 'Нақшаи кунунӣ',

@@ -201,6 +201,7 @@ export const en: Translations = {
   businessLogo: 'Logo',
   uploadLogo: 'Upload logo',
   // Billing / monetization
+  help: 'Help',
   billing: 'Plans',
   billingTitle: 'Plans & billing',
   currentPlan: 'Current plan',

@@ -13,6 +13,7 @@ import BillingPage from './pages/BillingPage'
 import AdminPage from './pages/AdminPage'
 import OfertaPage from './pages/OfertaPage'
 import PrivacyPage from './pages/PrivacyPage'
+import HelpPage from './pages/HelpPage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token)
@@ -83,6 +84,7 @@ export default function App() {
         <Route path="/settings"  element={<RequireAuth><SettingsPage /></RequireAuth>} />
         <Route path="/profile"   element={<RequireAuth><ProfilePage /></RequireAuth>} />
         <Route path="/billing"   element={<RequireAuth><BillingPage /></RequireAuth>} />
+        <Route path="/help"      element={<RequireAuth><HelpPage /></RequireAuth>} />
         <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
