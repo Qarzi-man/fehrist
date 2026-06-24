@@ -16,7 +16,7 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      theme: 'light',
+      theme: 'dark',
       setTheme: (theme) => { applyTheme(theme); set({ theme }) },
       toggle: () => {
         const next = get().theme === 'light' ? 'dark' : 'light'
@@ -31,4 +31,10 @@ export const useThemeStore = create<ThemeState>()(
       },
     }
   )
+)
+
+// Apply dark immediately on first load before Zustand hydrates
+applyTheme((localStorage.getItem('daftarcha-theme') as string | null)
+  ? (JSON.parse(localStorage.getItem('daftarcha-theme')!) as { state: { theme: Theme } }).state.theme
+  : 'dark'
 )
