@@ -24,7 +24,7 @@ export interface PaymentRequest {
 }
 
 export function getBillingStatus(): Promise<BillingStatus> {
-  return api.get('/api/v1/billing/status').then((r) => r.data)
+  return api.get('/billing/status').then((r) => r.data)
 }
 
 export function createPaymentRequest(payload: {
@@ -33,9 +33,9 @@ export function createPaymentRequest(payload: {
   sms_count?: number
   note?: string
 }): Promise<PaymentRequest> {
-  return api.post('/api/v1/billing/request', payload).then((r) => r.data)
+  return api.post('/billing/request', payload).then((r) => r.data)
 }
 
 export function getPaymentRequests(): Promise<PaymentRequest[]> {
-  return api.get('/api/v1/billing/requests').then((r) => r.data)
+  return api.get('/billing/requests').then((r) => r.data)
 }

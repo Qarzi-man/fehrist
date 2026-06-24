@@ -39,10 +39,12 @@ function AppWithRefresh({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!token) { setReady(true); return }
-    api.get('/api/v1/auth/me')
+    api.get('/auth/me')
       .then((r) => {
         console.log('[App] /me response:', r.data)
-        updateUser({ is_admin: !!r.data.is_admin })
+        if (typeof r.data?.is_admin === 'boolean') {
+          updateUser({ is_admin: r.data.is_admin })
+        }
       })
       .catch((err) => console.error('[App] /me failed:', err?.response?.status, err?.message))
       .finally(() => setReady(true))

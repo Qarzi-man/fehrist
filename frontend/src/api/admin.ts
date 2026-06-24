@@ -71,7 +71,7 @@ export interface RevenueRow {
   count: number
 }
 
-const B = '/api/v1/admin'
+const B = '/admin'
 
 export const getAdminStats = (): Promise<AdminStats> =>
   api.get(`${B}/stats`).then((r) => r.data)

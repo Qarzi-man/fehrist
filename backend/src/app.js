@@ -47,6 +47,9 @@ app.use('/api/analytics',        analyticsRouter);
 app.use('/api/business/members', membersRouter);
 app.use('/api/sms',              smsRouter);
 app.use('/api/profile',          profileRouter);
+app.use('/api/notifications',    notificationsRouter);
+app.use('/api/billing',          billingRouter);
+app.use('/api/admin',            adminRouter);
 
 app.use(errorHandler);
 
