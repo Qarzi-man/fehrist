@@ -23,8 +23,9 @@ function RequireAdmin({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token)
   const user  = useAuthStore((s) => s.user)
   console.log('[RequireAdmin] token:', !!token, '| user:', user)
+  console.log('[RequireAdmin] is_admin check:', user?.is_admin)
   if (!token) return <Navigate to="/auth" replace />
-  if (!user?.is_admin) return <Navigate to="/dashboard" replace />
+  if (user?.is_admin !== true) return <Navigate to="/dashboard" replace />
   return <>{children}</>
 }
 
