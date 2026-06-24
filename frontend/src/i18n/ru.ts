@@ -227,6 +227,21 @@ export const ru = {
   limitSms: 'бесплатных SMS в месяц (максимум 10)',
   goToBilling: 'Перейти к тарифам',
   noRequests: 'Заявок пока нет',
+  // Plan comparison cards
+  planSectionTitle: 'Выберите план',
+  freePlanTitle: 'Бесплатный план',
+  paidPlanTitle: 'Подписка — 29 сом/мес.',
+  popularBadge: 'Популярный',
+  planFeature2Businesses: '2 бизнеса',
+  planFeature50Clients: '50 клиентов на каждый бизнес',
+  planFeature3Members: '3 сотрудника на бизнес',
+  planFeature10Sms: '10 SMS в месяц',
+  planFeatureCore: 'Долги, рассрочка, аналитика',
+  planFeatureUnlimitedBusinesses: 'Безлимитные бизнесы',
+  planFeatureUnlimitedClients: 'Безлимитные клиенты',
+  planFeatureUnlimitedMembers: 'Безлимитные сотрудники',
+  planFeatureSmsPackages: '10 SMS бесплатно + пакеты SMS',
+  planFeaturePrioritySupport: 'Приоритетная поддержка',
 }
 
 export type Translations = typeof ru

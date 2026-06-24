@@ -103,6 +103,58 @@ export default function BillingPage() {
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">{t.billingTitle}</h1>
         </div>
 
+        {/* Plan comparison cards — always visible */}
+        <div>
+          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-3">{t.planSectionTitle}</p>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Free plan */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 flex flex-col">
+              <p className="text-sm font-bold text-gray-900 dark:text-white mb-3">{t.freePlanTitle}</p>
+              <ul className="space-y-2 flex-1">
+                {[
+                  t.planFeature2Businesses,
+                  t.planFeature50Clients,
+                  t.planFeature3Members,
+                  t.planFeature10Sms,
+                  t.planFeatureCore,
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+                    <span className="text-emerald-500 shrink-0 mt-px">✓</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Paid plan */}
+            <div className="relative bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl p-4 flex flex-col shadow-lg shadow-indigo-500/20">
+              <span className="absolute -top-2.5 right-3 text-[10px] font-bold bg-amber-400 text-amber-900 rounded-full px-2 py-0.5 shadow">
+                {t.popularBadge}
+              </span>
+              <p className="text-sm font-bold text-white mb-3">{t.paidPlanTitle}</p>
+              <ul className="space-y-2 flex-1">
+                {[
+                  t.planFeatureUnlimitedBusinesses,
+                  t.planFeatureUnlimitedClients,
+                  t.planFeatureUnlimitedMembers,
+                  t.planFeatureSmsPackages,
+                  t.planFeaturePrioritySupport,
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-1.5 text-xs text-indigo-100">
+                    <span className="text-white shrink-0 mt-px">✓</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => { setSuccess(false); setPayModal({ type: 'subscription', amount: 29, label: 'Подписка — 29 сом./мес.' }) }}
+                className="mt-4 w-full rounded-xl bg-white/20 hover:bg-white/30 py-2 text-xs font-bold text-white transition"
+              >
+                {t.buyBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+
         {loading ? (
           <p className="text-center text-sm text-gray-400 py-12">{t.loading}</p>
         ) : (
