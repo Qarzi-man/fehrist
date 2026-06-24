@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tg">
 <head>
   <meta charset="UTF-8">
@@ -127,9 +127,7 @@
     /* Mock laptop */
     .mock-screen { background: #0a0f1e; border-radius: 6px; overflow: hidden; }
 
-    /* Numbers counter */
-    .stat-num { font-family: 'Syne', sans-serif; }
-  </style>
+</style>
 </head>
 <body>
 
@@ -199,29 +197,6 @@
       <a href="#demo" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="hero_cta_secondary">Смотреть демо</a>
     </div>
     <p class="mt-7 text-xs text-slate-600 reveal d4" data-i18n="hero_trust">✓ Бесплатно &nbsp;·&nbsp; ✓ Без карты &nbsp;·&nbsp; ✓ iOS и Android</p>
-  </div>
-</section>
-
-<!-- ═══════════════════ NUMBERS ═══════════════════ -->
-<section class="py-16 md:py-20">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6">
-    <div class="grid grid-cols-3 gap-4 md:gap-8">
-      <div class="text-center reveal d1">
-        <p class="stat-num text-4xl md:text-6xl font-black mb-2" style="background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-counter="500" data-suffix="+">500+</p>
-        <p class="text-xs md:text-sm text-slate-400 font-semibold" data-i18n="numbers_businesses_label">бизнесов</p>
-        <p class="text-[11px] text-slate-600 mt-0.5" data-i18n="numbers_businesses_sub">доверяют нам</p>
-      </div>
-      <div class="text-center reveal d2">
-        <p class="stat-num text-4xl md:text-6xl font-black mb-2" style="background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-counter="10000" data-suffix="+">10 000+</p>
-        <p class="text-xs md:text-sm text-slate-400 font-semibold" data-i18n="numbers_debts_label">долгов</p>
-        <p class="text-[11px] text-slate-600 mt-0.5" data-i18n="numbers_debts_sub">записано</p>
-      </div>
-      <div class="text-center reveal d3">
-        <p class="stat-num text-4xl md:text-6xl font-black mb-2" style="background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-counter="4" data-suffix="">4</p>
-        <p class="text-xs md:text-sm text-slate-400 font-semibold" data-i18n="numbers_langs_label">языка</p>
-        <p class="text-[11px] text-slate-600 mt-0.5" data-i18n="numbers_langs_sub">поддерживаем</p>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -568,46 +543,43 @@ const T = {
     nav_login:'Даромадан',
     hero_badge:'Daftarcha — ҳисоби қарзҳо барои бизнес',
     hero_title:'Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>',
-    hero_sub:'Daftarcha ба соҳибкорон кӯмак мекунад, ки қарзҳоро пайгирӣ кунанд, СМС фиристанд ва гузориш созанд',
+    hero_sub:'Daftarcha ба соҳибкорон кӯмак мекунад, ки қарзҳоро пайгирӣ кунанд, ба мизоҷон СМС фиристанд ва ҳисобот тайёр кунанд',
     hero_cta_primary:'Ройгон оғоз кунед',
     hero_cta_secondary:'Намоиш дидан',
-    hero_trust:'✓ Ройгон · ✓ Бе кредит · ✓ iOS ва Android',
-    numbers_businesses_label:'бизнесҳо',numbers_businesses_sub:'боварӣ доранд',
-    numbers_debts_label:'қарзҳо',numbers_debts_sub:'сабт шудааст',
-    numbers_langs_label:'забон',numbers_langs_sub:'дастгирӣ мекунем',
-    problems_title:'Мушкилоти маъмул?',
-    problem1_title:'Дафтарча гум мешавад',problem1_desc:'Сабти дастӣ боиси хатогиҳо ва аз даст додани маълумот мегардад',
-    problem2_title:'Excel мураккаб аст',problem2_desc:'Ҷадвалҳои мураккаб вақти зиёд мебаранд ва аз телефон дастрас нестанд',
-    problem3_title:'Мизоҷ фаромӯш мекунад',problem3_desc:'Ёдоварии дастӣ боварибахш нест ва вақти зиёд мегирад',
-    features_title:'Ҳамаи чизи зарурӣ дар як ҷо',
-    feature1_title:'Ҳисоби қарзҳо',feature1_desc:'Мизоҷ ба шумо ё шумо ба мизоҷ — ҳамааш дар як экран',
-    feature2_title:'Насия ва тақсит',feature2_desc:'Ҷадвали пардохтҳо бо санаҳо ва назорати пардохтҳои қисмӣ',
-    feature3_title:'СМС-хабардиҳӣ',feature3_desc:'Ба мизоҷон СМС фиристед ва дар бораи пардохт ёдоварӣ кунед',
+    hero_trust:'✓ Ройгон · ✓ Бидуни кредит · ✓ iOS ва Android',
+    problems_title:'Мушкилоти шинос?',
+    problem1_title:'Дафтар гум мешавад',problem1_desc:'Навиштаҷоти дастӣ боиси хатогиҳо ва аз даст рафтани маълумот мегардад',
+    problem2_title:'Excel мураккаб аст',problem2_desc:'Ҷадвалҳои мураккаб вақти зиёдро мегиранд ва аз телефон дастрас нестанд',
+    problem3_title:'Мизоҷон фаромӯш мекунанд',problem3_desc:'Ёдоварии дастӣ боварибахш нест ва вақти зиёдро мегирад',
+    features_title:'Ҳамаи лозима дар як ҷо',
+    feature1_title:'Ҳисоби қарзҳо',feature1_desc:'Мизоҷ ба шумо ё шумо ба мизоҷ қарздор — ҳамааш дар як экран',
+    feature2_title:'Насия ва тақсит',feature2_desc:'Ҷадвали пардохтҳо бо санаҳо ва назорати пардохтҳои нопурра',
+    feature3_title:'Хабардиҳии СМС',feature3_desc:'Ба мизоҷон СМС фиристед ва онҳоро дар бораи пардохт огоҳ кунед',
     feature4_title:'Чандвалютавӣ',feature4_desc:'Сомонӣ, рубл ва доллар — ҳамаи асъорҳо дар як ҷо',
     feature5_title:'Дастрасии кормандон',feature5_desc:'Кормандонро даъват кунед — ҳар яке танҳо маълумоти зарурӣ мебинад',
-    feature6_title:'Таҳлил ва гузоришот',feature6_desc:'Графикҳо, рӯйхати беҳтарин мизоҷон ва содироти Excel',
-    screenshots_title:'Интерфейси оддӣ ва ширин',screenshots_sub:'Аз рӯзи аввал бе омӯзиш кор кунед',
+    feature6_title:'Таҳлил ва гузоришот',feature6_desc:'Намудорҳо, беҳтарин мизоҷон ва содироти Excel',
+    screenshots_title:'Интерфейси оддӣ ва зебо',screenshots_sub:'Аз рӯзи аввал бе омӯзиш кор кунед',
     mobile_badge:'Барномаи мобилӣ',
     mobile_title:'Ба зудӣ дар App Store<br>ва Google Play',
     mobile_sub:'Навсозиҳоро пайгирӣ кунед — барномаи бумӣ дар коркард аст',
     mobile_soon:'Ба зудӣ',
     pricing_title:'Нархҳо',
-    pricing_free_name:'Ройгон',pricing_free_price:'0 сом.',pricing_free_sub:'Барои ҳамеша',
-    pricing_paid_name:'Обуна',pricing_paid_price:'29 сом./моҳ',pricing_paid_sub:'Ҳама чиз бидуни маҳдудият',
+    pricing_free_name:'Ройгон',pricing_free_price:'0 сомонӣ',pricing_free_sub:'Барои ҳамеша',
+    pricing_paid_name:'Обуна',pricing_paid_price:'29 сомонӣ/моҳ',pricing_paid_sub:'Ҳама чиз бидуни маҳдудият',
     pricing_popular:'Маъмул',
     pricing_free_f1:'2 бизнес',pricing_free_f2:'50 мизоҷ барои ҳар бизнес',
-    pricing_free_f3:'3 корманд барои бизнес',pricing_free_f4:'10 СМС дар моҳ',pricing_free_f5:'Қарзҳо, насия, таҳлил',
+    pricing_free_f3:'3 корманд барои ҳар бизнес',pricing_free_f4:'10 СМС дар моҳ',pricing_free_f5:'Қарзҳо, насия, таҳлил',
     pricing_paid_f1:'Бизнесҳои беҳудуд',pricing_paid_f2:'Мизоҷони беҳудуд',
     pricing_paid_f3:'Кормандони беҳудуд',pricing_paid_f4:'10 СМС ройгон + пакетҳои арзон',pricing_paid_f5:'Дастгирии афзалиятнок',
     pricing_cta_free:'Ройгон оғоз кунед',pricing_cta_paid:'Обунаро харидан',
     faq_title:'Саволҳои зуд-зуд пурсида мешавад',
-    faq1_q:'Чӣ тавр оғоз кунам?',faq1_a:'Дар сайт бақайдгирӣ кунед, номи бизнес ва рақами телефонро ворид кунед. Дар якчанд дақиқа ба кор шурӯъ кунед — бе омӯзиш.',
-    faq2_q:'Насия ва тақсит чист?',faq2_a:'Насия — ин схемаи пардохти қисм-қисм аст. Шумо миқдори қисмҳо ва мӯҳлатро муайян мекунед, барнома ҷадвалро худаш месозад.',
-    faq3_q:'Чӣ тавр корманд даъват кунам?',faq3_a:'Дар «Танзимот» → «Кормандон» рақами телефони корманд ворид кунед. Вай хабар мегирад ва метавонад даъватро қабул кунад.',
-    faq4_q:'Маълумотҳои ман дар амон аст?',faq4_a:'Бале. Ҳамаи маълумотҳо дар серверҳои муҳофизатшуда нигоҳ дошта мешаванд ва зери рамз мебошанд.',
-    faq5_q:'Чӣ тавр обунаро харидорӣ кунам?',faq5_a:'Ба «Тарифҳо» равед, тугмаи «Харидан»-ро пахш кунед ва дастурамалро иҷро кунед — маблағро ба кошелаки Алиф Мобайл интиқол диҳед.',
+    faq1_q:'Чӣ тавр оғоз кунам?',faq1_a:'Ба сайт даромада бақайдгирӣ кунед, номи бизнес ва рақами телефонро ворид кунед. Дар якчанд дақиқа ба кор шурӯъ кунед — бе омӯзиш.',
+    faq2_q:'Насия ва тақсит чист?',faq2_a:'Насия — схемаи пардохт бо қисмҳо аст. Шумо теъдоди қисмҳо ва мӯҳлатро муайян мекунед, барнома ҷадвалро худаш тартиб медиҳад.',
+    faq3_q:'Чӣ тавр корманд даъват кунам?',faq3_a:'Дар «Танзимот» → «Кормандон» рақами телефони корманд ворид кунед. Ӯ хабар мегирад ва метавонад даъватро қабул кунад.',
+    faq4_q:'Маълумотҳои ман бехатар аст?',faq4_a:'Бале. Ҳамаи маълумотҳо дар серверҳои муҳофизатшуда нигоҳдорӣ мешаванд ва рамзгузорӣ шудаанд.',
+    faq5_q:'Чӣ тавр обунаро харидорӣ кунам?',faq5_a:'Ба «Нархҳо» равед, тугмаи «Харидан»-ро пахш кунед ва дастурамалро иҷро кунед — маблағро ба ҳамёни Алиф Мобайл интиқол диҳед.',
     cta_title:'Ҳисоби қарзҳоро<br>ҳозир оғоз кунед',
-    cta_sub:'Ройгон, бе кредит, дар ҳама гуна дастгоҳ',cta_btn:'Ройгон оғоз кунед',
+    cta_sub:'Ройгон, бидуни кредит, дар ҳама гуна дастгоҳ',cta_btn:'Ройгон оғоз кунед',
     footer_oferta:'Оферта',footer_privacy:'Махфият',footer_help:'Кӯмак',
   },
   ru: {
@@ -780,52 +752,11 @@ window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('nav-scrolled', scrollY > 20);
 }, { passive: true });
 
-// Counter animation
-function animateCounter(el) {
-  const target = parseInt(el.getAttribute('data-counter'), 10);
-  const suffix = el.getAttribute('data-suffix') || '';
-  if (isNaN(target)) return;
-  const duration = 1400;
-  const start = performance.now();
-  function frame(now) {
-    const progress = Math.min((now - start) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const value = Math.round(eased * target);
-    el.textContent = value >= 1000
-      ? value.toLocaleString('ru-RU').replace(/,/g, ' ') + suffix
-      : value + suffix;
-    if (progress < 1) requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-
-// Scroll reveal + counter trigger
-const countersDone = new WeakSet();
+// Scroll reveal
 const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      e.target.querySelectorAll('[data-counter]').forEach(el => {
-        if (!countersDone.has(el)) { countersDone.add(el); animateCounter(el); }
-      });
-    }
-  });
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.07 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-// Also observe stat numbers directly in case they're not inside .reveal
-document.querySelectorAll('[data-counter]').forEach(el => {
-  const revealParent = el.closest('.reveal');
-  if (!revealParent) {
-    const singleObs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !countersDone.has(el)) {
-        countersDone.add(el); animateCounter(el);
-        singleObs.disconnect();
-      }
-    }, { threshold: 0.3 });
-    singleObs.observe(el);
-  }
-});
 
 // Init
 apply();
