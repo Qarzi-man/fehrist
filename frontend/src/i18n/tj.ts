@@ -28,6 +28,7 @@ export const tj: Translations = {
   errPasswordRequired: 'Рамзро ворид кунед',
   errOtpRequired: 'Рамзро аз SMS ворид кунед',
   errNameRequired: 'Номро ворид кунед',
+  rememberMe: 'Маро дар хотир нигоҳ дор',
   errInvalidCredentials: 'Рақам ё рамз нодуруст аст',
   errPhoneExists: 'Ин рақам аллакай сабт шудааст',
   errInvalidOtp: 'Рамз нодуруст ё кӯҳна аст',

@@ -7,13 +7,21 @@ import { getApiError } from '../../lib/utils'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 
+const SAVED_PHONE_KEY = 'daftarcha-saved-phone'
+
+function getSavedPhone() {
+  return localStorage.getItem(SAVED_PHONE_KEY) || ''
+}
+
 export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
   const t = useT()
   const navigate = useNavigate()
   const setAuth = useAuthStore((s) => s.setAuth)
 
-  const [phone, setPhone] = useState('+992')
+  const saved = getSavedPhone()
+  const [phone, setPhone] = useState(saved || '+992')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(!!saved)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -23,6 +31,12 @@ export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
 
     if (!phone.trim()) return setError(t.errPhoneRequired)
     if (!password) return setError(t.errPasswordRequired)
+
+    if (remember) {
+      localStorage.setItem(SAVED_PHONE_KEY, phone.trim())
+    } else {
+      localStorage.removeItem(SAVED_PHONE_KEY)
+    }
 
     setLoading(true)
     try {
@@ -58,6 +72,16 @@ export default function LoginForm({ onSwitch }: { onSwitch: () => void }) {
         placeholder={t.passwordPlaceholder}
         autoComplete="current-password"
       />
+
+      <label className="flex items-center gap-2 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 accent-indigo-600"
+        />
+        <span className="text-sm text-gray-600">{t.rememberMe}</span>
+      </label>
 
       {error && (
         <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>

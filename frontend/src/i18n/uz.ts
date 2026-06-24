@@ -28,6 +28,7 @@ export const uz: Translations = {
   errPasswordRequired: 'Parolni kiriting',
   errOtpRequired: 'SMS kodini kiriting',
   errNameRequired: 'Ismni kiriting',
+  rememberMe: "Meni eslab qol",
   errInvalidCredentials: "Noto'g'ri raqam yoki parol",
   errPhoneExists: "Bu raqam allaqachon ro'yxatdan o'tgan",
   errInvalidOtp: "Noto'g'ri yoki eskirgan kod",

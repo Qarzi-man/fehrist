@@ -28,6 +28,7 @@ export const ru = {
   errPasswordRequired: 'Введите пароль',
   errOtpRequired: 'Введите код из SMS',
   errNameRequired: 'Введите имя',
+  rememberMe: 'Запомнить меня',
   errInvalidCredentials: 'Неверный номер или пароль',
   errPhoneExists: 'Этот номер уже зарегистрирован',
   errInvalidOtp: 'Неверный или устаревший код',

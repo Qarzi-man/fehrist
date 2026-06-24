@@ -7,9 +7,9 @@ function generateOtp() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
-function signToken(userId) {
+function signToken(userId, isAdmin = false) {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    expiresIn: isAdmin ? '30d' : '1h',
   });
 }
 
@@ -129,7 +129,7 @@ async function login(req, res, next) {
 
     const { id, phone: p, full_name, is_admin } = rows[0];
     console.log('[login] userId:', id, 'phone:', p, 'is_admin:', is_admin);
-    res.json({ token: signToken(id), user: { id, phone: p, full_name, is_admin: !!is_admin } });
+    res.json({ token: signToken(id, !!is_admin), user: { id, phone: p, full_name, is_admin: !!is_admin } });
   } catch (err) {
     next(err);
   }

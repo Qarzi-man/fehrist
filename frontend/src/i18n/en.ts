@@ -28,6 +28,7 @@ export const en: Translations = {
   errPasswordRequired: 'Password is required',
   errOtpRequired: 'Enter the SMS code',
   errNameRequired: 'Name is required',
+  rememberMe: 'Remember me',
   errInvalidCredentials: 'Invalid phone or password',
   errPhoneExists: 'This phone is already registered',
   errInvalidOtp: 'Invalid or expired code',
