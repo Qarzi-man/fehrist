@@ -35,19 +35,27 @@ function RequireGuest({ children }: { children: React.ReactNode }) {
 }
 
 function AppWithRefresh({ children }: { children: React.ReactNode }) {
-  const token = useAuthStore((s) => s.token)
-  const user  = useAuthStore((s) => s.user)
+  const token      = useAuthStore((s) => s.token)
+  const user       = useAuthStore((s) => s.user)
   const updateUser = useAuthStore((s) => s.updateUser)
-  const [ready, setReady] = useState(!token)
+  // Start blocked — we need to wait for:
+  // 1) Zustand persist to hydrate from localStorage
+  // 2) /me call to refresh is_admin from server
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    console.log('[AppWithRefresh] token:', token ? token.slice(0, 20) + '...' : null)
-    console.log('[AppWithRefresh] user from store:', user)
-    if (!token) { setReady(true); return }
+    // This runs after first render — by now Zustand has hydrated from localStorage
+    console.log('[AppWithRefresh] after hydration — token:', token ? token.slice(0, 20) + '...' : null)
+    console.log('[AppWithRefresh] after hydration — user:', user)
+
+    if (!token) {
+      setReady(true)
+      return
+    }
+
     api.get('/auth/me')
       .then((r) => {
         console.log('[App] /me response:', r.data)
-        console.log('[App] user from store after /me:', { ...user, is_admin: r.data?.is_admin })
         if (typeof r.data?.is_admin === 'boolean') {
           updateUser({ is_admin: r.data.is_admin })
         }
