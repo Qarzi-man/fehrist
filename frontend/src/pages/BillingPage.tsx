@@ -174,27 +174,39 @@ export default function BillingPage() {
             </div>
 
             {/* SMS balance */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-4">{t.smsBalance}</p>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">{t.freeSmsRemaining}</span>
-                  <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                    {status?.free_sms_remaining ?? 0} / {status?.free_sms_limit ?? 10}
-                  </span>
+            {(() => {
+              const smsLimit     = status?.free_sms_limit ?? 10
+              const smsRemaining = status?.free_sms_remaining ?? 0
+              const smsUsed      = smsLimit - smsRemaining
+              const usedPct      = Math.round((smsUsed / smsLimit) * 100)
+              const barColor     = smsRemaining === 0
+                ? 'bg-red-500'
+                : smsRemaining < smsLimit / 2
+                  ? 'bg-yellow-400'
+                  : 'bg-emerald-500'
+              return (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-4">{t.smsBalance}</p>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        {t.freeSmsRemaining}: {t.freeSmsUsed} {smsUsed} {t.paidOf} {smsLimit}
+                      </span>
+                    </div>
+                    <div className="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${barColor} rounded-full transition-all`}
+                        style={{ width: `${usedPct}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-300">{t.purchasedSms}</span>
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">{status?.purchased_sms ?? 0}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="h-2 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-indigo-500 rounded-full transition-all"
-                    style={{ width: `${Math.round(((status?.free_sms_remaining ?? 0) / (status?.free_sms_limit ?? 10)) * 100)}%` }}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">{t.purchasedSms}</span>
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">{status?.purchased_sms ?? 0}</span>
-                </div>
-              </div>
-            </div>
+              )
+            })()}
 
             {/* SMS packages */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
