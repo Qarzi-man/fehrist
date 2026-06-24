@@ -3,14 +3,29 @@ import { getAdminRevenue, type RevenueRow } from '../../api/admin'
 
 type Period = 'day' | 'week' | 'month'
 
+const TYPE_LABEL: Record<string, string> = {
+  subscription: 'Подписка',
+  sms:          'SMS пакет',
+}
+
+const TYPE_BADGE: Record<string, string> = {
+  subscription: 'bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-500/30',
+  sms:          'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
+}
+
 function exportCsv(rows: RevenueRow[], total: number) {
-  const header = ['Дата', 'Выручка (сом.)', 'Заявок']
-  const body = rows.map((r) => [r.date, parseFloat(String(r.revenue)).toFixed(2), r.count])
-  const footer = ['ИТОГО', total.toFixed(2), rows.reduce((s, r) => s + r.count, 0)]
-  const csv = [header, ...body, footer].map((r) => r.join(',')).join('\n')
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
+  const header = ['Дата', 'Тип', 'Выручка (сом.)', 'Заявок']
+  const body   = rows.map((r) => [
+    r.date,
+    TYPE_LABEL[r.type] ?? r.type,
+    parseFloat(String(r.revenue)).toFixed(2),
+    r.count,
+  ])
+  const footer = ['ИТОГО', '', total.toFixed(2), rows.reduce((s, r) => s + r.count, 0)]
+  const csv    = [header, ...body, footer].map((r) => r.join(',')).join('\n')
+  const blob   = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
+  const url    = URL.createObjectURL(blob)
+  const a      = document.createElement('a')
   a.href = url
   a.download = `revenue-${new Date().toISOString().slice(0, 10)}.csv`
   document.body.appendChild(a)
@@ -20,15 +35,22 @@ function exportCsv(rows: RevenueRow[], total: number) {
 }
 
 export default function AdminRevenue() {
-  const [period, setPeriod]   = useState<Period>('month')
-  const [rows, setRows]       = useState<RevenueRow[]>([])
-  const [total, setTotal]     = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [period, setPeriod]         = useState<Period>('month')
+  const [rows, setRows]             = useState<RevenueRow[]>([])
+  const [total, setTotal]           = useState(0)
+  const [totalSub, setTotalSub]     = useState(0)
+  const [totalSms, setTotalSms]     = useState(0)
+  const [loading, setLoading]       = useState(false)
 
   function load(p = period) {
     setLoading(true)
     getAdminRevenue({ period: p })
-      .then((r) => { setRows(r.data); setTotal(r.total) })
+      .then((r) => {
+        setRows(r.data)
+        setTotal(r.total)
+        setTotalSub(r.total_subscription ?? 0)
+        setTotalSms(r.total_sms ?? 0)
+      })
       .catch((err) => console.error('[AdminRevenue] load failed:', err?.response?.status, err?.message))
       .finally(() => setLoading(false))
   }
@@ -71,16 +93,21 @@ export default function AdminRevenue() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-emerald-600/20 to-emerald-600/5 border border-emerald-500/20 rounded-2xl p-5">
-          <p className="text-xs text-gray-500 mb-2">Выручка за период</p>
-          <p className="text-3xl font-bold text-emerald-300">{total.toFixed(2)}</p>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-gradient-to-br from-indigo-600/20 to-indigo-600/5 border border-indigo-500/20 rounded-2xl p-5">
+          <p className="text-xs text-gray-500 mb-2">Выручка от подписок</p>
+          <p className="text-2xl font-bold text-indigo-300">{totalSub.toFixed(2)}</p>
           <p className="text-xs text-gray-500 mt-1">сомони</p>
         </div>
-        <div className="bg-gradient-to-br from-indigo-600/20 to-indigo-600/5 border border-indigo-500/20 rounded-2xl p-5">
-          <p className="text-xs text-gray-500 mb-2">Одобрено заявок</p>
-          <p className="text-3xl font-bold text-indigo-300">{totalCount}</p>
-          <p className="text-xs text-gray-500 mt-1">транзакций</p>
+        <div className="bg-gradient-to-br from-amber-600/20 to-amber-600/5 border border-amber-500/20 rounded-2xl p-5">
+          <p className="text-xs text-gray-500 mb-2">Выручка от SMS пакетов</p>
+          <p className="text-2xl font-bold text-amber-300">{totalSms.toFixed(2)}</p>
+          <p className="text-xs text-gray-500 mt-1">сомони</p>
+        </div>
+        <div className="bg-gradient-to-br from-emerald-600/20 to-emerald-600/5 border border-emerald-500/20 rounded-2xl p-5">
+          <p className="text-xs text-gray-500 mb-2">Итого за период</p>
+          <p className="text-2xl font-bold text-emerald-300">{total.toFixed(2)}</p>
+          <p className="text-xs text-gray-500 mt-1">{totalCount} транзакций</p>
         </div>
       </div>
 
@@ -90,6 +117,7 @@ export default function AdminRevenue() {
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex justify-between px-5 py-3.5 border-b border-gray-700/30 animate-pulse">
                 <div className="h-3 bg-gray-700 rounded w-24" />
+                <div className="h-3 bg-gray-700 rounded w-20" />
                 <div className="h-3 bg-gray-700 rounded w-16" />
                 <div className="h-3 bg-gray-700 rounded w-8" />
               </div>
@@ -100,6 +128,7 @@ export default function AdminRevenue() {
             <thead>
               <tr className="text-[11px] text-gray-600 uppercase border-b border-gray-700/50">
                 <th className="px-5 py-2.5 text-left font-medium">Дата</th>
+                <th className="px-5 py-2.5 text-left font-medium">Тип</th>
                 <th className="px-5 py-2.5 text-right font-medium">Выручка (сом.)</th>
                 <th className="px-5 py-2.5 text-right font-medium">Заявок</th>
               </tr>
@@ -108,12 +137,17 @@ export default function AdminRevenue() {
               {rows.map((r, i) => (
                 <tr key={i} className="border-b border-gray-700/30 last:border-0 hover:bg-gray-700/20 transition">
                   <td className="px-5 py-3.5 text-gray-300">{r.date}</td>
+                  <td className="px-5 py-3.5">
+                    <span className={`text-[11px] font-semibold rounded-full px-2.5 py-0.5 ${TYPE_BADGE[r.type] ?? 'bg-gray-700/50 text-gray-400'}`}>
+                      {TYPE_LABEL[r.type] ?? r.type}
+                    </span>
+                  </td>
                   <td className="px-5 py-3.5 text-right font-bold text-emerald-400">{parseFloat(String(r.revenue)).toFixed(2)}</td>
                   <td className="px-5 py-3.5 text-right text-gray-400">{r.count}</td>
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={3} className="text-center text-gray-600 py-12">Нет данных за период</td></tr>
+                <tr><td colSpan={4} className="text-center text-gray-600 py-12">Нет данных за период</td></tr>
               )}
             </tbody>
           </table>

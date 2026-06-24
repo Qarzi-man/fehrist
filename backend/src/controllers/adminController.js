@@ -273,21 +273,25 @@ async function getSmsLogs(req, res, next) {
 
 async function getRevenue(req, res, next) {
   try {
-    const period = req.query.period === 'week' ? 'week' : req.query.period === 'day' ? 'day' : 'month';
+    const period   = req.query.period === 'week' ? 'week' : req.query.period === 'day' ? 'day' : 'month';
     const trunc    = period === 'day' ? 'hour' : 'day';
     const interval = period === 'day' ? '24 hours' : period === 'week' ? '7 days' : '30 days';
 
     const { rows } = await pool.query(`
       SELECT DATE_TRUNC('${trunc}', approved_at)::date AS date,
+             type,
              COALESCE(SUM(amount), 0)::numeric AS revenue,
              COUNT(*)::int AS count
       FROM payment_requests
       WHERE status = 'approved' AND approved_at > NOW() - INTERVAL '${interval}'
-      GROUP BY 1 ORDER BY 1
+      GROUP BY 1, 2 ORDER BY 1, 2
     `);
 
-    const total = rows.reduce((s, r) => s + parseFloat(r.revenue || 0), 0);
-    res.json({ data: rows, total });
+    const total              = rows.reduce((s, r) => s + parseFloat(r.revenue || 0), 0);
+    const total_subscription = rows.filter((r) => r.type === 'subscription').reduce((s, r) => s + parseFloat(r.revenue || 0), 0);
+    const total_sms          = rows.filter((r) => r.type === 'sms').reduce((s, r) => s + parseFloat(r.revenue || 0), 0);
+
+    res.json({ data: rows, total, total_subscription, total_sms });
   } catch (err) { next(err); }
 }
 

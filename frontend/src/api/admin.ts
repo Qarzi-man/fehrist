@@ -66,9 +66,17 @@ export interface AdminSmsLog {
 }
 
 export interface RevenueRow {
-  date: string
+  date:    string
+  type:    string   // 'subscription' | 'sms'
   revenue: number
-  count: number
+  count:   number
+}
+
+export interface RevenueResponse {
+  data:               RevenueRow[]
+  total:              number
+  total_subscription: number
+  total_sms:          number
 }
 
 const B = '/admin'
@@ -101,4 +109,4 @@ export const getAdminSmsLogs = (p: { dateFrom?: string; dateTo?: string; page?: 
   api.get(`${B}/sms`, { params: p }).then((r) => r.data as { data: AdminSmsLog[]; total: number; totalPages: number; page: number })
 
 export const getAdminRevenue = (p: { period?: string }) =>
-  api.get(`${B}/revenue`, { params: p }).then((r) => r.data as { data: RevenueRow[]; total: number })
+  api.get(`${B}/revenue`, { params: p }).then((r) => r.data as RevenueResponse)
