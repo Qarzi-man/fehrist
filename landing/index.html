@@ -7,15 +7,16 @@
   <meta name="description" content="Daftarcha — барномаи ҳисоби қарзҳо барои соҳибкорони Тоҷикистон. Учёт долгов, SMS уведомления, аналитика.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      theme: { extend: { fontFamily: { inter: ['Inter', 'sans-serif'] } } }
+      theme: { extend: { fontFamily: { inter: ['Inter','sans-serif'], syne: ['Syne','sans-serif'] } } }
     }
   </script>
   <style>
     *, *::before, *::after { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    h1, h2 { font-family: 'Syne', sans-serif; }
     :root { --bg: #0a0f1e; --card: #0d1428; --border: #1e2d4a; }
     html { scroll-behavior: smooth; }
     body { background-color: var(--bg); color: #fff; -webkit-font-smoothing: antialiased; }
@@ -25,28 +26,73 @@
       background-size: 28px 28px;
     }
     .hero-glow {
-      background: radial-gradient(ellipse 900px 500px at 50% -60px, rgba(99,102,241,0.22), transparent 70%);
+      background: radial-gradient(ellipse 1000px 600px at 50% -80px, rgba(99,102,241,0.25), transparent 70%);
     }
+
+    /* Static gradient text */
     .gradient-text {
       background: linear-gradient(135deg, #a5b4fc, #c4b5fd);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+    /* Animated gradient text for hero keyword */
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .gradient-text-anim {
+      background: linear-gradient(135deg, #818cf8, #c084fc, #a5b4fc, #f0abfc, #818cf8);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 5s ease infinite;
+    }
+
     .btn-gradient {
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
       transition: opacity .2s, transform .2s, box-shadow .2s;
     }
-    .btn-gradient:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 12px 32px rgba(99,102,241,.4); }
+    .btn-gradient:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 12px 32px rgba(99,102,241,.45); }
+
+    /* Feature card with gradient border on hover */
+    .feature-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      position: relative;
+      transition: background .25s, transform .25s, border-color .25s;
+    }
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity .25s;
+      pointer-events: none;
+    }
+    .feature-card:hover { background: rgba(99,102,241,.07); border-color: transparent; transform: translateY(-2px); }
+    .feature-card:hover::after { opacity: 1; }
+
+    /* Plain card (problems, faq) */
     .card {
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(255,255,255,.07);
       transition: background .25s, border-color .25s, transform .25s;
     }
     .card:hover { background: rgba(99,102,241,.07); border-color: rgba(99,102,241,.28); transform: translateY(-2px); }
+
     .pricing-popular {
       background: linear-gradient(135deg, rgba(99,102,241,.14), rgba(139,92,246,.14));
       border: 1px solid rgba(99,102,241,.38);
+      box-shadow: 0 0 40px rgba(99,102,241,.18), 0 0 80px rgba(139,92,246,.1);
     }
 
     /* Reveal */
@@ -80,6 +126,9 @@
 
     /* Mock laptop */
     .mock-screen { background: #0a0f1e; border-radius: 6px; overflow: hidden; }
+
+    /* Numbers counter */
+    .stat-num { font-family: 'Syne', sans-serif; }
   </style>
 </head>
 <body>
@@ -95,7 +144,7 @@
             <path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <span class="text-[17px] font-extrabold text-white tracking-tight">Daftarcha</span>
+        <span class="text-[17px] font-extrabold text-white tracking-tight" style="font-family:'Syne',sans-serif;">Daftarcha</span>
       </a>
 
       <div class="hidden md:flex items-center gap-3">
@@ -105,8 +154,8 @@
           <button onclick="switchLang('uz')" data-lang="uz" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">UZ</button>
           <button onclick="switchLang('en')" data-lang="en" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">EN</button>
         </div>
-        <a href="https://app.daftarcha.tj" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
-        <a href="https://app.daftarcha.tj" class="btn-gradient px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/25" data-i18n="hero_cta_primary">Начать бесплатно</a>
+        <a href="https://serene-friendship.up.railway.app" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
+        <a href="https://serene-friendship.up.railway.app" class="btn-gradient px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/25" data-i18n="hero_cta_primary">Начать бесплатно</a>
       </div>
 
       <button onclick="toggleMenu()" class="md:hidden p-2 text-slate-400 hover:text-white transition-colors">
@@ -124,8 +173,8 @@
         <button onclick="switchLang('uz')" data-lang="uz" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">UZ</button>
         <button onclick="switchLang('en')" data-lang="en" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">EN</button>
       </div>
-      <a href="https://app.daftarcha.tj" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_login">Войти</a>
-      <a href="https://app.daftarcha.tj" class="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white text-center" data-i18n="hero_cta_primary">Начать бесплатно</a>
+      <a href="https://serene-friendship.up.railway.app" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_login">Войти</a>
+      <a href="https://serene-friendship.up.railway.app" class="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white text-center" data-i18n="hero_cta_primary">Начать бесплатно</a>
     </div>
   </div>
 </nav>
@@ -139,17 +188,40 @@
       <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
       <span class="text-xs font-semibold text-indigo-300" data-i18n="hero_badge">Daftarcha — учёт долгов для бизнеса</span>
     </div>
-    <h1 class="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[1.08] text-white mb-6 reveal d1" data-i18n="hero_title">
-      Управляйте долгами<br><span class="gradient-text">вашего бизнеса</span> легко
+    <h1 class="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight leading-[1.04] text-white mb-6 reveal d1" data-i18n="hero_title">
+      Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>
     </h1>
     <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 reveal d2" data-i18n="hero_sub">
-      Daftarcha помогает предпринимателям вести учёт долгов, отправлять SMS клиентам и строить отчёты
+      Daftarcha ба соҳибкорон кӯмак мекунад, ки қарзҳоро пайгирӣ кунанд, СМС фиристанд ва гузориш созанд
     </p>
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 reveal d3">
-      <a href="https://app.daftarcha.tj" class="btn-gradient w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white shadow-2xl shadow-indigo-500/35" data-i18n="hero_cta_primary">Начать бесплатно</a>
+      <a href="https://serene-friendship.up.railway.app" class="btn-gradient w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white shadow-2xl shadow-indigo-500/35" data-i18n="hero_cta_primary">Начать бесплатно</a>
       <a href="#demo" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="hero_cta_secondary">Смотреть демо</a>
     </div>
     <p class="mt-7 text-xs text-slate-600 reveal d4" data-i18n="hero_trust">✓ Бесплатно &nbsp;·&nbsp; ✓ Без карты &nbsp;·&nbsp; ✓ iOS и Android</p>
+  </div>
+</section>
+
+<!-- ═══════════════════ NUMBERS ═══════════════════ -->
+<section class="py-16 md:py-20">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6">
+    <div class="grid grid-cols-3 gap-4 md:gap-8">
+      <div class="text-center reveal d1">
+        <p class="stat-num text-4xl md:text-6xl font-black mb-2" style="background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-counter="500" data-suffix="+">500+</p>
+        <p class="text-xs md:text-sm text-slate-400 font-semibold" data-i18n="numbers_businesses_label">бизнесов</p>
+        <p class="text-[11px] text-slate-600 mt-0.5" data-i18n="numbers_businesses_sub">доверяют нам</p>
+      </div>
+      <div class="text-center reveal d2">
+        <p class="stat-num text-4xl md:text-6xl font-black mb-2" style="background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-counter="10000" data-suffix="+">10 000+</p>
+        <p class="text-xs md:text-sm text-slate-400 font-semibold" data-i18n="numbers_debts_label">долгов</p>
+        <p class="text-[11px] text-slate-600 mt-0.5" data-i18n="numbers_debts_sub">записано</p>
+      </div>
+      <div class="text-center reveal d3">
+        <p class="stat-num text-4xl md:text-6xl font-black mb-2" style="background:linear-gradient(135deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" data-counter="4" data-suffix="">4</p>
+        <p class="text-xs md:text-sm text-slate-400 font-semibold" data-i18n="numbers_langs_label">языка</p>
+        <p class="text-[11px] text-slate-600 mt-0.5" data-i18n="numbers_langs_sub">поддерживаем</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -198,42 +270,42 @@
       <h2 class="text-3xl md:text-4xl font-black text-white" data-i18n="features_title">Всё необходимое в одном месте</h2>
     </div>
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div class="card rounded-2xl p-6 reveal d1">
+      <div class="feature-card rounded-2xl p-6 reveal d1">
         <div class="w-11 h-11 rounded-xl bg-indigo-500/15 flex items-center justify-center mb-4">
           <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5" data-i18n="feature1_title">Учёт долгов</h3>
         <p class="text-sm text-slate-400 leading-relaxed" data-i18n="feature1_desc">Клиент должен вам или вы должны — всё на одном экране</p>
       </div>
-      <div class="card rounded-2xl p-6 reveal d2">
+      <div class="feature-card rounded-2xl p-6 reveal d2">
         <div class="w-11 h-11 rounded-xl bg-violet-500/15 flex items-center justify-center mb-4">
           <svg class="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5" data-i18n="feature2_title">Рассрочка и насия</h3>
         <p class="text-sm text-slate-400 leading-relaxed" data-i18n="feature2_desc">График платежей с датами и отслеживанием частичных оплат</p>
       </div>
-      <div class="card rounded-2xl p-6 reveal d3">
+      <div class="feature-card rounded-2xl p-6 reveal d3">
         <div class="w-11 h-11 rounded-xl bg-sky-500/15 flex items-center justify-center mb-4">
           <svg class="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5" data-i18n="feature3_title">SMS уведомления</h3>
         <p class="text-sm text-slate-400 leading-relaxed" data-i18n="feature3_desc">Отправляйте персональные SMS и напоминайте о платеже</p>
       </div>
-      <div class="card rounded-2xl p-6 reveal d1">
+      <div class="feature-card rounded-2xl p-6 reveal d1">
         <div class="w-11 h-11 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-4">
           <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5" data-i18n="feature4_title">Мультивалютность</h3>
         <p class="text-sm text-slate-400 leading-relaxed" data-i18n="feature4_desc">Сомони, рубли и доллары — все валюты в одном месте</p>
       </div>
-      <div class="card rounded-2xl p-6 reveal d2">
+      <div class="feature-card rounded-2xl p-6 reveal d2">
         <div class="w-11 h-11 rounded-xl bg-rose-500/15 flex items-center justify-center mb-4">
           <svg class="w-5 h-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5" data-i18n="feature5_title">Доступ сотрудников</h3>
         <p class="text-sm text-slate-400 leading-relaxed" data-i18n="feature5_desc">Приглашайте сотрудников, каждый видит только нужное</p>
       </div>
-      <div class="card rounded-2xl p-6 reveal d3">
+      <div class="feature-card rounded-2xl p-6 reveal d3">
         <div class="w-11 h-11 rounded-xl bg-amber-500/15 flex items-center justify-center mb-4">
           <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         </div>
@@ -255,19 +327,16 @@
       <div class="relative max-w-4xl mx-auto">
         <div class="absolute inset-0 scale-75 translate-y-10 rounded-full blur-3xl pointer-events-none" style="background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.2));"></div>
         <div class="relative bg-[#111827] rounded-t-2xl p-3 border border-white/10 shadow-2xl">
-          <!-- browser chrome -->
           <div class="flex items-center gap-2 mb-3 px-1">
             <div class="w-3 h-3 rounded-full bg-rose-500/60"></div>
             <div class="w-3 h-3 rounded-full bg-amber-500/60"></div>
             <div class="w-3 h-3 rounded-full bg-emerald-500/60"></div>
             <div class="ml-3 flex-1 bg-white/5 rounded-lg h-6 flex items-center px-3 gap-2">
               <svg class="w-3 h-3 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-              <span class="text-[10px] text-slate-500">app.daftarcha.tj/debts</span>
+              <span class="text-[10px] text-slate-500">serene-friendship.up.railway.app/debts</span>
             </div>
           </div>
-          <!-- app UI -->
           <div class="mock-screen flex" style="min-height:320px;">
-            <!-- sidebar -->
             <div class="w-40 shrink-0 border-r border-white/5 p-3 flex flex-col gap-1" style="background:rgba(5,8,20,.9);">
               <div class="flex items-center gap-2 px-2 py-2 mb-2">
                 <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center">
@@ -283,13 +352,9 @@
               <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg opacity-40"><svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><span class="text-[10px] text-slate-400">Аналитика</span></div>
               <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg opacity-40"><svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg><span class="text-[10px] text-slate-400">Тарифы</span></div>
             </div>
-            <!-- main -->
             <div class="flex-1 p-4 overflow-hidden">
               <div class="flex items-center justify-between mb-3">
-                <div>
-                  <p class="text-[11px] font-bold text-white">Долги</p>
-                  <p class="text-[9px] text-slate-500">ИП Иванов · 12 активных</p>
-                </div>
+                <div><p class="text-[11px] font-bold text-white">Долги</p><p class="text-[9px] text-slate-500">ИП Иванов · 12 активных</p></div>
                 <div class="px-3 py-1 rounded-lg text-[10px] font-bold text-white" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">+ Долг</div>
               </div>
               <div class="grid grid-cols-3 gap-2 mb-3">
@@ -330,6 +395,46 @@
   </div>
 </section>
 
+<!-- ═══════════════════ MOBILE APP COMING SOON ═══════════════════ -->
+<section class="py-20 md:py-28">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center">
+    <div class="reveal">
+      <div class="inline-flex items-center gap-2 bg-slate-500/10 border border-slate-500/20 rounded-full px-4 py-1.5 mb-6">
+        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        <span class="text-xs font-semibold text-slate-400" data-i18n="mobile_badge">Мобильное приложение</span>
+      </div>
+      <h2 class="text-3xl md:text-4xl font-black text-white mb-3" data-i18n="mobile_title">Скоро в App Store<br>и Google Play</h2>
+      <p class="text-slate-400 mb-10 max-w-sm mx-auto" data-i18n="mobile_sub">Следите за обновлениями — нативное приложение уже в разработке</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <!-- App Store -->
+        <div class="relative opacity-50 cursor-not-allowed select-none" title="Coming soon">
+          <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3.5 w-48">
+            <svg class="w-8 h-8 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+            </svg>
+            <div class="text-left">
+              <p class="text-[10px] text-slate-500" data-i18n="mobile_soon">Скоро</p>
+              <p class="text-sm font-bold text-slate-300">App Store</p>
+            </div>
+          </div>
+        </div>
+        <!-- Google Play -->
+        <div class="relative opacity-50 cursor-not-allowed select-none" title="Coming soon">
+          <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3.5 w-48">
+            <svg class="w-8 h-8 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 20.5v-17c0-.83.94-1.3 1.6-.8l14 8.5c.6.37.6 1.23 0 1.6l-14 8.5c-.66.5-1.6.03-1.6-.8zm2-14.18V17.7l10.07-6.18L5 6.32z"/>
+            </svg>
+            <div class="text-left">
+              <p class="text-[10px] text-slate-500" data-i18n="mobile_soon">Скоро</p>
+              <p class="text-sm font-bold text-slate-300">Google Play</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════════════ PRICING ═══════════════════ -->
 <section id="pricing" class="py-20 md:py-28">
   <div class="max-w-3xl mx-auto px-4 sm:px-6">
@@ -349,7 +454,7 @@
           <li class="flex items-center gap-3 text-sm text-slate-300"><svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_free_f4">10 SMS в месяц</span></li>
           <li class="flex items-center gap-3 text-sm text-slate-300"><svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_free_f5">Долги, рассрочка, аналитика</span></li>
         </ul>
-        <a href="https://app.daftarcha.tj" class="block w-full py-3 rounded-xl text-sm font-semibold text-center text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="pricing_cta_free">Начать бесплатно</a>
+        <a href="https://serene-friendship.up.railway.app" class="block w-full py-3 rounded-xl text-sm font-semibold text-center text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="pricing_cta_free">Начать бесплатно</a>
       </div>
       <!-- Paid -->
       <div class="pricing-popular rounded-2xl p-7 relative reveal d2">
@@ -366,7 +471,7 @@
           <li class="flex items-center gap-3 text-sm text-slate-200"><svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_paid_f4">10 SMS бесплатно + дешёвые пакеты</span></li>
           <li class="flex items-center gap-3 text-sm text-slate-200"><svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_paid_f5">Приоритетная поддержка</span></li>
         </ul>
-        <a href="https://app.daftarcha.tj" class="btn-gradient block w-full py-3 rounded-xl text-sm font-bold text-white text-center shadow-xl shadow-indigo-500/30" data-i18n="pricing_cta_paid">Купить подписку</a>
+        <a href="https://serene-friendship.up.railway.app" class="btn-gradient block w-full py-3 rounded-xl text-sm font-bold text-white text-center shadow-xl shadow-indigo-500/30" data-i18n="pricing_cta_paid">Купить подписку</a>
       </div>
     </div>
   </div>
@@ -426,7 +531,7 @@
       <div class="relative text-center py-16 px-6">
         <h2 class="text-3xl md:text-4xl font-black text-white mb-4" data-i18n="cta_title">Начните вести учёт долгов<br>прямо сейчас</h2>
         <p class="text-slate-400 mb-8 max-w-sm mx-auto" data-i18n="cta_sub">Бесплатно, без кредитной карты, на любом устройстве</p>
-        <a href="https://app.daftarcha.tj" class="btn-gradient inline-block px-10 py-4 rounded-2xl text-base font-bold text-white shadow-2xl shadow-indigo-500/40" data-i18n="cta_btn">Начать бесплатно</a>
+        <a href="https://serene-friendship.up.railway.app" class="btn-gradient inline-block px-10 py-4 rounded-2xl text-base font-bold text-white shadow-2xl shadow-indigo-500/40" data-i18n="cta_btn">Начать бесплатно</a>
       </div>
     </div>
   </div>
@@ -441,16 +546,16 @@
           <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 36 36" fill="none"><path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fill-opacity=".95"/><path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/></svg>
           </div>
-          <span class="text-sm font-extrabold text-white">Daftarcha</span>
+          <span class="text-sm font-extrabold text-white" style="font-family:'Syne',sans-serif;">Daftarcha</span>
         </a>
         <p class="text-xs text-slate-600">© 2025 ИП Исмонов Ғафур Фарҳодович</p>
         <a href="mailto:niyatorzuzoda@gmail.com" class="text-xs text-slate-600 hover:text-indigo-400 transition-colors mt-0.5 block">niyatorzuzoda@gmail.com</a>
       </div>
       <div class="flex flex-wrap gap-x-7 gap-y-2.5">
-        <a href="https://app.daftarcha.tj/oferta"  class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_oferta">Оферта</a>
-        <a href="https://app.daftarcha.tj/privacy" class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_privacy">Конфиденциальность</a>
-        <a href="https://app.daftarcha.tj/help"    class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_help">Помощь</a>
-        <a href="https://app.daftarcha.tj"         class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
+        <a href="https://serene-friendship.up.railway.app/oferta"  class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_oferta">Оферта</a>
+        <a href="https://serene-friendship.up.railway.app/privacy" class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_privacy">Конфиденциальность</a>
+        <a href="https://serene-friendship.up.railway.app/help"    class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_help">Помощь</a>
+        <a href="https://serene-friendship.up.railway.app"         class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
       </div>
     </div>
   </div>
@@ -462,18 +567,18 @@ const T = {
   tj: {
     nav_login:'Даромадан',
     hero_badge:'Daftarcha — ҳисоби қарзҳо барои бизнес',
-    hero_title:'Қарзҳои бизнеси худро<br><span class="gradient-text">осон идора кунед</span>',
+    hero_title:'Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>',
     hero_sub:'Daftarcha ба соҳибкорон кӯмак мекунад, ки қарзҳоро пайгирӣ кунанд, СМС фиристанд ва гузориш созанд',
     hero_cta_primary:'Ройгон оғоз кунед',
     hero_cta_secondary:'Намоиш дидан',
     hero_trust:'✓ Ройгон · ✓ Бе кредит · ✓ iOS ва Android',
+    numbers_businesses_label:'бизнесҳо',numbers_businesses_sub:'боварӣ доранд',
+    numbers_debts_label:'қарзҳо',numbers_debts_sub:'сабт шудааст',
+    numbers_langs_label:'забон',numbers_langs_sub:'дастгирӣ мекунем',
     problems_title:'Мушкилоти маъмул?',
-    problem1_title:'Дафтарча гум мешавад',
-    problem1_desc:'Сабти дастӣ боиси хатогиҳо ва аз даст додани маълумот мегардад',
-    problem2_title:'Excel мураккаб аст',
-    problem2_desc:'Ҷадвалҳои мураккаб вақти зиёд мебаранд ва аз телефон дастрас нестанд',
-    problem3_title:'Мизоҷ фаромӯш мекунад',
-    problem3_desc:'Ёдоварии дастӣ боварибахш нест ва вақти зиёд мегирад',
+    problem1_title:'Дафтарча гум мешавад',problem1_desc:'Сабти дастӣ боиси хатогиҳо ва аз даст додани маълумот мегардад',
+    problem2_title:'Excel мураккаб аст',problem2_desc:'Ҷадвалҳои мураккаб вақти зиёд мебаранд ва аз телефон дастрас нестанд',
+    problem3_title:'Мизоҷ фаромӯш мекунад',problem3_desc:'Ёдоварии дастӣ боварибахш нест ва вақти зиёд мегирад',
     features_title:'Ҳамаи чизи зарурӣ дар як ҷо',
     feature1_title:'Ҳисоби қарзҳо',feature1_desc:'Мизоҷ ба шумо ё шумо ба мизоҷ — ҳамааш дар як экран',
     feature2_title:'Насия ва тақсит',feature2_desc:'Ҷадвали пардохтҳо бо санаҳо ва назорати пардохтҳои қисмӣ',
@@ -481,8 +586,11 @@ const T = {
     feature4_title:'Чандвалютавӣ',feature4_desc:'Сомонӣ, рубл ва доллар — ҳамаи асъорҳо дар як ҷо',
     feature5_title:'Дастрасии кормандон',feature5_desc:'Кормандонро даъват кунед — ҳар яке танҳо маълумоти зарурӣ мебинад',
     feature6_title:'Таҳлил ва гузоришот',feature6_desc:'Графикҳо, рӯйхати беҳтарин мизоҷон ва содироти Excel',
-    screenshots_title:'Интерфейси оддӣ ва ширин',
-    screenshots_sub:'Аз рӯзи аввал бе омӯзиш кор кунед',
+    screenshots_title:'Интерфейси оддӣ ва ширин',screenshots_sub:'Аз рӯзи аввал бе омӯзиш кор кунед',
+    mobile_badge:'Барномаи мобилӣ',
+    mobile_title:'Ба зудӣ дар App Store<br>ва Google Play',
+    mobile_sub:'Навсозиҳоро пайгирӣ кунед — барномаи бумӣ дар коркард аст',
+    mobile_soon:'Ба зудӣ',
     pricing_title:'Нархҳо',
     pricing_free_name:'Ройгон',pricing_free_price:'0 сом.',pricing_free_sub:'Барои ҳамеша',
     pricing_paid_name:'Обуна',pricing_paid_price:'29 сом./моҳ',pricing_paid_sub:'Ҳама чиз бидуни маҳдудият',
@@ -505,10 +613,13 @@ const T = {
   ru: {
     nav_login:'Войти',
     hero_badge:'Daftarcha — учёт долгов для бизнеса',
-    hero_title:'Управляйте долгами<br><span class="gradient-text">вашего бизнеса</span> легко',
+    hero_title:'Управляйте долгами<br><span class="gradient-text-anim">вашего бизнеса</span> легко',
     hero_sub:'Daftarcha помогает предпринимателям вести учёт долгов, отправлять SMS клиентам и строить отчёты',
     hero_cta_primary:'Начать бесплатно',hero_cta_secondary:'Смотреть демо',
     hero_trust:'✓ Бесплатно · ✓ Без карты · ✓ iOS и Android',
+    numbers_businesses_label:'бизнесов',numbers_businesses_sub:'доверяют нам',
+    numbers_debts_label:'долгов',numbers_debts_sub:'записано',
+    numbers_langs_label:'языка',numbers_langs_sub:'поддерживаем',
     problems_title:'Знакомые проблемы?',
     problem1_title:'Блокнот теряется',problem1_desc:'Ручные записи приводят к ошибкам и потере данных',
     problem2_title:'Excel — сложно',problem2_desc:'Сложные таблицы отнимают время и недоступны с телефона',
@@ -521,6 +632,10 @@ const T = {
     feature5_title:'Доступ сотрудников',feature5_desc:'Приглашайте сотрудников, каждый видит только нужное',
     feature6_title:'Аналитика и отчёты',feature6_desc:'Графики, топ клиентов и экспорт в Excel',
     screenshots_title:'Простой и приятный интерфейс',screenshots_sub:'Работайте с первого дня без обучения',
+    mobile_badge:'Мобильное приложение',
+    mobile_title:'Скоро в App Store<br>и Google Play',
+    mobile_sub:'Следите за обновлениями — нативное приложение уже в разработке',
+    mobile_soon:'Скоро',
     pricing_title:'Тарифы',
     pricing_free_name:'Бесплатно',pricing_free_price:'0 сом.',pricing_free_sub:'Навсегда',
     pricing_paid_name:'Подписка',pricing_paid_price:'29 сом./мес',pricing_paid_sub:'Всё без ограничений',
@@ -543,10 +658,13 @@ const T = {
   uz: {
     nav_login:'Kirish',
     hero_badge:'Daftarcha — biznes uchun qarz hisobi',
-    hero_title:'Biznesingiz qarzlarini<br><span class="gradient-text">osonlik bilan boshqaring</span>',
+    hero_title:'Biznesingiz qarzlarini<br><span class="gradient-text-anim">osonlik bilan boshqaring</span>',
     hero_sub:'Daftarcha tadbirkorlarga qarzlarni kuzatish, SMS yuborish va hisobot tuzishda yordam beradi',
     hero_cta_primary:'Bepul boshlash',hero_cta_secondary:"Demoni ko'rish",
     hero_trust:"✓ Bepul · ✓ Kartsiz · ✓ iOS va Android",
+    numbers_businesses_label:'biznes',numbers_businesses_sub:'ishonadi',
+    numbers_debts_label:'qarz',numbers_debts_sub:'qayd etilgan',
+    numbers_langs_label:'til',numbers_langs_sub:"qo'llab-quvvatlaymiz",
     problems_title:'Tanish muammolar?',
     problem1_title:"Daftar yo'qoladi",problem1_desc:"Qo'lda yozish xatolarga va ma'lumot yo'qolishiga olib keladi",
     problem2_title:'Excel murakkab',problem2_desc:"Murakkab jadvallar vaqt oladi va telefondan foydalanib bo'lmaydi",
@@ -559,6 +677,10 @@ const T = {
     feature5_title:'Xodimlar kirishi',feature5_desc:"Xodimlarni taklif qiling — har biri faqat kerakli ma'lumotni ko'radi",
     feature6_title:'Tahlil va hisobotlar',feature6_desc:'Grafiklar, top mijozlar va Excelga eksport',
     screenshots_title:'Oddiy va qulay interfeys',screenshots_sub:"Birinchi kundan boshlab o'rganmasdan ishlang",
+    mobile_badge:'Mobil ilova',
+    mobile_title:"Tez orada App Store<br>va Google Play'da",
+    mobile_sub:"Yangilanishlarni kuzatib boring — mahalliy ilova allaqachon ishlab chiqilmoqda",
+    mobile_soon:'Tez orada',
     pricing_title:'Narxlar',
     pricing_free_name:'Bepul',pricing_free_price:"0 so'm.",pricing_free_sub:'Har doim',
     pricing_paid_name:'Obuna',pricing_paid_price:"29 so'm./oy",pricing_paid_sub:'Cheklovsiz hamma narsa',
@@ -581,10 +703,13 @@ const T = {
   en: {
     nav_login:'Sign in',
     hero_badge:'Daftarcha — debt tracking for business',
-    hero_title:'Manage your business<br><span class="gradient-text">debts with ease</span>',
+    hero_title:'Manage your business<br><span class="gradient-text-anim">debts with ease</span>',
     hero_sub:'Daftarcha helps entrepreneurs track debts, send SMS reminders to clients and generate reports',
     hero_cta_primary:'Start for free',hero_cta_secondary:'See demo',
     hero_trust:'✓ Free · ✓ No card · ✓ iOS & Android',
+    numbers_businesses_label:'businesses',numbers_businesses_sub:'trust us',
+    numbers_debts_label:'debts',numbers_debts_sub:'recorded',
+    numbers_langs_label:'languages',numbers_langs_sub:'supported',
     problems_title:'Sound familiar?',
     problem1_title:'Notebooks get lost',problem1_desc:'Manual records lead to errors and loss of important data',
     problem2_title:'Excel is complex',problem2_desc:"Complex spreadsheets waste time and aren't accessible on mobile",
@@ -597,6 +722,10 @@ const T = {
     feature5_title:'Team access',feature5_desc:'Invite employees — each person sees only what they need',
     feature6_title:'Analytics & reports',feature6_desc:'Charts, top clients and Excel export',
     screenshots_title:'Simple and beautiful interface',screenshots_sub:'Work from day one without any training',
+    mobile_badge:'Mobile app',
+    mobile_title:'Coming soon to App Store<br>and Google Play',
+    mobile_sub:'Stay tuned — the native app is already in development',
+    mobile_soon:'Coming soon',
     pricing_title:'Pricing',
     pricing_free_name:'Free',pricing_free_price:'$0',pricing_free_sub:'Forever',
     pricing_paid_name:'Subscription',pricing_paid_price:'29 som/mo',pricing_paid_sub:'Everything unlimited',
@@ -651,11 +780,52 @@ window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('nav-scrolled', scrollY > 20);
 }, { passive: true });
 
-// Scroll reveal
+// Counter animation
+function animateCounter(el) {
+  const target = parseInt(el.getAttribute('data-counter'), 10);
+  const suffix = el.getAttribute('data-suffix') || '';
+  if (isNaN(target)) return;
+  const duration = 1400;
+  const start = performance.now();
+  function frame(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const value = Math.round(eased * target);
+    el.textContent = value >= 1000
+      ? value.toLocaleString('ru-RU').replace(/,/g, ' ') + suffix
+      : value + suffix;
+    if (progress < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// Scroll reveal + counter trigger
+const countersDone = new WeakSet();
 const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('[data-counter]').forEach(el => {
+        if (!countersDone.has(el)) { countersDone.add(el); animateCounter(el); }
+      });
+    }
+  });
 }, { threshold: 0.07 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Also observe stat numbers directly in case they're not inside .reveal
+document.querySelectorAll('[data-counter]').forEach(el => {
+  const revealParent = el.closest('.reveal');
+  if (!revealParent) {
+    const singleObs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !countersDone.has(el)) {
+        countersDone.add(el); animateCounter(el);
+        singleObs.disconnect();
+      }
+    }, { threshold: 0.3 });
+    singleObs.observe(el);
+  }
+});
 
 // Init
 apply();
