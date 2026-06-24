@@ -110,9 +110,21 @@ async function getBusinesses(req, res, next) {
     const page   = Math.max(1, parseInt(req.query.page) || 1);
     const limit  = Math.min(100, parseInt(req.query.limit) || 20);
     const offset = (page - 1) * limit;
+    const filter = req.query.filter || 'all';
+
+    let filterClause = '';
+    if (filter === 'expiring') {
+      filterClause = `AND b.subscription_status = 'active'
+        AND b.subscription_expires_at >= NOW()
+        AND b.subscription_expires_at <= NOW() + INTERVAL '7 days'`;
+    } else if (filter === 'expired') {
+      filterClause = `AND b.subscription_status = 'active'
+        AND b.subscription_expires_at IS NOT NULL
+        AND b.subscription_expires_at < NOW()`;
+    }
 
     const [countRes, dataRes] = await Promise.all([
-      pool.query('SELECT COUNT(*) FROM businesses'),
+      pool.query(`SELECT COUNT(*) FROM businesses b WHERE 1=1 ${filterClause}`),
       pool.query(`
         SELECT b.id, b.name, b.subscription_status, b.subscription_expires_at, b.created_at,
           u.full_name AS owner_name, u.phone AS owner_phone,
@@ -120,12 +132,31 @@ async function getBusinesses(req, res, next) {
           (SELECT COUNT(*) FROM debts   WHERE business_id=b.id AND deleted_at IS NULL)::int AS debt_count,
           (SELECT COUNT(*) FROM business_members WHERE business_id=b.id AND status='active')::int AS member_count
         FROM businesses b JOIN users u ON u.id = b.owner_id
-        ORDER BY b.created_at DESC LIMIT $1 OFFSET $2
+        WHERE 1=1 ${filterClause}
+        ORDER BY b.subscription_expires_at ASC NULLS LAST, b.created_at DESC
+        LIMIT $1 OFFSET $2
       `, [limit, offset]),
     ]);
 
     const total = parseInt(countRes.rows[0].count);
     res.json({ data: dataRes.rows, total, page, limit, totalPages: Math.ceil(total / limit) });
+  } catch (err) { next(err); }
+}
+
+async function getExpiringSubscriptions(req, res, next) {
+  try {
+    const { rows } = await pool.query(`
+      SELECT b.id, b.name, b.subscription_expires_at,
+             u.full_name AS owner_name, u.phone AS owner_phone,
+             GREATEST(0, EXTRACT(DAY FROM (b.subscription_expires_at - NOW()))::int) AS days_left
+      FROM businesses b
+      JOIN users u ON u.id = b.owner_id
+      WHERE b.subscription_status = 'active'
+        AND b.subscription_expires_at >= NOW()
+        AND b.subscription_expires_at <= NOW() + INTERVAL '7 days'
+      ORDER BY b.subscription_expires_at ASC
+    `);
+    res.json({ data: rows, count: rows.length });
   } catch (err) { next(err); }
 }
 
@@ -295,4 +326,4 @@ async function getRevenue(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { getStats, getUsers, blockUser, getBusinesses, updatePlan, getPayments, approvePayment, rejectPayment, getSmsLogs, getRevenue };
+module.exports = { getStats, getUsers, blockUser, getBusinesses, updatePlan, getPayments, approvePayment, rejectPayment, getSmsLogs, getRevenue, getExpiringSubscriptions };

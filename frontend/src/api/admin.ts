@@ -90,8 +90,20 @@ export const getAdminUsers = (p: { search?: string; page?: number; limit?: numbe
 export const blockAdminUser = (id: number, blocked: boolean) =>
   api.patch(`${B}/users/${id}/block`, { blocked }).then((r) => r.data)
 
-export const getAdminBusinesses = (p: { page?: number; limit?: number }) =>
+export interface ExpiringBusiness {
+  id: number
+  name: string
+  owner_name: string | null
+  owner_phone: string
+  subscription_expires_at: string
+  days_left: number
+}
+
+export const getAdminBusinesses = (p: { page?: number; limit?: number; filter?: 'all' | 'expiring' | 'expired' }) =>
   api.get(`${B}/businesses`, { params: p }).then((r) => r.data as { data: AdminBusiness[]; total: number; totalPages: number; page: number })
+
+export const getExpiringSubscriptions = () =>
+  api.get(`${B}/subscriptions/expiring`).then((r) => r.data as { data: ExpiringBusiness[]; count: number })
 
 export const updateBusinessPlan = (id: number, payload: { subscription_status: string; subscription_expires_at?: string | null }) =>
   api.patch(`${B}/businesses/${id}/plan`, payload).then((r) => r.data)

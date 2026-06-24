@@ -1,11 +1,30 @@
 import { useEffect, useState } from 'react'
 import { getAdminBusinesses, updateBusinessPlan, type AdminBusiness } from '../../api/admin'
 
+type Filter = 'all' | 'expiring' | 'expired'
 interface PlanModal { biz: AdminBusiness }
 
-function PlanBadge({ status }: { status: string }) {
-  if (status === 'active') return <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400 ring-1 ring-emerald-500/20">Платный</span>
-  return <span className="inline-flex items-center rounded-full bg-gray-700/60 px-2.5 py-0.5 text-[10px] font-semibold text-gray-400 ring-1 ring-gray-600/30">Бесплатный</span>
+function SubscriptionBadge({ status, expiresAt }: { status: string; expiresAt: string | null }) {
+  if (status !== 'active') {
+    return <span className="inline-flex items-center rounded-full bg-gray-700/60 px-2.5 py-0.5 text-[10px] font-semibold text-gray-400 ring-1 ring-gray-600/30">Бесплатный</span>
+  }
+
+  if (!expiresAt) {
+    return <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400 ring-1 ring-emerald-500/20">Платный</span>
+  }
+
+  const now = new Date()
+  const exp = new Date(expiresAt)
+  const diffMs = exp.getTime() - now.getTime()
+  const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+
+  if (daysLeft < 0) {
+    return <span className="inline-flex items-center rounded-full bg-rose-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-rose-400 ring-1 ring-rose-500/20">Просрочена</span>
+  }
+  if (daysLeft <= 7) {
+    return <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-400 ring-1 ring-amber-500/20">Истекает через {daysLeft} дн.</span>
+  }
+  return <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400 ring-1 ring-emerald-500/20">Активна</span>
 }
 
 function SkeletonRow() {
@@ -18,26 +37,39 @@ function SkeletonRow() {
   )
 }
 
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: 'all',      label: 'Все' },
+  { key: 'expiring', label: 'Истекают (7 дней)' },
+  { key: 'expired',  label: 'Просрочены' },
+]
+
 export default function AdminBusinesses() {
+  const [filter, setFilter]         = useState<Filter>('all')
   const [businesses, setBusinesses] = useState<AdminBusiness[]>([])
-  const [total, setTotal]       = useState(0)
-  const [page, setPage]         = useState(1)
+  const [total, setTotal]           = useState(0)
+  const [page, setPage]             = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading]   = useState(false)
-  const [planModal, setPlanModal] = useState<PlanModal | null>(null)
+  const [loading, setLoading]       = useState(false)
+  const [planModal, setPlanModal]   = useState<PlanModal | null>(null)
   const [planStatus, setPlanStatus] = useState('free')
   const [planExpires, setPlanExpires] = useState('')
-  const [saving, setSaving]     = useState(false)
+  const [saving, setSaving]         = useState(false)
 
-  function load(p = page) {
+  function load(p = page, f = filter) {
     setLoading(true)
-    getAdminBusinesses({ page: p, limit: 20 })
+    getAdminBusinesses({ page: p, limit: 20, filter: f })
       .then((r) => { setBusinesses(r.data); setTotal(r.total); setTotalPages(r.totalPages) })
       .catch((err) => console.error('[AdminBusinesses] load failed:', err?.response?.status, err?.message))
       .finally(() => setLoading(false))
   }
 
   useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function changeFilter(f: Filter) {
+    setFilter(f)
+    setPage(1)
+    load(1, f)
+  }
 
   function openPlanModal(biz: AdminBusiness) {
     setPlanStatus(biz.subscription_status)
@@ -66,10 +98,29 @@ export default function AdminBusinesses() {
     } finally { setSaving(false) }
   }
 
-  function goPage(p: number) { setPage(p); load(p) }
+  function goPage(p: number) { setPage(p); load(p, filter) }
 
   return (
     <div className="space-y-4">
+      {/* Filter tabs */}
+      <div className="flex gap-1 bg-gray-800/60 rounded-xl p-1 border border-gray-700/50 w-fit">
+        {FILTERS.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => changeFilter(f.key)}
+            className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
+              filter === f.key
+                ? f.key === 'expiring' ? 'bg-amber-600 text-white shadow-md'
+                : f.key === 'expired'  ? 'bg-rose-600 text-white shadow-md'
+                : 'bg-indigo-600 text-white shadow-md'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       <div className="bg-gray-800/60 rounded-2xl border border-gray-700/50 overflow-hidden">
         <div className="px-5 py-3.5 border-b border-gray-700/50 flex items-center justify-between">
           <p className="text-sm font-semibold text-white">Бизнесы</p>
@@ -80,7 +131,7 @@ export default function AdminBusinesses() {
             <thead>
               <tr className="text-[11px] text-gray-600 uppercase border-b border-gray-700/50">
                 <th className="px-5 py-2.5 text-left font-medium">Название / Владелец</th>
-                <th className="px-5 py-2.5 text-left font-medium">План</th>
+                <th className="px-5 py-2.5 text-left font-medium">Подписка</th>
                 <th className="px-5 py-2.5 text-left font-medium">Истекает</th>
                 <th className="px-5 py-2.5 text-center font-medium">Клиенты</th>
                 <th className="px-5 py-2.5 text-center font-medium">Долги</th>
@@ -98,7 +149,7 @@ export default function AdminBusinesses() {
                       <p className="text-xs text-gray-500">{b.owner_name ?? b.owner_phone}</p>
                     </td>
                     <td className="px-5 py-3.5">
-                      <PlanBadge status={b.subscription_status} />
+                      <SubscriptionBadge status={b.subscription_status} expiresAt={b.subscription_expires_at} />
                     </td>
                     <td className="px-5 py-3.5 text-xs text-gray-500">
                       {b.subscription_expires_at ? new Date(b.subscription_expires_at).toLocaleDateString('ru') : '—'}
