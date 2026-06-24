@@ -239,6 +239,6 @@ export const tj: Translations = {
   planFeatureUnlimitedBusinesses: 'Тиҷоратҳои беҳудуд',
   planFeatureUnlimitedClients: 'Муштариёни беҳудуд',
   planFeatureUnlimitedMembers: 'Кормандони беҳудуд',
-  planFeatureSmsPackages: '10 SMS ройгон + пакетҳои SMS',
+  planFeatureSmsPackages: '10 SMS ройгон + пакетҳои SMS арзон',
   planFeaturePrioritySupport: 'Дастгирии афзалиятнок',
 }

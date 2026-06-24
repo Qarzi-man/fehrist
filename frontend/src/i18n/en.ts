@@ -239,6 +239,6 @@ export const en: Translations = {
   planFeatureUnlimitedBusinesses: 'Unlimited businesses',
   planFeatureUnlimitedClients: 'Unlimited clients',
   planFeatureUnlimitedMembers: 'Unlimited employees',
-  planFeatureSmsPackages: '10 free SMS + SMS packages',
+  planFeatureSmsPackages: '10 free SMS + discounted SMS packages',
   planFeaturePrioritySupport: 'Priority support',
 }

@@ -246,7 +246,7 @@ export const ru = {
   planFeatureUnlimitedBusinesses: 'Безлимитные бизнесы',
   planFeatureUnlimitedClients: 'Безлимитные клиенты',
   planFeatureUnlimitedMembers: 'Безлимитные сотрудники',
-  planFeatureSmsPackages: '10 SMS бесплатно + пакеты SMS',
+  planFeatureSmsPackages: '10 SMS бесплатно + дешёвые пакеты SMS',
   planFeaturePrioritySupport: 'Приоритетная поддержка',
 }
 

@@ -239,6 +239,6 @@ export const uz: Translations = {
   planFeatureUnlimitedBusinesses: 'Cheksiz bizneslar',
   planFeatureUnlimitedClients: 'Cheksiz mijozlar',
   planFeatureUnlimitedMembers: 'Cheksiz xodimlar',
-  planFeatureSmsPackages: '10 ta bepul SMS + SMS paketlar',
+  planFeatureSmsPackages: '10 ta bepul SMS + arzon SMS paketlar',
   planFeaturePrioritySupport: "Ustuvor qo'llab-quvvatlash",
 }
