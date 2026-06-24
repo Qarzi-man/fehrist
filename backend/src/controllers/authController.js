@@ -128,6 +128,7 @@ async function login(req, res, next) {
     }
 
     const { id, phone: p, full_name, is_admin } = rows[0];
+    console.log('[login] userId:', id, 'phone:', p, 'is_admin:', is_admin);
     res.json({ token: signToken(id), user: { id, phone: p, full_name, is_admin: !!is_admin } });
   } catch (err) {
     next(err);
@@ -142,7 +143,9 @@ async function me(req, res, next) {
       [req.user.userId]
     );
     if (!rows.length) return res.status(404).json({ error: 'User not found' });
-    res.json(rows[0]);
+    const user = { ...rows[0], is_admin: !!rows[0].is_admin };
+    console.log('[me] userId:', user.id, 'is_admin:', user.is_admin);
+    res.json(user);
   } catch (err) {
     next(err);
   }

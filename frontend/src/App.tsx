@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
+import api from './api/client'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
 import DebtsPage from './pages/DebtsPage'
@@ -30,9 +32,30 @@ function RequireGuest({ children }: { children: React.ReactNode }) {
   return token ? <Navigate to="/dashboard" replace /> : <>{children}</>
 }
 
+function AppWithRefresh({ children }: { children: React.ReactNode }) {
+  const token = useAuthStore((s) => s.token)
+  const updateUser = useAuthStore((s) => s.updateUser)
+  const [ready, setReady] = useState(!token)
+
+  useEffect(() => {
+    if (!token) { setReady(true); return }
+    api.get('/api/v1/auth/me')
+      .then((r) => {
+        console.log('[App] /me response:', r.data)
+        updateUser({ is_admin: !!r.data.is_admin })
+      })
+      .catch((err) => console.error('[App] /me failed:', err?.response?.status, err?.message))
+      .finally(() => setReady(true))
+  }, [token]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!ready) return null
+  return <>{children}</>
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <AppWithRefresh>
       <Routes>
         <Route path="/auth"     element={<RequireGuest><AuthPage /></RequireGuest>} />
         <Route path="/oferta"   element={<OfertaPage />} />
@@ -47,6 +70,7 @@ export default function App() {
         <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
+      </AppWithRefresh>
     </BrowserRouter>
   )
 }
