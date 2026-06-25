@@ -145,6 +145,19 @@
     }
     .pricing-free:hover { transform: translateY(-6px); border-color: rgba(99,102,241,.3); box-shadow: 0 12px 40px rgba(99,102,241,.1); }
 
+    /* Phone mockup carousel */
+    .phone-mockup { width:200px;height:390px;background:#0F172A;border-radius:32px;border:6px solid #1E293B;box-shadow:0 0 0 1px #334155,0 24px 60px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.04);overflow:hidden;position:relative;flex-shrink:0; }
+    .phone-notch { position:absolute;top:9px;left:50%;transform:translateX(-50%);width:52px;height:4px;background:#334155;border-radius:9999px;z-index:10; }
+    .phone-screen-inner { width:100%;height:100%;background:#0F172A;padding-top:22px;overflow:hidden; }
+    .mock-row { display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid rgba(51,65,85,.5); }
+    .mock-avatar { width:26px;height:26px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0; }
+    .mock-info { flex:1; }
+    .mock-name { color:#F8FAFC;font-size:9px;font-weight:600; }
+    .mock-amount { font-size:9px;font-weight:700;margin-top:1px; }
+    .sms-card { display:flex;align-items:flex-start;gap:6px;background:rgba(30,41,59,.8);border-radius:7px;padding:7px;margin-bottom:5px; }
+    .sms-icon { font-size:13px;flex-shrink:0; }
+    .cs-dot { border:none;cursor:pointer;height:10px;border-radius:9999px;transition:background .3s,width .3s; }
+
     /* Section dividers */
     .section-divider {
       height: 1px;
@@ -259,6 +272,113 @@
       <a href="#demo" class="relative w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="hero_cta_secondary">Смотреть демо</a>
     </div>
     <p class="mt-7 text-xs text-slate-600 hero-anim-d4" data-i18n="hero_trust">✓ Бесплатно &nbsp;·&nbsp; ✓ Без карты &nbsp;·&nbsp; ✓ iOS и Android</p>
+  </div>
+</section>
+
+<!-- ═══════════════════ CAROUSEL / DEMO ═══════════════════ -->
+<section id="demo" class="py-20 md:py-28 overflow-hidden">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="text-center mb-14 reveal">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4" data-i18n="carousel_title">Всё под рукой</h2>
+      <p class="text-slate-400 max-w-xl mx-auto text-base" data-i18n="carousel_sub">Удобный интерфейс для учёта долгов, SMS и аналитики</p>
+    </div>
+    <div class="relative overflow-hidden rounded-3xl" style="background:rgba(30,41,59,.25);border:1px solid rgba(51,65,85,.4);">
+      <div id="cs-track" class="flex" style="transition:transform .5s cubic-bezier(.16,1,.3,1);">
+
+        <!-- Slide 1: Debt list -->
+        <div class="cs-slide min-w-full flex flex-col md:flex-row items-center justify-center gap-10 px-6 md:px-14 py-10">
+          <div class="flex justify-center flex-shrink-0">
+            <div class="phone-mockup">
+              <div class="phone-notch"></div>
+              <div class="phone-screen-inner">
+                <div style="background:#1E293B;padding:8px 0 6px;border-bottom:1px solid #334155;text-align:center;">
+                  <span style="color:#94A3B8;font-size:9px;font-weight:600;" data-i18n="carousel_s1_title">Список долгов</span>
+                </div>
+                <div class="mock-row"><div class="mock-avatar" style="background:#6366F1;">А</div><div class="mock-info"><div class="mock-name">Алишер М.</div><div class="mock-amount" style="color:#10B981;">+12 500 с</div></div></div>
+                <div class="mock-row"><div class="mock-avatar" style="background:#8B5CF6;">Б</div><div class="mock-info"><div class="mock-name">Бахром Т.</div><div class="mock-amount" style="color:#EF4444;">–8 200 с</div></div></div>
+                <div class="mock-row"><div class="mock-avatar" style="background:#3B82F6;">К</div><div class="mock-info"><div class="mock-name">Камол Р.</div><div class="mock-amount" style="color:#10B981;">+5 400 с</div></div></div>
+                <div class="mock-row"><div class="mock-avatar" style="background:#F59E0B;">Н</div><div class="mock-info"><div class="mock-name">Нилуфар А.</div><div class="mock-amount" style="color:#10B981;">+3 100 с</div></div></div>
+                <div style="margin:10px 10px 0;background:#6366F1;border-radius:8px;padding:7px;text-align:center;"><span style="color:#fff;font-size:9px;font-weight:700;">+ Добавить долг</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center md:text-left">
+            <div style="display:inline-block;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:999px;padding:3px 14px;margin-bottom:14px;"><span style="color:#818CF8;font-size:12px;font-weight:600;">01 / 03</span></div>
+            <h3 class="text-2xl md:text-3xl font-bold text-white mb-3" data-i18n="carousel_s1_title">Список долгов</h3>
+            <p class="text-slate-400 text-base max-w-xs" data-i18n="carousel_s1_desc">Все долги на одном экране — кто, сколько и когда должен</p>
+          </div>
+        </div>
+
+        <!-- Slide 2: SMS -->
+        <div class="cs-slide min-w-full flex flex-col md:flex-row items-center justify-center gap-10 px-6 md:px-14 py-10">
+          <div class="flex justify-center flex-shrink-0">
+            <div class="phone-mockup">
+              <div class="phone-notch"></div>
+              <div class="phone-screen-inner">
+                <div style="background:#1E293B;padding:8px 0 6px;border-bottom:1px solid #334155;text-align:center;">
+                  <span style="color:#94A3B8;font-size:9px;font-weight:600;">SMS</span>
+                </div>
+                <div style="padding:8px;">
+                  <div class="sms-card"><div class="sms-icon">💬</div><div><div class="mock-name">Напоминание</div><div style="color:#94A3B8;font-size:8px;margin-top:2px;">«Уважаемый {имя}, у вас долг...»</div></div></div>
+                  <div class="sms-card"><div class="sms-icon">📣</div><div><div class="mock-name">Просрочка</div><div style="color:#94A3B8;font-size:8px;margin-top:2px;">«Срок платежа истёк...»</div></div></div>
+                  <div class="sms-card"><div class="sms-icon">✅</div><div><div class="mock-name">Спасибо</div><div style="color:#94A3B8;font-size:8px;margin-top:2px;">«Оплата получена, спасибо!»</div></div></div>
+                  <div style="margin-top:8px;background:#6366F1;border-radius:8px;padding:7px;text-align:center;"><span style="color:#fff;font-size:9px;font-weight:700;">Отправить всем</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center md:text-left">
+            <div style="display:inline-block;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:999px;padding:3px 14px;margin-bottom:14px;"><span style="color:#818CF8;font-size:12px;font-weight:600;">02 / 03</span></div>
+            <h3 class="text-2xl md:text-3xl font-bold text-white mb-3" data-i18n="carousel_s2_title">SMS уведомления</h3>
+            <p class="text-slate-400 text-base max-w-xs" data-i18n="carousel_s2_desc">Отправляйте напоминания клиентам в один клик</p>
+          </div>
+        </div>
+
+        <!-- Slide 3: Analytics -->
+        <div class="cs-slide min-w-full flex flex-col md:flex-row items-center justify-center gap-10 px-6 md:px-14 py-10">
+          <div class="flex justify-center flex-shrink-0">
+            <div class="phone-mockup">
+              <div class="phone-notch"></div>
+              <div class="phone-screen-inner">
+                <div style="background:#1E293B;padding:8px 0 6px;border-bottom:1px solid #334155;text-align:center;">
+                  <span style="color:#94A3B8;font-size:9px;font-weight:600;" data-i18n="carousel_s3_title">Аналитика</span>
+                </div>
+                <div style="padding:8px;">
+                  <div style="background:#1E293B;border-radius:8px;padding:8px;margin-bottom:8px;">
+                    <div style="color:#94A3B8;font-size:8px;margin-bottom:3px;">Общий долг</div>
+                    <div style="color:#F8FAFC;font-size:15px;font-weight:700;">26 100 с</div>
+                  </div>
+                  <div style="display:flex;align-items:flex-end;gap:4px;height:64px;padding:0 2px;margin-bottom:8px;border-bottom:1px solid #334155;">
+                    <div style="flex:1;background:rgba(99,102,241,.35);border-radius:3px 3px 0 0;height:38%;"></div>
+                    <div style="flex:1;background:rgba(99,102,241,.55);border-radius:3px 3px 0 0;height:55%;"></div>
+                    <div style="flex:1;background:rgba(99,102,241,.45);border-radius:3px 3px 0 0;height:42%;"></div>
+                    <div style="flex:1;background:#6366F1;border-radius:3px 3px 0 0;height:72%;"></div>
+                    <div style="flex:1;background:rgba(99,102,241,.5);border-radius:3px 3px 0 0;height:58%;"></div>
+                    <div style="flex:1;background:rgba(99,102,241,.75);border-radius:3px 3px 0 0;height:88%;"></div>
+                  </div>
+                  <div style="display:flex;gap:6px;">
+                    <div style="flex:1;background:#1E293B;border-radius:7px;padding:6px;text-align:center;"><div style="color:#10B981;font-size:10px;font-weight:700;">+4</div><div style="color:#94A3B8;font-size:7px;margin-top:2px;">выплачено</div></div>
+                    <div style="flex:1;background:#1E293B;border-radius:7px;padding:6px;text-align:center;"><div style="color:#EF4444;font-size:10px;font-weight:700;">2</div><div style="color:#94A3B8;font-size:7px;margin-top:2px;">просрочка</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center md:text-left">
+            <div style="display:inline-block;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:999px;padding:3px 14px;margin-bottom:14px;"><span style="color:#818CF8;font-size:12px;font-weight:600;">03 / 03</span></div>
+            <h3 class="text-2xl md:text-3xl font-bold text-white mb-3" data-i18n="carousel_s3_title">Аналитика</h3>
+            <p class="text-slate-400 text-base max-w-xs" data-i18n="carousel_s3_desc">Графики и статистика помогают видеть картину целиком</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- Dots -->
+    <div class="flex justify-center gap-3 mt-8">
+      <button class="cs-dot" style="background:#6366F1;width:24px;" data-idx="0"></button>
+      <button class="cs-dot" style="background:#334155;width:10px;" data-idx="1"></button>
+      <button class="cs-dot" style="background:#334155;width:10px;" data-idx="2"></button>
+    </div>
   </div>
 </section>
 
@@ -586,7 +706,7 @@
       <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(99,102,241,.28),transparent);"></div>
       <div class="relative text-center py-16 px-6">
         <h2 class="text-3xl md:text-4xl font-black text-white mb-4" data-i18n="cta_title">Начните вести учёт долгов<br>прямо сейчас</h2>
-        <p class="text-slate-400 mb-8 max-w-sm mx-auto" data-i18n="cta_sub">Бесплатно, без кредитной карты, на любом устройстве</p>
+        <p class="text-slate-400 mb-8 max-w-sm mx-auto" data-i18n="cta_sub">Бесплатно, без скрытых платежей, на любом устройстве</p>
         <a href="https://serene-friendship.up.railway.app" class="btn-gradient pulse-glow inline-block px-10 py-4 rounded-2xl text-base font-bold text-white" data-i18n="cta_btn">Начать бесплатно</a>
       </div>
     </div>
@@ -661,8 +781,12 @@ const T = {
     faq5_q:'Чӣ тавр обунаро харидорӣ кунам?',faq5_a:'Ба «Нархҳо» равед, тугмаи «Харидан»-ро пахш кунед — маблағро ба ҳамёни Алиф Мобайл интиқол диҳед.',
     faq7_q:'Оё Daftarcha дар Тоҷикистон кор мекунад?',faq7_a:'Бале, Daftarcha махсус барои соҳибкорони Тоҷикистон сохта шудааст. Сомонӣ ва забони тоҷикӣ пурра дастгирӣ мешаванд.',
     cta_title:'Ҳисоби қарзҳоро<br>ҳозир оғоз кунед',
-    cta_sub:'Ройгон, бе кредит, дар ҳама гуна дастгоҳ',cta_btn:'Ройгон оғоз кунед',
+    cta_sub:'Ройгон, бе пардохтҳои пинҳонӣ, дар ҳама гуна дастгоҳ',cta_btn:'Ройгон оғоз кунед',
     footer_oferta:'Оферта',footer_privacy:'Махфият',footer_help:'Кӯмак',
+    carousel_title:'Ҳама чиз дар дастрас',carousel_sub:'Интерфейси қулай барои ҳисоби қарзҳо, SMS ва таҳлил',
+    carousel_s1_title:'Рӯйхати қарзҳо',carousel_s1_desc:'Ҳамаи қарзҳо дар як экран — кӣ, чӣ қадар ва кай бояд пардохт кунад',
+    carousel_s2_title:'Хабарҳои SMS',carousel_s2_desc:'Ёдовариҳоро бо як клик ба муштариён фиристед',
+    carousel_s3_title:'Таҳлил',carousel_s3_desc:'Диаграммаҳо ва омор манзараи умумиро нишон медиҳанд',
   },
   ru: {
     nav_login:'Войти',
@@ -704,8 +828,12 @@ const T = {
     faq5_q:'Как купить подписку?',faq5_a:'Перейдите в «Тарифы», нажмите «Купить» и следуйте инструкции — переведите сумму на кошелёк Алиф Моби.',
     faq7_q:'Работает ли Daftarcha в Таджикистане?',faq7_a:'Да, Daftarcha создан специально для бизнеса в Таджикистане, поддерживает сомони и таджикский язык.',
     cta_title:'Начните вести учёт долгов<br>прямо сейчас',
-    cta_sub:'Бесплатно, без кредитной карты, на любом устройстве',cta_btn:'Начать бесплатно',
+    cta_sub:'Бесплатно, без скрытых платежей, на любом устройстве',cta_btn:'Начать бесплатно',
     footer_oferta:'Оферта',footer_privacy:'Конфиденциальность',footer_help:'Помощь',
+    carousel_title:'Всё под рукой',carousel_sub:'Удобный интерфейс для учёта долгов, SMS и аналитики',
+    carousel_s1_title:'Список долгов',carousel_s1_desc:'Все долги на одном экране — кто, сколько и когда должен',
+    carousel_s2_title:'SMS уведомления',carousel_s2_desc:'Отправляйте напоминания клиентам в один клик',
+    carousel_s3_title:'Аналитика',carousel_s3_desc:'Графики и статистика помогают видеть картину целиком',
   },
   uz: {
     nav_login:'Kirish',
@@ -747,8 +875,12 @@ const T = {
     faq5_q:'Obunani qanday sotib olaman?',faq5_a:"«Tariflar»ga o'ting, «Sotib olish» tugmasini bosing va ko'rsatmaga amal qiling — Alif Mobil hamyoniga o'tkazing.",
     faq7_q:"Daftarcha Tojikistonda ishlaydi?",faq7_a:"Ha, Daftarcha Tojikistondagi biznes uchun maxsus yaratilgan, somoni va tojik tilini qo'llab-quvvatlaydi.",
     cta_title:"Hoziroq qarz hisobini<br>boshlang",
-    cta_sub:"Bepul, kredit kartasisiz, istalgan qurilmada",cta_btn:'Bepul boshlash',
+    cta_sub:"Bepul, yashirin to'lovsiz, istalgan qurilmada",cta_btn:'Bepul boshlash',
     footer_oferta:'Oferta',footer_privacy:'Maxfiylik',footer_help:'Yordam',
+    carousel_title:"Hamma narsa qo'lingizda",carousel_sub:"Qarz hisobi, SMS va tahlil uchun qulay interfeys",
+    carousel_s1_title:"Qarzlar ro'yxati",carousel_s1_desc:"Barcha qarzlar bir ekranda — kim, qancha va qachon to'lashi kerak",
+    carousel_s2_title:'SMS bildirishnomalar',carousel_s2_desc:"Bir klik bilan mijozlarga eslatmalar yuboring",
+    carousel_s3_title:'Tahlil',carousel_s3_desc:"Grafiklar va statistika umumiy manzarani ko'rishga yordam beradi",
   },
   en: {
     nav_login:'Sign in',
@@ -790,8 +922,12 @@ const T = {
     faq5_q:'How do I buy a subscription?',faq5_a:"Go to Plans, click Buy and follow the instructions — transfer the amount to the Alif Mobil wallet.",
     faq7_q:'Does Daftarcha work in Tajikistan?',faq7_a:'Yes, Daftarcha is built specifically for businesses in Tajikistan, with somoni currency and Tajik language support.',
     cta_title:'Start tracking your debts<br>right now',
-    cta_sub:'Free, no credit card required, on any device',cta_btn:'Start for free',
+    cta_sub:'Free, no hidden fees, on any device',cta_btn:'Start for free',
     footer_oferta:'Terms',footer_privacy:'Privacy',footer_help:'Help',
+    carousel_title:'Everything at your fingertips',carousel_sub:'Intuitive interface for debt tracking, SMS and analytics',
+    carousel_s1_title:'Debt list',carousel_s1_desc:'All debts on one screen — who owes what and when',
+    carousel_s2_title:'SMS notifications',carousel_s2_desc:'Send reminders to clients with a single tap',
+    carousel_s3_title:'Analytics',carousel_s3_desc:'Charts and statistics give you the full picture',
   }
 };
 
@@ -837,6 +973,31 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 // Init
 apply();
 updateBtns();
+
+// Carousel
+(function(){
+  const track = document.getElementById('cs-track');
+  if (!track) return;
+  const slides = track.querySelectorAll('.cs-slide');
+  const dots   = document.querySelectorAll('.cs-dot');
+  let cur = 0, timer;
+  function goTo(n) {
+    cur = (n + slides.length) % slides.length;
+    track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+    dots.forEach(function(d, i) {
+      d.style.background = i === cur ? '#6366F1' : '#334155';
+      d.style.width      = i === cur ? '24px'    : '10px';
+    });
+  }
+  dots.forEach(function(d) {
+    d.addEventListener('click', function() {
+      clearInterval(timer);
+      goTo(+d.dataset.idx);
+      timer = setInterval(function(){ goTo(cur + 1); }, 4000);
+    });
+  });
+  timer = setInterval(function(){ goTo(cur + 1); }, 4000);
+})();
 </script>
 </body>
 </html>
