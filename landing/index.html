@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tg">
 <head>
   <meta charset="UTF-8">
@@ -7,16 +7,17 @@
   <meta name="description" content="Daftarcha — барномаи ҳисоби қарзҳо барои соҳибкорони Тоҷикистон. Учёт долгов, SMS уведомления, аналитика.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      theme: { extend: { fontFamily: { inter: ['Inter','sans-serif'], syne: ['Syne','sans-serif'] } } }
+      theme: { extend: { fontFamily: { inter: ['Inter','sans-serif'], cabinet: ['"Cabinet Grotesk"','sans-serif'] } } }
     }
   </script>
   <style>
     *, *::before, *::after { font-family: 'Inter', sans-serif; box-sizing: border-box; }
-    h1, h2 { font-family: 'Syne', sans-serif; }
+    h1, h2, h3 { font-family: 'Cabinet Grotesk', 'Inter', sans-serif; }
     :root { --bg: #0a0f1e; --card: #0d1428; --border: #1e2d4a; }
     html { scroll-behavior: smooth; }
     body { background-color: var(--bg); color: #fff; -webkit-font-smoothing: antialiased; }
@@ -26,17 +27,10 @@
       background-size: 28px 28px;
     }
     .hero-glow {
-      background: radial-gradient(ellipse 1000px 600px at 50% -80px, rgba(99,102,241,0.25), transparent 70%);
+      background: radial-gradient(ellipse 1000px 600px at 50% -80px, rgba(99,102,241,0.22), transparent 70%);
     }
 
-    /* Static gradient text */
-    .gradient-text {
-      background: linear-gradient(135deg, #a5b4fc, #c4b5fd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    /* Animated gradient text for hero keyword */
+    /* Animated gradient text */
     @keyframes gradientShift {
       0%   { background-position: 0% 50%; }
       50%  { background-position: 100% 50%; }
@@ -51,6 +45,52 @@
       animation: gradientShift 5s ease infinite;
     }
 
+    /* Hero entrance animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-anim    { animation: fadeInUp 0.8s ease-out both; }
+    .hero-anim-d1 { animation: fadeInUp 0.8s ease-out 0.12s both; }
+    .hero-anim-d2 { animation: fadeInUp 0.8s ease-out 0.26s both; }
+    .hero-anim-d3 { animation: fadeInUp 0.8s ease-out 0.42s both; }
+    .hero-anim-d4 { animation: fadeInUp 0.8s ease-out 0.54s both; }
+
+    /* Floating mock browser */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+    .float-anim { animation: float 4s ease-in-out infinite; }
+
+    /* CTA pulse glow */
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,.35), 0 8px 24px rgba(99,102,241,.3); }
+      50%       { box-shadow: 0 0 44px rgba(99,102,241,.68), 0 12px 36px rgba(139,92,246,.52); }
+    }
+    .pulse-glow { animation: pulseGlow 2.6s ease-in-out infinite; }
+
+    /* Hero animated blobs */
+    @keyframes blob1 {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33%       { transform: translate(40px,-30px) scale(1.1); }
+      66%       { transform: translate(-20px,20px) scale(.95); }
+    }
+    @keyframes blob2 {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33%       { transform: translate(-35px,25px) scale(1.08); }
+      66%       { transform: translate(25px,-15px) scale(.97); }
+    }
+    @keyframes blob3 {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33%       { transform: translate(20px,35px) scale(.92); }
+      66%       { transform: translate(-30px,-20px) scale(1.05); }
+    }
+    .blob { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; opacity: .26; }
+    .blob-1 { width: 520px; height: 520px; background: radial-gradient(circle, #6366f1, transparent 70%); top: -120px; left: 5%; animation: blob1 14s ease-in-out infinite; }
+    .blob-2 { width: 400px; height: 400px; background: radial-gradient(circle, #8b5cf6, transparent 70%); top: -20px; right: 8%; animation: blob2 17s ease-in-out infinite 2s; }
+    .blob-3 { width: 320px; height: 320px; background: radial-gradient(circle, #3b82f6, transparent 70%); top: 200px; left: 40%; animation: blob3 11s ease-in-out infinite 1s; }
+
     .btn-gradient {
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
       transition: opacity .2s, transform .2s, box-shadow .2s;
@@ -62,7 +102,7 @@
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(255,255,255,.07);
       position: relative;
-      transition: background .25s, transform .25s, border-color .25s;
+      transition: background .25s, transform .3s, border-color .25s, box-shadow .3s;
     }
     .feature-card::after {
       content: '';
@@ -78,32 +118,50 @@
       transition: opacity .25s;
       pointer-events: none;
     }
-    .feature-card:hover { background: rgba(99,102,241,.07); border-color: transparent; transform: translateY(-2px); }
+    .feature-card:hover { background: rgba(99,102,241,.08); border-color: transparent; transform: translateY(-4px); box-shadow: 0 16px 40px rgba(99,102,241,.12); }
     .feature-card:hover::after { opacity: 1; }
 
     /* Plain card (problems, faq) */
     .card {
       background: rgba(255,255,255,.03);
       border: 1px solid rgba(255,255,255,.07);
-      transition: background .25s, border-color .25s, transform .25s;
+      transition: background .25s, border-color .25s, transform .3s, box-shadow .3s;
     }
-    .card:hover { background: rgba(99,102,241,.07); border-color: rgba(99,102,241,.28); transform: translateY(-2px); }
+    .card:hover { background: rgba(99,102,241,.07); border-color: rgba(99,102,241,.28); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(99,102,241,.1); }
 
+    /* Pricing cards */
     .pricing-popular {
       background: linear-gradient(135deg, rgba(99,102,241,.14), rgba(139,92,246,.14));
       border: 1px solid rgba(99,102,241,.38);
       box-shadow: 0 0 40px rgba(99,102,241,.18), 0 0 80px rgba(139,92,246,.1);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .pricing-popular:hover { transform: translateY(-6px); box-shadow: 0 0 60px rgba(99,102,241,.35), 0 20px 60px rgba(139,92,246,.25); }
+
+    .pricing-free {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .pricing-free:hover { transform: translateY(-6px); border-color: rgba(99,102,241,.3); box-shadow: 0 12px 40px rgba(99,102,241,.1); }
+
+    /* Section dividers */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99,102,241,.18) 30%, rgba(139,92,246,.18) 70%, transparent);
+      max-width: 700px;
+      margin: 0 auto;
     }
 
-    /* Reveal */
+    /* Reveal on scroll */
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity .65s cubic-bezier(.16,1,.3,1), transform .65s cubic-bezier(.16,1,.3,1); }
     .reveal.visible { opacity: 1; transform: none; }
     .d1 { transition-delay: .08s; } .d2 { transition-delay: .16s; } .d3 { transition-delay: .24s; }
     .d4 { transition-delay: .32s; } .d5 { transition-delay: .40s; }
 
     /* Navbar */
-    #navbar { transition: background .3s, border-color .3s, backdrop-filter .3s; }
-    .nav-scrolled { background: rgba(10,15,30,.92) !important; backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.06); }
+    #navbar { transition: background .3s, backdrop-filter .3s, border-color .3s; }
+    .nav-scrolled { background: rgba(10,15,30,.93) !important; backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.08); }
 
     /* Lang buttons */
     .lang-btn { color: #94a3b8; }
@@ -127,7 +185,7 @@
     /* Mock laptop */
     .mock-screen { background: #0a0f1e; border-radius: 6px; overflow: hidden; }
 
-</style>
+  </style>
 </head>
 <body>
 
@@ -142,7 +200,7 @@
             <path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <span class="text-[17px] font-extrabold text-white tracking-tight" style="font-family:'Syne',sans-serif;">Daftarcha</span>
+        <span style="font-family:'Cabinet Grotesk',sans-serif;font-weight:800;letter-spacing:-0.03em;font-size:19px;" class="text-white">Daftarcha</span>
       </a>
 
       <div class="hidden md:flex items-center gap-3">
@@ -181,25 +239,30 @@
 <section class="relative pt-28 pb-24 md:pt-36 md:pb-32 overflow-hidden">
   <div class="absolute inset-0 dot-grid opacity-50 pointer-events-none"></div>
   <div class="absolute inset-0 hero-glow pointer-events-none"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
   <div class="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
-    <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-7 reveal">
+    <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-7 hero-anim">
       <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
       <span class="text-xs font-semibold text-indigo-300" data-i18n="hero_badge">Daftarcha — учёт долгов для бизнеса</span>
     </div>
-    <h1 class="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight leading-[1.04] text-white mb-6 reveal d1" data-i18n="hero_title">
+    <h1 class="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight leading-[1.04] text-white mb-6 hero-anim-d1" data-i18n="hero_title">
       Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>
     </h1>
-    <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 reveal d2" data-i18n="hero_sub">
+    <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 hero-anim-d2" data-i18n="hero_sub">
       Учёт долгов, рассрочка и SMS уведомления для вашего бизнеса в одном месте
     </p>
-    <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 reveal d3">
+    <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 hero-anim-d3">
       <div class="absolute inset-x-0 -top-6 -bottom-6 pointer-events-none" style="background:radial-gradient(ellipse 70% 120% at 50% 50%,rgba(99,102,241,.3),transparent);filter:blur(28px);"></div>
-      <a href="https://serene-friendship.up.railway.app" class="relative btn-gradient w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white shadow-2xl shadow-indigo-500/35" data-i18n="hero_cta_primary">Начать бесплатно</a>
+      <a href="https://serene-friendship.up.railway.app" class="relative btn-gradient pulse-glow w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white" data-i18n="hero_cta_primary">Начать бесплатно</a>
       <a href="#demo" class="relative w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="hero_cta_secondary">Смотреть демо</a>
     </div>
-    <p class="mt-7 text-xs text-slate-600 reveal d4" data-i18n="hero_trust">✓ Бесплатно &nbsp;·&nbsp; ✓ Без карты &nbsp;·&nbsp; ✓ iOS и Android</p>
+    <p class="mt-7 text-xs text-slate-600 hero-anim-d4" data-i18n="hero_trust">✓ Бесплатно &nbsp;·&nbsp; ✓ Без карты &nbsp;·&nbsp; ✓ iOS и Android</p>
   </div>
 </section>
+
+<div class="px-4"><div class="section-divider"></div></div>
 
 <!-- ═══════════════════ PROBLEMS ═══════════════════ -->
 <section class="py-20 md:py-28">
@@ -238,6 +301,8 @@
     </div>
   </div>
 </section>
+
+<div class="px-4"><div class="section-divider"></div></div>
 
 <!-- ═══════════════════ FEATURES ═══════════════════ -->
 <section id="features" class="py-20 md:py-28">
@@ -292,6 +357,8 @@
   </div>
 </section>
 
+<div class="px-4"><div class="section-divider"></div></div>
+
 <!-- ═══════════════════ DEMO MOCK ═══════════════════ -->
 <section id="demo" class="py-20 md:py-28 overflow-hidden">
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
@@ -300,7 +367,7 @@
       <p class="text-slate-400 max-w-md mx-auto" data-i18n="screenshots_sub">Работайте с первого дня без обучения</p>
     </div>
     <div class="reveal">
-      <div class="relative max-w-4xl mx-auto">
+      <div class="relative max-w-4xl mx-auto float-anim">
         <div class="absolute inset-0 scale-75 translate-y-10 rounded-full blur-3xl pointer-events-none" style="background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.2));"></div>
         <div class="relative bg-[#111827] rounded-t-2xl p-3 border border-white/10 shadow-2xl">
           <div class="flex items-center gap-2 mb-3 px-1">
@@ -371,6 +438,8 @@
   </div>
 </section>
 
+<div class="px-4"><div class="section-divider"></div></div>
+
 <!-- ═══════════════════ MOBILE APP COMING SOON ═══════════════════ -->
 <section class="py-20 md:py-28">
   <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center">
@@ -411,6 +480,8 @@
   </div>
 </section>
 
+<div class="px-4"><div class="section-divider"></div></div>
+
 <!-- ═══════════════════ PRICING ═══════════════════ -->
 <section id="pricing" class="py-20 md:py-28">
   <div class="max-w-3xl mx-auto px-4 sm:px-6">
@@ -419,7 +490,7 @@
     </div>
     <div class="grid md:grid-cols-2 gap-6">
       <!-- Free -->
-      <div class="card rounded-2xl p-7 reveal d1">
+      <div class="pricing-free rounded-2xl p-7 reveal d1">
         <p class="text-sm font-semibold text-slate-400 mb-1" data-i18n="pricing_free_name">Бесплатно</p>
         <p class="text-4xl font-black text-white mb-0.5" data-i18n="pricing_free_price">0 сом.</p>
         <p class="text-sm text-slate-500 mb-6" data-i18n="pricing_free_sub">Навсегда</p>
@@ -452,6 +523,8 @@
     </div>
   </div>
 </section>
+
+<div class="px-4"><div class="section-divider"></div></div>
 
 <!-- ═══════════════════ FAQ ═══════════════════ -->
 <section id="faq" class="py-20 md:py-28">
@@ -497,13 +570,6 @@
       </details>
       <details class="card rounded-2xl group">
         <summary class="flex items-center justify-between gap-4 px-6 py-5">
-          <span class="text-sm font-semibold text-white" data-i18n="faq6_q">Мои данные в безопасности?</span>
-          <svg class="faq-chevron w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </summary>
-        <p class="px-6 pb-5 pt-3 text-sm text-slate-400 leading-relaxed border-t border-white/5" data-i18n="faq6_a">Да, все данные хранятся на защищённых серверах и доступны только вам.</p>
-      </details>
-      <details class="card rounded-2xl group">
-        <summary class="flex items-center justify-between gap-4 px-6 py-5">
           <span class="text-sm font-semibold text-white" data-i18n="faq7_q">Работает ли Daftarcha в Таджикистане?</span>
           <svg class="faq-chevron w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
         </summary>
@@ -521,7 +587,7 @@
       <div class="relative text-center py-16 px-6">
         <h2 class="text-3xl md:text-4xl font-black text-white mb-4" data-i18n="cta_title">Начните вести учёт долгов<br>прямо сейчас</h2>
         <p class="text-slate-400 mb-8 max-w-sm mx-auto" data-i18n="cta_sub">Бесплатно, без кредитной карты, на любом устройстве</p>
-        <a href="https://serene-friendship.up.railway.app" class="btn-gradient inline-block px-10 py-4 rounded-2xl text-base font-bold text-white shadow-2xl shadow-indigo-500/40" data-i18n="cta_btn">Начать бесплатно</a>
+        <a href="https://serene-friendship.up.railway.app" class="btn-gradient pulse-glow inline-block px-10 py-4 rounded-2xl text-base font-bold text-white" data-i18n="cta_btn">Начать бесплатно</a>
       </div>
     </div>
   </div>
@@ -536,7 +602,7 @@
           <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 36 36" fill="none"><path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fill-opacity=".95"/><path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/></svg>
           </div>
-          <span class="text-sm font-extrabold text-white" style="font-family:'Syne',sans-serif;">Daftarcha</span>
+          <span style="font-family:'Cabinet Grotesk',sans-serif;font-weight:800;letter-spacing:-0.03em;font-size:17px;" class="text-white">Daftarcha</span>
         </a>
         <p class="text-xs text-slate-600">© 2025 ИП Исмонов Ғафур Фарҳодович</p>
         <a href="mailto:niyatorzuzoda@gmail.com" class="text-xs text-slate-600 hover:text-indigo-400 transition-colors mt-0.5 block">niyatorzuzoda@gmail.com</a>
@@ -558,18 +624,18 @@ const T = {
     nav_login:'Даромадан',
     hero_badge:'Daftarcha — ҳисоби қарзҳо барои бизнес',
     hero_title:'Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>',
-    hero_sub:'Ҳисоби қарзҳо, қисталлар ва хабарҳои SMS барои бизнеси шумо',
+    hero_sub:'Ҳисоби қарзҳо, насия ва хабарҳои SMS барои бизнеси шумо',
     hero_cta_primary:'Ройгон оғоз кунед',
     hero_cta_secondary:'Намоиш дидан',
-    hero_trust:'✓ Ройгон · ✓ Бидуни кредит · ✓ iOS ва Android',
+    hero_trust:'✓ Ройгон · ✓ Бе кредит · ✓ iOS ва Android',
     problems_title:'Мушкилоти шинос?',
-    problem1_title:'Дафтарча гум мешавад',problem1_desc:'Навиштаҷоти дастӣ боиси хатогиҳо ва аз даст рафтани маълумот мегардад',
-    problem2_title:'Excel мушкил аст',problem2_desc:'Ҷадвалҳои мураккаб вақти зиёдро мегиранд ва аз телефон дастрас нестанд',
-    problem3_title:'Муштариён фаромӯш мекунанд',problem3_desc:'Ёдоварии дастӣ боварибахш нест ва вақти зиёдро мегирад',
-    features_title:'Ҳамаи лозима дар як ҷо',
-    feature1_title:'Ҳисоби қарзҳо',feature1_desc:'Мизоҷ ба шумо ё шумо ба мизоҷ қарздор — ҳамааш дар як экран',
-    feature2_title:'Қисталлар ва насия',feature2_desc:'Ҷадвали пардохтҳо бо санаҳо ва назорати пардохтҳои нопурра',
-    feature3_title:'Хабарҳои SMS',feature3_desc:'Ба муштариён SMS фиристед ва онҳоро дар бораи пардохт огоҳ кунед',
+    problem1_title:'Дафтарча гум мешавад',problem1_desc:'Навиштаҷоти дастӣ хатогиҳо меорад ва маълумот аз даст меравад',
+    problem2_title:'Excel мушкил аст',problem2_desc:'Ҷадвалҳо вақт мегиранд ва аз телефон кор кардан бо онҳо душвор аст',
+    problem3_title:'Муштариён фаромӯш мекунанд',problem3_desc:'Ёдоварии дастӣ боварибахш нест ва вақти зиёд мегирад',
+    features_title:'Ҳамаи чизҳои лозима дар як ҷой',
+    feature1_title:'Ҳисоби қарзҳо',feature1_desc:'Муштарӣ ба шумо ё шумо ба муштарӣ қарздор — ҳамааш дар як экран',
+    feature2_title:'Насия',feature2_desc:'Ҷадвали пардохт, назорати насия ва пардохтҳои қисман',
+    feature3_title:'Хабарҳои SMS',feature3_desc:'Ба муштариён SMS фиристед ва онҳоро дар бораи пардохт хабардор кунед',
     feature4_title:'Бисёрвалютагӣ',feature4_desc:'Сомонӣ, рубл ва доллар — ҳамаи асъорҳо дар як ҷо',
     feature5_title:'Дастрасии корманд',feature5_desc:'Кормандонро даъват кунед — ҳар яке танҳо маълумоти зарурӣ мебинад',
     feature6_title:'Таҳлил ва ҳисобот',feature6_desc:'Намудорҳо, беҳтарин муштариён ва содироти Excel',
@@ -589,14 +655,13 @@ const T = {
     pricing_cta_free:'Оғоз кунед',pricing_cta_paid:'Харидани обуна',
     faq_title:'Саволҳои зиёд пурсидашаванда',
     faq1_q:'Чӣ тавр оғоз кунам?',faq1_a:'Ба сайт даромада бақайдгирӣ кунед, номи бизнес ва рақами телефонро ворид кунед. Дар якчанд дақиқа ба кор шурӯъ кунед — бе омӯзиш.',
-    faq2_q:'Насия ва тақсит чист?',faq2_a:'Насия — схемаи пардохт бо қисмҳо аст. Шумо теъдоди қисмҳо ва мӯҳлатро муайян мекунед, барнома ҷадвалро худаш тартиб медиҳад.',
+    faq2_q:'Насия чист?',faq2_a:'Насия — пардохти қисм-қисм аст. Шумо теъдоди қисмҳо ва мӯҳлатро муайян мекунед, барнома ҷадвалро худаш тайёр мекунад.',
     faq3_q:'Чӣ тавр корманд даъват кунам?',faq3_a:'Дар «Танзимот» → «Кормандон» рақами телефони корманд ворид кунед. Ӯ хабар мегирад ва метавонад даъватро қабул кунад.',
-    faq4_q:'Маълумотҳои ман бехатар аст?',faq4_a:'Бале. Ҳамаи маълумотҳо дар серверҳои муҳофизатшуда нигоҳдорӣ мешаванд ва рамзгузорӣ шудаанд.',
-    faq5_q:'Чӣ тавр обунаро харидорӣ кунам?',faq5_a:'Ба «Нархҳо» равед, тугмаи «Харидан»-ро пахш кунед ва дастурамалро иҷро кунед — маблағро ба ҳамёни Алиф Мобайл интиқол диҳед.',
-    faq6_q:'Маълумотҳои ман бехатар аст?',faq6_a:'Бале, ҳамаи маълумотҳо дар серверҳои муҳофизатшуда нигоҳдорӣ мешаванд ва танҳо ба шумо дастрасанд.',
-    faq7_q:'Оё Daftarcha дар Тоҷикистон кор мекунад?',faq7_a:'Бале, Daftarcha махсус барои бизнес дар Тоҷикистон сохта шудааст, сомониро ва забони тоҷикиро дастгирӣ мекунад.',
+    faq4_q:'Маълумотҳои ман бехатар аст?',faq4_a:'Бале. Ҳамаи маълумотҳо дар серверҳои муҳофизатшуда нигоҳ дошта мешаванд ва танҳо ба шумо дастрасанд.',
+    faq5_q:'Чӣ тавр обунаро харидорӣ кунам?',faq5_a:'Ба «Нархҳо» равед, тугмаи «Харидан»-ро пахш кунед — маблағро ба ҳамёни Алиф Мобайл интиқол диҳед.',
+    faq7_q:'Оё Daftarcha дар Тоҷикистон кор мекунад?',faq7_a:'Бале, Daftarcha махсус барои соҳибкорони Тоҷикистон сохта шудааст. Сомонӣ ва забони тоҷикӣ пурра дастгирӣ мешаванд.',
     cta_title:'Ҳисоби қарзҳоро<br>ҳозир оғоз кунед',
-    cta_sub:'Ройгон, бидуни кредит, дар ҳама гуна дастгоҳ',cta_btn:'Ройгон оғоз кунед',
+    cta_sub:'Ройгон, бе кредит, дар ҳама гуна дастгоҳ',cta_btn:'Ройгон оғоз кунед',
     footer_oferta:'Оферта',footer_privacy:'Махфият',footer_help:'Кӯмак',
   },
   ru: {
@@ -637,7 +702,6 @@ const T = {
     faq3_q:'Как пригласить сотрудника?',faq3_a:'В «Настройках» → «Сотрудники» введите номер телефона. Сотрудник получит уведомление и сможет принять приглашение.',
     faq4_q:'Безопасны ли мои данные?',faq4_a:'Да. Все данные хранятся на защищённых серверах и зашифрованы.',
     faq5_q:'Как купить подписку?',faq5_a:'Перейдите в «Тарифы», нажмите «Купить» и следуйте инструкции — переведите сумму на кошелёк Алиф Моби.',
-    faq6_q:'Мои данные в безопасности?',faq6_a:'Да, все данные хранятся на защищённых серверах и доступны только вам.',
     faq7_q:'Работает ли Daftarcha в Таджикистане?',faq7_a:'Да, Daftarcha создан специально для бизнеса в Таджикистане, поддерживает сомони и таджикский язык.',
     cta_title:'Начните вести учёт долгов<br>прямо сейчас',
     cta_sub:'Бесплатно, без кредитной карты, на любом устройстве',cta_btn:'Начать бесплатно',
@@ -677,11 +741,10 @@ const T = {
     pricing_cta_free:'Bepul boshlash',pricing_cta_paid:'Obuna sotib olish',
     faq_title:"Ko'p so'raladigan savollar",
     faq1_q:'Qanday boshlash kerak?',faq1_a:"Saytda ro'yxatdan o'ting, biznes nomini va telefon raqamini kiriting. Bir necha daqiqada ishlashni boshlang — o'rganmasdan.",
-    faq2_q:"Nasiya va bo'lib to'lash nima?",faq2_a:"Nasiya — qismlarga to'lash sxemasi. Siz qismlar sonini va muddatini belgilaysiz, ilova jadvalini o'zi tuzadi.",
+    faq2_q:"Nasiya nima?",faq2_a:"Nasiya — qismlarga to'lash sxemasi. Siz qismlar sonini va muddatini belgilaysiz, ilova jadvalini o'zi tuzadi.",
     faq3_q:'Xodimni qanday taklif qilaman?',faq3_a:"«Sozlamalar» → «Xodimlar» bo'limida telefon raqamini kiriting. Xodim bildirishnoma oladi va taklifni qabul qilishi mumkin.",
     faq4_q:"Ma'lumotlarim xavfsizmi?",faq4_a:"Ha. Barcha ma'lumotlar himoyalangan serverlarda saqlanadi va shifrlangan.",
     faq5_q:'Obunani qanday sotib olaman?',faq5_a:"«Tariflar»ga o'ting, «Sotib olish» tugmasini bosing va ko'rsatmaga amal qiling — Alif Mobil hamyoniga o'tkazing.",
-    faq6_q:"Ma'lumotlarim xavfsizmi?",faq6_a:"Ha, barcha ma'lumotlar himoyalangan serverlarda saqlanadi va faqat sizga ochiq.",
     faq7_q:"Daftarcha Tojikistonda ishlaydi?",faq7_a:"Ha, Daftarcha Tojikistondagi biznes uchun maxsus yaratilgan, somoni va tojik tilini qo'llab-quvvatlaydi.",
     cta_title:"Hoziroq qarz hisobini<br>boshlang",
     cta_sub:"Bepul, kredit kartasisiz, istalgan qurilmada",cta_btn:'Bepul boshlash',
@@ -725,7 +788,6 @@ const T = {
     faq3_q:'How do I invite an employee?',faq3_a:'In Settings → Employees, enter the phone number. The employee will receive a notification and can accept the invitation.',
     faq4_q:'Is my data safe?',faq4_a:'Yes. All data is stored on secure servers and encrypted.',
     faq5_q:'How do I buy a subscription?',faq5_a:"Go to Plans, click Buy and follow the instructions — transfer the amount to the Alif Mobil wallet.",
-    faq6_q:'Is my data safe?',faq6_a:'Yes, all data is stored on secure servers and accessible only to you.',
     faq7_q:'Does Daftarcha work in Tajikistan?',faq7_a:'Yes, Daftarcha is built specifically for businesses in Tajikistan, with somoni currency and Tajik language support.',
     cta_title:'Start tracking your debts<br>right now',
     cta_sub:'Free, no credit card required, on any device',cta_btn:'Start for free',
