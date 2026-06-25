@@ -26,7 +26,7 @@ export const oferta: Record<Lang, LegalDoc> = {
       },
       {
         title: '5. Стоимость услуг',
-        text: 'Бесплатный план:\n— 2 бизнеса, 50 клиентов на каждый бизнес, 3 сотрудника, 10 SMS в месяц.\n\nПодписка — 29 сомони/месяц:\n— Безлимитные бизнесы, клиенты и сотрудники.\n— 10 SMS бесплатно + дешёвые пакеты SMS.\n\nSMS пакеты (без подписки):\n— 50 SMS — 20 сомони\n— 100 SMS — 40 сомони\n— 300 SMS — 120 сомони\n\nSMS пакеты (с подпиской):\n— 50 SMS — 15 сомони\n— 100 SMS — 30 сомони\n— 300 SMS — 90 сомони',
+        text: 'Бесплатный план:\n— 2 бизнеса, 50 клиентов на каждый бизнес, 3 сотрудника, 10 SMS в месяц.\n\nПодписка — 29 сомони/месяц:\n— Безлимитные бизнесы, клиенты и сотрудники.\n— 10 SMS бесплатно + дешёвые пакеты SMS.\n\nSMS пакеты (без подписки):\n— 50 SMS — 14 сомони\n— 100 SMS — 28 сомони\n— 300 SMS — 84 сомони\n\nSMS пакеты (с подпиской):\n— 50 SMS — 13 сомони\n— 100 SMS — 26 сомони\n— 300 SMS — 78 сомони',
       },
       {
         title: '6. Ответственность',
@@ -61,7 +61,7 @@ export const oferta: Record<Lang, LegalDoc> = {
       },
       {
         title: '5. Арзиши хизматҳо',
-        text: 'Нақшаи ройгон:\n— 2 тиҷорат, 50 муштарӣ дар ҳар тиҷорат, 3 корманд, 10 SMS дар моҳ.\n\nОбуна — 29 сомонӣ/моҳ:\n— Тиҷоратҳо, муштариён ва кормандони беҳудуд.\n— 10 SMS ройгон + пакетҳои SMS арзон.\n\nПакетҳои SMS (бе обуна):\n— 50 SMS — 20 сомонӣ\n— 100 SMS — 40 сомонӣ\n— 300 SMS — 120 сомонӣ\n\nПакетҳои SMS (бо обуна):\n— 50 SMS — 15 сомонӣ\n— 100 SMS — 30 сомонӣ\n— 300 SMS — 90 сомонӣ',
+        text: 'Нақшаи ройгон:\n— 2 тиҷорат, 50 муштарӣ дар ҳар тиҷорат, 3 корманд, 10 SMS дар моҳ.\n\nОбуна — 29 сомонӣ/моҳ:\n— Тиҷоратҳо, муштариён ва кормандони беҳудуд.\n— 10 SMS ройгон + пакетҳои SMS арзон.\n\nПакетҳои SMS (бе обуна):\n— 50 SMS — 14 сомонӣ\n— 100 SMS — 28 сомонӣ\n— 300 SMS — 84 сомонӣ\n\nПакетҳои SMS (бо обуна):\n— 50 SMS — 13 сомонӣ\n— 100 SMS — 26 сомонӣ\n— 300 SMS — 78 сомонӣ',
       },
       {
         title: '6. Масъулият',
@@ -96,7 +96,7 @@ export const oferta: Record<Lang, LegalDoc> = {
       },
       {
         title: '5. Xizmat narxlari',
-        text: 'Bepul tarif:\n— 2 ta biznes, har biznesdа 50 ta mijoz, 3 ta xodim, oyiga 10 ta SMS.\n\nObuna — 29 somoniy/oy:\n— Cheksiz bizneslar, mijozlar va xodimlar.\n— 10 ta bepul SMS + arzon SMS paketlar.\n\nSMS paketlar (obunasiz):\n— 50 SMS — 20 somoniy\n— 100 SMS — 40 somoniy\n— 300 SMS — 120 somoniy\n\nSMS paketlar (obuna bilan):\n— 50 SMS — 15 somoniy\n— 100 SMS — 30 somoniy\n— 300 SMS — 90 somoniy',
+        text: 'Bepul tarif:\n— 2 ta biznes, har biznesdа 50 ta mijoz, 3 ta xodim, oyiga 10 ta SMS.\n\nObuna — 29 somoniy/oy:\n— Cheksiz bizneslar, mijozlar va xodimlar.\n— 10 ta bepul SMS + arzon SMS paketlar.\n\nSMS paketlar (obunasiz):\n— 50 SMS — 14 somoniy\n— 100 SMS — 28 somoniy\n— 300 SMS — 84 somoniy\n\nSMS paketlar (obuna bilan):\n— 50 SMS — 13 somoniy\n— 100 SMS — 26 somoniy\n— 300 SMS — 78 somoniy',
       },
       {
         title: '6. Javobgarlik',
@@ -131,7 +131,7 @@ export const oferta: Record<Lang, LegalDoc> = {
       },
       {
         title: '5. Pricing',
-        text: 'Free plan:\n— 2 businesses, 50 clients per business, 3 employees, 10 SMS per month.\n\nSubscription — 29 somoni/month:\n— Unlimited businesses, clients and employees.\n— 10 free SMS + discounted SMS packages.\n\nSMS packages (without subscription):\n— 50 SMS — 20 somoni\n— 100 SMS — 40 somoni\n— 300 SMS — 120 somoni\n\nSMS packages (with subscription):\n— 50 SMS — 15 somoni\n— 100 SMS — 30 somoni\n— 300 SMS — 90 somoni',
+        text: 'Free plan:\n— 2 businesses, 50 clients per business, 3 employees, 10 SMS per month.\n\nSubscription — 29 somoni/month:\n— Unlimited businesses, clients and employees.\n— 10 free SMS + discounted SMS packages.\n\nSMS packages (without subscription):\n— 50 SMS — 14 somoni\n— 100 SMS — 28 somoni\n— 300 SMS — 84 somoni\n\nSMS packages (with subscription):\n— 50 SMS — 13 somoni\n— 100 SMS — 26 somoni\n— 300 SMS — 78 somoni',
       },
       {
         title: '6. Liability',

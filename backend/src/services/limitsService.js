@@ -5,8 +5,8 @@ const FREE_CLIENTS     = 50;
 const FREE_SMS_MONTHLY = 10;
 
 // Price per SMS unit (сомони) depending on subscription
-const SMS_PRICE_FREE       = 0.4;  // free plan: 50 SMS = 20 som
-const SMS_PRICE_SUBSCRIBED = 0.3;  // active plan: 50 SMS = 15 som
+const SMS_PRICE_FREE       = 0.28;  // free plan: 50 SMS = 14 som
+const SMS_PRICE_SUBSCRIBED = 0.26;  // active plan: 50 SMS = 13 som
 
 async function isSubscribed(businessId) {
   const { rows } = await pool.query(

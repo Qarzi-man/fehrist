@@ -11,15 +11,15 @@ import {
 } from '../api/billing'
 
 const SMS_PACKAGES_FREE = [
-  { count: 50,  price: 20 },
-  { count: 100, price: 40 },
-  { count: 300, price: 120 },
+  { count: 50,  price: 14 },
+  { count: 100, price: 28 },
+  { count: 300, price: 84 },
 ]
 
 const SMS_PACKAGES_SUB = [
-  { count: 50,  price: 15 },
-  { count: 100, price: 30 },
-  { count: 300, price: 90 },
+  { count: 50,  price: 13 },
+  { count: 100, price: 26 },
+  { count: 300, price: 78 },
 ]
 
 interface PayModal {
