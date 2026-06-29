@@ -9,6 +9,7 @@ type Tab = 'login' | 'register'
 export default function AuthPage() {
   const t = useT()
   const [tab, setTab] = useState<Tab>('login')
+  const [prefillPhone, setPrefillPhone] = useState('')
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 px-4 py-10">
@@ -65,9 +66,14 @@ export default function AuthPage() {
           </div>
 
           {tab === 'login' ? (
-            <LoginForm onSwitch={() => setTab('register')} />
+            <LoginForm
+              onSwitch={(phone) => {
+                if (phone) setPrefillPhone(phone)
+                setTab('register')
+              }}
+            />
           ) : (
-            <RegisterForm onSwitch={() => setTab('login')} />
+            <RegisterForm onSwitch={() => setTab('login')} initialPhone={prefillPhone} />
           )}
         </div>
       </div>

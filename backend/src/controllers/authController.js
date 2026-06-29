@@ -8,9 +8,8 @@ function generateOtp() {
 }
 
 function signToken(userId, isAdmin = false) {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: isAdmin ? '30d' : '1h',
-  });
+  void isAdmin;
+  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '30d' });
 }
 
 // POST /api/auth/send-otp
@@ -114,14 +113,23 @@ async function register(req, res, next) {
 // POST /api/auth/login
 async function login(req, res, next) {
   try {
-    const { phone, password } = req.body;
-    if (!phone || !password) return res.status(400).json({ error: 'phone and password required' });
+    const { phone, otp } = req.body;
+    if (!phone || !otp) return res.status(400).json({ error: 'phone and otp required' });
 
+    // Check user first — if not found, return without consuming OTP so register can reuse it
     const { rows } = await pool.query(`SELECT * FROM users WHERE phone = $1`, [phone]);
-    if (!rows.length) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!rows.length) return res.status(404).json({ error: 'user_not_found' });
 
-    const valid = await bcrypt.compare(password, rows[0].password);
-    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+    // Verify OTP
+    const otpResult = await pool.query(
+      `SELECT * FROM otp_codes
+       WHERE phone = $1 AND code = $2 AND used = FALSE AND expires_at > NOW()
+       ORDER BY created_at DESC LIMIT 1`,
+      [phone, otp]
+    );
+    if (!otpResult.rows.length) return res.status(400).json({ error: 'Invalid or expired OTP' });
+
+    await pool.query(`UPDATE otp_codes SET used = TRUE WHERE id = $1`, [otpResult.rows[0].id]);
 
     if (rows[0].is_blocked) {
       return res.status(403).json({ error: 'Аккаунт заблокирован. Свяжитесь с поддержкой: niyatorzuzoda@gmail.com' });
