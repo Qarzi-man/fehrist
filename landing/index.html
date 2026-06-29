@@ -243,7 +243,7 @@
         <a href="#features" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_features">Возможности</a>
         <a href="#pricing" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_pricing">Тарифы</a>
         <a href="#faq" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_about">О нас</a>
-        <a href="https://app.daftarcha.tj" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
+        <a href="https://app.daftarcha.tj/login" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
         <div class="lang-dropdown" id="lang-dropdown">
           <button class="globe-btn" onclick="toggleLangMenu(event)" aria-label="Language">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -257,7 +257,7 @@
             <button onclick="switchLang('en');closeLangMenu()" data-lang="en" class="lang-item">English</button>
           </div>
         </div>
-        <a href="https://app.daftarcha.tj" class="btn-gradient px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/25" data-i18n="hero_cta_primary">Начать бесплатно</a>
+        <a href="https://app.daftarcha.tj/register" class="btn-gradient px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/25" data-i18n="hero_cta_primary">Начать бесплатно</a>
       </div>
 
       <button onclick="toggleMenu()" class="md:hidden p-2 text-slate-400 hover:text-white transition-colors">
@@ -272,8 +272,8 @@
       <a href="#features" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_features">Возможности</a>
       <a href="#pricing" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_pricing">Тарифы</a>
       <a href="#faq" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_about">О нас</a>
-      <a href="https://app.daftarcha.tj" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_login">Войти</a>
-      <a href="https://app.daftarcha.tj" class="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white text-center" data-i18n="hero_cta_primary">Начать бесплатно</a>
+      <a href="https://app.daftarcha.tj/login" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_login">Войти</a>
+      <a href="https://app.daftarcha.tj/register" class="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white text-center" data-i18n="hero_cta_primary">Начать бесплатно</a>
       <div class="flex items-center gap-1.5 pt-1 border-t border-white/5">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <button onclick="switchLang('ru')" data-lang="ru" class="lang-btn-mobile">RU</button>
@@ -289,29 +289,101 @@
 </nav>
 
 <!-- ═══════════════════ HERO ═══════════════════ -->
-<section class="relative pt-28 pb-24 md:pt-36 md:pb-32 overflow-hidden">
+<section class="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden">
   <div class="absolute inset-0 dot-grid opacity-50 pointer-events-none"></div>
   <div class="absolute inset-0 hero-glow pointer-events-none"></div>
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
-  <div class="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
-    <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-7 hero-anim">
-      <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
-      <span class="text-xs font-semibold text-indigo-300" data-i18n="hero_badge">Daftarcha — учёт долгов для бизнеса</span>
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+
+      <!-- LEFT: text + buttons -->
+      <div class="flex-1 text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-7 hero-anim">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+          <span class="text-xs font-semibold text-indigo-300" data-i18n="hero_badge">Daftarcha — учёт долгов для бизнеса</span>
+        </div>
+        <h1 class="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.05] text-white mb-6 hero-anim-d1" data-i18n="hero_title">
+          Управляйте долгами<br><span class="gradient-text-anim">вашего бизнеса</span> легко
+        </h1>
+        <p class="text-lg md:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 mb-10 hero-anim-d2" data-i18n="hero_sub">
+          Учёт долгов, рассрочка и SMS уведомления для вашего бизнеса в одном месте
+        </p>
+        <div class="relative flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 hero-anim-d3">
+          <div class="absolute inset-x-0 -top-6 -bottom-6 pointer-events-none" style="background:radial-gradient(ellipse 70% 120% at 50% 50%,rgba(99,102,241,.3),transparent);filter:blur(28px);"></div>
+          <a href="https://app.daftarcha.tj/register" class="relative btn-gradient pulse-glow w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white" data-i18n="hero_cta_primary">Начать бесплатно</a>
+          <a href="#demo" class="relative w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="hero_cta_secondary">Смотреть демо</a>
+        </div>
+        <p class="mt-7 text-xs text-slate-600 hero-anim-d4" data-i18n="hero_trust">✓ Бесплатно &nbsp;·&nbsp; ✓ Без карты &nbsp;·&nbsp; ✓ iOS и Android</p>
+      </div>
+
+      <!-- RIGHT: phone mockup -->
+      <div class="flex-shrink-0 flex justify-center hero-anim-d2">
+        <div class="relative float-anim">
+          <!-- iPhone frame -->
+          <div style="width:248px;height:488px;background:#0F172A;border-radius:40px;border:8px solid #1E293B;box-shadow:0 0 0 1px #334155,0 40px 100px rgba(0,0,0,.85),0 0 80px rgba(99,102,241,.28),inset 0 0 0 1px rgba(255,255,255,.05);overflow:hidden;position:relative;">
+            <!-- Dynamic island -->
+            <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:64px;height:7px;background:#1E293B;border-radius:9999px;z-index:10;"></div>
+            <!-- Screen -->
+            <div style="width:100%;height:100%;background:#0F172A;padding-top:30px;overflow:hidden;">
+              <!-- App header -->
+              <div style="background:#1E293B;padding:10px 14px 8px;border-bottom:1px solid rgba(51,65,85,.6);display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div style="color:#F8FAFC;font-size:12px;font-weight:700;">Долги</div>
+                  <div style="color:#64748B;font-size:8px;">ИП Иванов</div>
+                </div>
+                <div style="background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;font-size:8px;font-weight:700;padding:3px 8px;border-radius:999px;">+ Долг</div>
+              </div>
+              <!-- Summary -->
+              <div style="display:flex;gap:6px;padding:8px 10px;">
+                <div style="flex:1;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.22);border-radius:10px;padding:7px 8px;">
+                  <div style="color:#94A3B8;font-size:7px;margin-bottom:2px;">Мне должны</div>
+                  <div style="color:#10B981;font-size:14px;font-weight:800;">26 200 с</div>
+                </div>
+                <div style="flex:1;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);border-radius:10px;padding:7px 8px;">
+                  <div style="color:#94A3B8;font-size:7px;margin-bottom:2px;">⚠ Просрочка</div>
+                  <div style="color:#EF4444;font-size:14px;font-weight:800;">3 долга</div>
+                </div>
+              </div>
+              <!-- Debt rows -->
+              <div style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid rgba(51,65,85,.4);">
+                <div style="width:32px;height:32px;border-radius:50%;background:#6366F1;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">А</div>
+                <div style="flex:1;"><div style="color:#F8FAFC;font-size:10px;font-weight:600;">Алишер М.</div><div style="color:#64748B;font-size:8px;margin-top:1px;">до 15 авг</div></div>
+                <div style="color:#10B981;font-size:10px;font-weight:700;">+12 500 с</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid rgba(51,65,85,.4);">
+                <div style="width:32px;height:32px;border-radius:50%;background:#8B5CF6;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">С</div>
+                <div style="flex:1;"><div style="color:#F8FAFC;font-size:10px;font-weight:600;">Санобар Р.</div><div style="color:#EF4444;font-size:8px;margin-top:1px;">⚠ просрочен</div></div>
+                <div style="color:#EF4444;font-size:10px;font-weight:700;">–8 500 с</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid rgba(51,65,85,.4);">
+                <div style="width:32px;height:32px;border-radius:50%;background:#F59E0B;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">Б</div>
+                <div style="flex:1;"><div style="color:#F8FAFC;font-size:10px;font-weight:600;">Бобур У.</div><div style="color:#64748B;font-size:8px;margin-top:1px;">до 20 авг</div></div>
+                <div style="color:#10B981;font-size:10px;font-weight:700;">+7 200 с</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid rgba(51,65,85,.4);">
+                <div style="width:32px;height:32px;border-radius:50%;background:#3B82F6;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">К</div>
+                <div style="flex:1;"><div style="color:#F8FAFC;font-size:10px;font-weight:600;">Камол Р.</div><div style="color:#64748B;font-size:8px;margin-top:1px;">до 30 авг</div></div>
+                <div style="color:#10B981;font-size:10px;font-weight:700;">+6 500 с</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;padding:8px 12px;">
+                <div style="width:32px;height:32px;border-radius:50%;background:#EC4899;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;">Н</div>
+                <div style="flex:1;"><div style="color:#F8FAFC;font-size:10px;font-weight:600;">Нилуфар А.</div><div style="color:#64748B;font-size:8px;margin-top:1px;">до 25 авг</div></div>
+                <div style="color:#10B981;font-size:10px;font-weight:700;">+5 000 с</div>
+              </div>
+              <!-- Add button -->
+              <div style="margin:8px 12px 0;background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:10px;padding:9px;text-align:center;">
+                <span style="color:#fff;font-size:10px;font-weight:700;">+ Добавить долг</span>
+              </div>
+            </div>
+          </div>
+          <!-- Glow under phone -->
+          <div style="position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);width:170px;height:48px;background:rgba(99,102,241,.45);filter:blur(24px);border-radius:50%;pointer-events:none;"></div>
+        </div>
+      </div>
+
     </div>
-    <h1 class="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight leading-[1.04] text-white mb-6 hero-anim-d1" data-i18n="hero_title">
-      Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>
-    </h1>
-    <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 hero-anim-d2" data-i18n="hero_sub">
-      Учёт долгов, рассрочка и SMS уведомления для вашего бизнеса в одном месте
-    </p>
-    <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 hero-anim-d3">
-      <div class="absolute inset-x-0 -top-6 -bottom-6 pointer-events-none" style="background:radial-gradient(ellipse 70% 120% at 50% 50%,rgba(99,102,241,.3),transparent);filter:blur(28px);"></div>
-      <a href="https://app.daftarcha.tj" class="relative btn-gradient pulse-glow w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white" data-i18n="hero_cta_primary">Начать бесплатно</a>
-      <a href="#demo" class="relative w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="hero_cta_secondary">Смотреть демо</a>
-    </div>
-    <p class="mt-7 text-xs text-slate-600 hero-anim-d4" data-i18n="hero_trust">✓ Бесплатно &nbsp;·&nbsp; ✓ Без карты &nbsp;·&nbsp; ✓ iOS и Android</p>
   </div>
 </section>
 
@@ -661,7 +733,7 @@
           <li class="flex items-center gap-3 text-sm text-slate-300"><svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_free_f4">10 SMS в месяц</span></li>
           <li class="flex items-center gap-3 text-sm text-slate-300"><svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_free_f5">Долги, рассрочка, аналитика</span></li>
         </ul>
-        <a href="https://app.daftarcha.tj" class="block w-full py-3 rounded-xl text-sm font-semibold text-center text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="pricing_cta_free">Начать бесплатно</a>
+        <a href="https://app.daftarcha.tj/register" class="block w-full py-3 rounded-xl text-sm font-semibold text-center text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="pricing_cta_free">Начать бесплатно</a>
       </div>
       <!-- Paid -->
       <div class="pricing-popular rounded-2xl p-7 relative reveal d2">
@@ -678,7 +750,7 @@
           <li class="flex items-center gap-3 text-sm text-slate-200"><svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_paid_f4">10 SMS бесплатно + дешёвые пакеты SMS</span></li>
           <li class="flex items-center gap-3 text-sm text-slate-200"><svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_paid_f5">Приоритетная поддержка</span></li>
         </ul>
-        <a href="https://app.daftarcha.tj" class="btn-gradient block w-full py-3 rounded-xl text-sm font-bold text-white text-center shadow-xl shadow-indigo-500/30" data-i18n="pricing_cta_paid">Купить подписку</a>
+        <a href="https://app.daftarcha.tj/register" class="btn-gradient block w-full py-3 rounded-xl text-sm font-bold text-white text-center shadow-xl shadow-indigo-500/30" data-i18n="pricing_cta_paid">Купить подписку</a>
       </div>
     </div>
   </div>
@@ -738,7 +810,7 @@
       <div class="relative text-center py-16 px-6">
         <h2 class="text-3xl md:text-4xl font-black text-white mb-4" data-i18n="cta_title">Начните вести учёт долгов<br>прямо сейчас</h2>
         <p class="text-slate-400 mb-8 max-w-sm mx-auto" data-i18n="cta_sub">Бесплатно, без скрытых платежей, на любом устройстве</p>
-        <a href="https://app.daftarcha.tj" class="btn-gradient pulse-glow inline-block px-10 py-4 rounded-2xl text-base font-bold text-white" data-i18n="cta_btn">Начать бесплатно</a>
+        <a href="https://app.daftarcha.tj/register" class="btn-gradient pulse-glow inline-block px-10 py-4 rounded-2xl text-base font-bold text-white" data-i18n="cta_btn">Начать бесплатно</a>
       </div>
     </div>
   </div>
@@ -762,7 +834,7 @@
         <a href="https://app.daftarcha.tj/oferta"  class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_oferta">Оферта</a>
         <a href="https://app.daftarcha.tj/privacy" class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_privacy">Конфиденциальность</a>
         <a href="https://app.daftarcha.tj/help"    class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_help">Помощь</a>
-        <a href="https://app.daftarcha.tj"         class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
+        <a href="https://app.daftarcha.tj/login"    class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
       </div>
     </div>
   </div>
@@ -773,7 +845,7 @@
 const T = {
   tj: {
     nav_login:'Даромадан',nav_features:'Имкониятҳо',nav_pricing:'Нархҳо',nav_about:'Дар бораи мо',
-    about_title:'Дар бораи мо',about_p1_title:'Дар бораи хизмат',about_p1_text:'Daftarcha — хизмати ҳисоби қарзҳо барои бизнес дар Тоҷикистон. Аз ҷониби дастаи Душанбе барои соҳибкорон сохта шудааст.',about_p2_title:'Забонҳо ва минтақа',about_p2_text:'Дастгирии 4 забон: тоҷикӣ, русӣ, ӯзбекӣ ва англисӣ. Бо асъори сомонӣ кор мекунем.',about_p3_title:'Тамос',
+    about_title:'Дар бораи мо',about_p1_title:'Дар бораи шарик',about_p1_text:'GAMMA GROUP — шарики Daftarcha. Ширкати консалтингӣ дар соҳаи бизнес ва молия.',about_p2_title:'Хизматҳо',about_p2_text:'Банақшагирии молиявӣ, стратегия, фарҳанги корпоративӣ, таҳияи арзишҳо ва рисолат, тренингҳо барои кормандон.',about_p3_title:'Тамос',
     hero_badge:'Daftarcha — ҳисоби қарзҳо барои бизнес',
     hero_title:'Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>',
     hero_sub:'Ҳисоби қарзҳо, насия ва хабарҳои SMS барои бизнеси шумо',
@@ -822,7 +894,7 @@ const T = {
   },
   ru: {
     nav_login:'Войти',nav_features:'Возможности',nav_pricing:'Тарифы',nav_about:'О нас',
-    about_title:'О нас',about_p1_title:'О сервисе',about_p1_text:'Daftarcha — сервис учёта долгов для бизнеса в Таджикистане. Разработан командой из Душанбе для предпринимателей, которым нужен простой и надёжный инструмент учёта долгов и рассрочки.',about_p2_title:'Языки и регион',about_p2_text:'Поддержка 4 языков: таджикский, русский, узбекский и английский. Работаем с валютой сомони. Создан специально для предпринимателей Таджикистана.',about_p3_title:'Контакт',
+    about_title:'О нас',about_p1_title:'О партнёре',about_p1_text:'GAMMA GROUP — партнёр Daftarcha. Консалтинговая компания в сфере бизнеса и финансов.',about_p2_title:'Услуги',about_p2_text:'Финансовое планирование, стратегирование, корпоративная культура, создание ценностей и миссии, тренинги для сотрудников.',about_p3_title:'Контакт',
     hero_badge:'Daftarcha — учёт долгов для бизнеса',
     hero_title:'Управляйте долгами<br><span class="gradient-text-anim">вашего бизнеса</span> легко',
     hero_sub:'Учёт долгов, рассрочка и SMS уведомления для вашего бизнеса в одном месте',
@@ -870,7 +942,7 @@ const T = {
   },
   uz: {
     nav_login:'Kirish',nav_features:"Imkoniyatlar",nav_pricing:'Narxlar',nav_about:'Biz haqimizda',
-    about_title:'Biz haqimizda',about_p1_title:'Xizmat haqida',about_p1_text:"Daftarcha — Tojikistondagi biznes uchun qarz hisobi xizmati. Dushanbe jamoasi tomonidan tadbirkorlar uchun yaratilgan.",about_p2_title:'Tillar va mintaqa',about_p2_text:"4 til qo'llab-quvvatlanadi: tojik, rus, o'zbek va ingliz. Somoni valyutasi bilan ishlaymiz.",about_p3_title:'Aloqa',
+    about_title:'Biz haqimizda',about_p1_title:'Hamkor haqida',about_p1_text:"GAMMA GROUP — Daftarcha'ning hamkori. Biznes va moliya sohasidagi konsalting kompaniyasi.",about_p2_title:'Xizmatlar',about_p2_text:"Moliyaviy rejalashtirish, strategiya, korporativ madaniyat, qadriyatlar va missiyani yaratish, xodimlar uchun treninglar.",about_p3_title:'Aloqa',
     hero_badge:'Daftarcha — biznes uchun qarz hisobi',
     hero_title:'Biznesingiz qarzlarini<br><span class="gradient-text-anim">osonlik bilan boshqaring</span>',
     hero_sub:"Qarz hisobi, nasiya va SMS bildirishnomalar — biznesingiz uchun bir joyda",
@@ -918,7 +990,7 @@ const T = {
   },
   en: {
     nav_login:'Sign in',nav_features:'Features',nav_pricing:'Pricing',nav_about:'About',
-    about_title:'About us',about_p1_title:'About the service',about_p1_text:'Daftarcha is a debt tracking service for businesses in Tajikistan. Built by a team from Dushanbe for entrepreneurs who need a simple and reliable tool.',about_p2_title:'Languages & region',about_p2_text:'Supports 4 languages: Tajik, Russian, Uzbek and English. Works with somoni currency. Built specifically for entrepreneurs in Tajikistan.',about_p3_title:'Contact',
+    about_title:'About us',about_p1_title:'About the partner',about_p1_text:'GAMMA GROUP is a partner of Daftarcha. A consulting company in the field of business and finance.',about_p2_title:'Services',about_p2_text:'Financial planning, strategy, corporate culture, values and mission development, employee training.',about_p3_title:'Contact',
     hero_badge:'Daftarcha — debt tracking for business',
     hero_title:'Manage your business<br><span class="gradient-text-anim">debts with ease</span>',
     hero_sub:'Debt tracking, installments and SMS notifications for your business — all in one place',
