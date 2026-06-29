@@ -90,9 +90,17 @@ export default function HelpPage() {
         </div>
 
         {/* Legal links */}
-        <div className="flex gap-4 text-xs text-gray-400">
-          <NavLink to="/oferta"  className="hover:text-indigo-500 transition">Оферта</NavLink>
-          <NavLink to="/privacy" className="hover:text-indigo-500 transition">Конфиденциальность</NavLink>
+        <div className="flex items-center justify-between gap-4">
+          <a
+            href="https://www.daftarcha.tj"
+            className="text-sm text-gray-400 hover:text-indigo-500 transition-colors"
+          >
+            ← На главную
+          </a>
+          <div className="flex gap-4 text-xs text-gray-400">
+            <NavLink to="/oferta"  className="hover:text-indigo-500 transition">Оферта</NavLink>
+            <NavLink to="/privacy" className="hover:text-indigo-500 transition">Конфиденциальность</NavLink>
+          </div>
         </div>
 
       </div>
