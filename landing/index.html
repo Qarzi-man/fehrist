@@ -198,6 +198,29 @@
     /* Mock laptop */
     .mock-screen { background: #0a0f1e; border-radius: 6px; overflow: hidden; }
 
+    /* Globe lang dropdown */
+    .lang-dropdown { position: relative; display: inline-flex; }
+    .globe-btn { display: flex; align-items: center; gap: 5px; padding: 6px 11px;
+      border-radius: 10px; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1); color: #94a3b8;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      transition: background .2s, color .2s; white-space: nowrap; }
+    .globe-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .lang-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0;
+      background: rgba(8,12,25,.97); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px; padding: 4px; min-width: 130px; z-index: 200;
+      backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,.5); }
+    .lang-menu.open { display: block; }
+    .lang-item { display: flex; align-items: center; width: 100%;
+      padding: 8px 12px; border-radius: 8px; text-align: left;
+      font-size: 13px; font-weight: 600; color: #94a3b8;
+      transition: background .15s, color .15s; cursor: pointer; }
+    .lang-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .lang-item.active { background: rgba(99,102,241,.2); color: #a5b4fc; }
+    .lang-btn-mobile { color: #64748b; font-size: 11px; font-weight: 700; cursor: pointer; transition: color .15s; }
+    .lang-btn-mobile:hover { color: #fff; }
+    .lang-btn-mobile.active { color: #a5b4fc; }
+
   </style>
 </head>
 <body>
@@ -216,18 +239,25 @@
         <span style="font-family:'Cabinet Grotesk',sans-serif;font-weight:800;letter-spacing:-0.03em;font-size:19px;" class="text-white">Daftarcha</span>
       </a>
 
-      <div class="hidden md:flex items-center gap-3">
-        <div class="flex gap-0.5 bg-white/5 border border-white/10 rounded-xl p-1">
-          <button onclick="switchLang('tj')" data-lang="tj" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">TJ</button>
-          <button onclick="switchLang('ru')" data-lang="ru" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">RU</button>
-          <button onclick="switchLang('uz')" data-lang="uz" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">UZ</button>
-          <button onclick="switchLang('en')" data-lang="en" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">EN</button>
-        </div>
+      <div class="hidden md:flex items-center gap-4">
         <a href="#features" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_features">Возможности</a>
         <a href="#pricing" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_pricing">Тарифы</a>
         <a href="#faq" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_about">О нас</a>
-        <a href="https://serene-friendship-production-bff0.up.railway.app" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
-        <a href="https://serene-friendship-production-bff0.up.railway.app" class="btn-gradient px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/25" data-i18n="hero_cta_primary">Начать бесплатно</a>
+        <a href="https://app.daftarcha.tj" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
+        <div class="lang-dropdown" id="lang-dropdown">
+          <button class="globe-btn" onclick="toggleLangMenu(event)" aria-label="Language">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span id="lang-label">RU</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div class="lang-menu" id="lang-menu">
+            <button onclick="switchLang('ru');closeLangMenu()" data-lang="ru" class="lang-item">Русский</button>
+            <button onclick="switchLang('tj');closeLangMenu()" data-lang="tj" class="lang-item">Тоҷикӣ</button>
+            <button onclick="switchLang('uz');closeLangMenu()" data-lang="uz" class="lang-item">O'zbek</button>
+            <button onclick="switchLang('en');closeLangMenu()" data-lang="en" class="lang-item">English</button>
+          </div>
+        </div>
+        <a href="https://app.daftarcha.tj" class="btn-gradient px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/25" data-i18n="hero_cta_primary">Начать бесплатно</a>
       </div>
 
       <button onclick="toggleMenu()" class="md:hidden p-2 text-slate-400 hover:text-white transition-colors">
@@ -239,17 +269,21 @@
   </div>
   <div id="mobile-menu" style="background:rgba(10,15,30,.97);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.06);">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-3">
-      <div class="flex gap-0.5 bg-white/5 border border-white/10 rounded-xl p-1 w-fit">
-        <button onclick="switchLang('tj')" data-lang="tj" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">TJ</button>
-        <button onclick="switchLang('ru')" data-lang="ru" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">RU</button>
-        <button onclick="switchLang('uz')" data-lang="uz" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">UZ</button>
-        <button onclick="switchLang('en')" data-lang="en" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">EN</button>
-      </div>
       <a href="#features" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_features">Возможности</a>
       <a href="#pricing" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_pricing">Тарифы</a>
       <a href="#faq" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_about">О нас</a>
-      <a href="https://serene-friendship-production-bff0.up.railway.app" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_login">Войти</a>
-      <a href="https://serene-friendship-production-bff0.up.railway.app" class="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white text-center" data-i18n="hero_cta_primary">Начать бесплатно</a>
+      <a href="https://app.daftarcha.tj" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_login">Войти</a>
+      <a href="https://app.daftarcha.tj" class="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white text-center" data-i18n="hero_cta_primary">Начать бесплатно</a>
+      <div class="flex items-center gap-1.5 pt-1 border-t border-white/5">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <button onclick="switchLang('ru')" data-lang="ru" class="lang-btn-mobile">RU</button>
+        <span class="text-slate-700 text-xs">·</span>
+        <button onclick="switchLang('tj')" data-lang="tj" class="lang-btn-mobile">TJ</button>
+        <span class="text-slate-700 text-xs">·</span>
+        <button onclick="switchLang('uz')" data-lang="uz" class="lang-btn-mobile">UZ</button>
+        <span class="text-slate-700 text-xs">·</span>
+        <button onclick="switchLang('en')" data-lang="en" class="lang-btn-mobile">EN</button>
+      </div>
     </div>
   </div>
 </nav>
@@ -274,7 +308,7 @@
     </p>
     <div class="relative flex flex-col sm:flex-row items-center justify-center gap-4 hero-anim-d3">
       <div class="absolute inset-x-0 -top-6 -bottom-6 pointer-events-none" style="background:radial-gradient(ellipse 70% 120% at 50% 50%,rgba(99,102,241,.3),transparent);filter:blur(28px);"></div>
-      <a href="https://serene-friendship-production-bff0.up.railway.app" class="relative btn-gradient pulse-glow w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white" data-i18n="hero_cta_primary">Начать бесплатно</a>
+      <a href="https://app.daftarcha.tj" class="relative btn-gradient pulse-glow w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white" data-i18n="hero_cta_primary">Начать бесплатно</a>
       <a href="#demo" class="relative w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="hero_cta_secondary">Смотреть демо</a>
     </div>
     <p class="mt-7 text-xs text-slate-600 hero-anim-d4" data-i18n="hero_trust">✓ Бесплатно &nbsp;·&nbsp; ✓ Без карты &nbsp;·&nbsp; ✓ iOS и Android</p>
@@ -384,37 +418,6 @@
       <button class="cs-dot" style="background:#6366F1;width:24px;" data-idx="0"></button>
       <button class="cs-dot" style="background:#334155;width:10px;" data-idx="1"></button>
       <button class="cs-dot" style="background:#334155;width:10px;" data-idx="2"></button>
-    </div>
-  </div>
-</section>
-
-<div class="px-4"><div class="section-divider"></div></div>
-
-<!-- ═══════════════════ STATS ═══════════════════ -->
-<section id="stats" class="py-16 md:py-20">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6">
-    <div class="text-center mb-12 reveal">
-      <h2 class="text-3xl md:text-4xl font-black text-white" data-i18n="stats_title">Нам доверяют</h2>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-      <div class="card rounded-2xl p-8 text-center reveal d1">
-        <div class="text-5xl md:text-6xl font-black mb-2">
-          <span class="stat-counter gradient-text-anim" data-target="500" data-suffix="+">0+</span>
-        </div>
-        <p class="text-slate-400 text-sm font-medium" data-i18n="stats_s1">бизнесов уже используют</p>
-      </div>
-      <div class="card rounded-2xl p-8 text-center reveal d2">
-        <div class="text-5xl md:text-6xl font-black mb-2">
-          <span class="stat-counter gradient-text-anim" data-target="10000" data-suffix="+">0+</span>
-        </div>
-        <p class="text-slate-400 text-sm font-medium" data-i18n="stats_s2">долгов учтено</p>
-      </div>
-      <div class="card rounded-2xl p-8 text-center reveal d3">
-        <div class="text-5xl md:text-6xl font-black mb-2">
-          <span class="stat-counter gradient-text-anim" data-target="4" data-suffix="">0</span>
-        </div>
-        <p class="text-slate-400 text-sm font-medium" data-i18n="stats_s3">языка интерфейса</p>
-      </div>
     </div>
   </div>
 </section>
@@ -658,7 +661,7 @@
           <li class="flex items-center gap-3 text-sm text-slate-300"><svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_free_f4">10 SMS в месяц</span></li>
           <li class="flex items-center gap-3 text-sm text-slate-300"><svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_free_f5">Долги, рассрочка, аналитика</span></li>
         </ul>
-        <a href="https://serene-friendship-production-bff0.up.railway.app" class="block w-full py-3 rounded-xl text-sm font-semibold text-center text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="pricing_cta_free">Начать бесплатно</a>
+        <a href="https://app.daftarcha.tj" class="block w-full py-3 rounded-xl text-sm font-semibold text-center text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all" data-i18n="pricing_cta_free">Начать бесплатно</a>
       </div>
       <!-- Paid -->
       <div class="pricing-popular rounded-2xl p-7 relative reveal d2">
@@ -675,7 +678,7 @@
           <li class="flex items-center gap-3 text-sm text-slate-200"><svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_paid_f4">10 SMS бесплатно + дешёвые пакеты SMS</span></li>
           <li class="flex items-center gap-3 text-sm text-slate-200"><svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span data-i18n="pricing_paid_f5">Приоритетная поддержка</span></li>
         </ul>
-        <a href="https://serene-friendship-production-bff0.up.railway.app" class="btn-gradient block w-full py-3 rounded-xl text-sm font-bold text-white text-center shadow-xl shadow-indigo-500/30" data-i18n="pricing_cta_paid">Купить подписку</a>
+        <a href="https://app.daftarcha.tj" class="btn-gradient block w-full py-3 rounded-xl text-sm font-bold text-white text-center shadow-xl shadow-indigo-500/30" data-i18n="pricing_cta_paid">Купить подписку</a>
       </div>
     </div>
   </div>
@@ -683,55 +686,46 @@
 
 <div class="px-4"><div class="section-divider"></div></div>
 
-<!-- ═══════════════════ FAQ ═══════════════════ -->
+<!-- ═══════════════════ О НАС ═══════════════════ -->
 <section id="faq" class="py-20 md:py-28">
   <div class="max-w-2xl mx-auto px-4 sm:px-6">
     <div class="text-center mb-12 reveal">
-      <h2 class="text-3xl md:text-4xl font-black text-white" data-i18n="faq_title">Частые вопросы</h2>
+      <h2 class="text-3xl md:text-4xl font-black text-white" data-i18n="about_title">О нас</h2>
     </div>
-    <div class="space-y-2 reveal">
-      <details class="card rounded-2xl group">
-        <summary class="flex items-center justify-between gap-4 px-6 py-5">
-          <span class="text-sm font-semibold text-white" data-i18n="faq1_q">Как начать?</span>
-          <svg class="faq-chevron w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </summary>
-        <p class="px-6 pb-5 pt-3 text-sm text-slate-400 leading-relaxed border-t border-white/5" data-i18n="faq1_a">Зарегистрируйтесь, введите название бизнеса и номер телефона. Начните работу за несколько минут — без обучения.</p>
-      </details>
-      <details class="card rounded-2xl group">
-        <summary class="flex items-center justify-between gap-4 px-6 py-5">
-          <span class="text-sm font-semibold text-white" data-i18n="faq2_q">Что такое рассрочка/насия?</span>
-          <svg class="faq-chevron w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </summary>
-        <p class="px-6 pb-5 pt-3 text-sm text-slate-400 leading-relaxed border-t border-white/5" data-i18n="faq2_a">Рассрочка — схема оплаты частями. Вы указываете количество частей и срок, приложение само строит график.</p>
-      </details>
-      <details class="card rounded-2xl group">
-        <summary class="flex items-center justify-between gap-4 px-6 py-5">
-          <span class="text-sm font-semibold text-white" data-i18n="faq3_q">Как пригласить сотрудника?</span>
-          <svg class="faq-chevron w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </summary>
-        <p class="px-6 pb-5 pt-3 text-sm text-slate-400 leading-relaxed border-t border-white/5" data-i18n="faq3_a">В «Настройках» → «Сотрудники» введите номер телефона. Сотрудник получит уведомление и сможет принять приглашение.</p>
-      </details>
-      <details class="card rounded-2xl group">
-        <summary class="flex items-center justify-between gap-4 px-6 py-5">
-          <span class="text-sm font-semibold text-white" data-i18n="faq4_q">Безопасны ли мои данные?</span>
-          <svg class="faq-chevron w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </summary>
-        <p class="px-6 pb-5 pt-3 text-sm text-slate-400 leading-relaxed border-t border-white/5" data-i18n="faq4_a">Да. Все данные хранятся на защищённых серверах и зашифрованы.</p>
-      </details>
-      <details class="card rounded-2xl group">
-        <summary class="flex items-center justify-between gap-4 px-6 py-5">
-          <span class="text-sm font-semibold text-white" data-i18n="faq5_q">Как купить подписку?</span>
-          <svg class="faq-chevron w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </summary>
-        <p class="px-6 pb-5 pt-3 text-sm text-slate-400 leading-relaxed border-t border-white/5" data-i18n="faq5_a">Перейдите в «Тарифы», нажмите «Купить» и следуйте инструкции — переведите сумму на кошелёк Алиф Моби.</p>
-      </details>
-      <details class="card rounded-2xl group">
-        <summary class="flex items-center justify-between gap-4 px-6 py-5">
-          <span class="text-sm font-semibold text-white" data-i18n="faq7_q">Работает ли Daftarcha в Таджикистане?</span>
-          <svg class="faq-chevron w-4 h-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </summary>
-        <p class="px-6 pb-5 pt-3 text-sm text-slate-400 leading-relaxed border-t border-white/5" data-i18n="faq7_a">Да, Daftarcha создан специально для бизнеса в Таджикистане, поддерживает сомони и таджикский язык.</p>
-      </details>
+    <div class="space-y-4 reveal">
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-white mb-2" data-i18n="about_p1_title">О сервисе</h3>
+            <p class="text-sm text-slate-400 leading-relaxed" data-i18n="about_p1_text">Daftarcha — сервис учёта долгов для бизнеса в Таджикистане. Разработан командой из Душанбе для предпринимателей, которым нужен простой и надёжный инструмент учёта долгов и рассрочки.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-white mb-2" data-i18n="about_p2_title">Языки и регион</h3>
+            <p class="text-sm text-slate-400 leading-relaxed" data-i18n="about_p2_text">Поддержка 4 языков: таджикский, русский, узбекский и английский. Работаем с валютой сомони. Создан специально для предпринимателей Таджикистана.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-white mb-2" data-i18n="about_p3_title">Контакт</h3>
+            <p class="text-sm text-slate-400 leading-relaxed"><a href="mailto:niyatorzuzoda@gmail.com" class="text-indigo-400 hover:text-indigo-300 transition-colors">niyatorzuzoda@gmail.com</a></p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -744,7 +738,7 @@
       <div class="relative text-center py-16 px-6">
         <h2 class="text-3xl md:text-4xl font-black text-white mb-4" data-i18n="cta_title">Начните вести учёт долгов<br>прямо сейчас</h2>
         <p class="text-slate-400 mb-8 max-w-sm mx-auto" data-i18n="cta_sub">Бесплатно, без скрытых платежей, на любом устройстве</p>
-        <a href="https://serene-friendship-production-bff0.up.railway.app" class="btn-gradient pulse-glow inline-block px-10 py-4 rounded-2xl text-base font-bold text-white" data-i18n="cta_btn">Начать бесплатно</a>
+        <a href="https://app.daftarcha.tj" class="btn-gradient pulse-glow inline-block px-10 py-4 rounded-2xl text-base font-bold text-white" data-i18n="cta_btn">Начать бесплатно</a>
       </div>
     </div>
   </div>
@@ -765,10 +759,10 @@
         <a href="mailto:niyatorzuzoda@gmail.com" class="text-xs text-slate-600 hover:text-indigo-400 transition-colors mt-0.5 block">niyatorzuzoda@gmail.com</a>
       </div>
       <div class="flex flex-wrap gap-x-7 gap-y-2.5">
-        <a href="https://serene-friendship-production-bff0.up.railway.app/oferta"  class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_oferta">Оферта</a>
-        <a href="https://serene-friendship-production-bff0.up.railway.app/privacy" class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_privacy">Конфиденциальность</a>
-        <a href="https://serene-friendship-production-bff0.up.railway.app/help"    class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_help">Помощь</a>
-        <a href="https://serene-friendship-production-bff0.up.railway.app"         class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
+        <a href="https://app.daftarcha.tj/oferta"  class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_oferta">Оферта</a>
+        <a href="https://app.daftarcha.tj/privacy" class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_privacy">Конфиденциальность</a>
+        <a href="https://app.daftarcha.tj/help"    class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="footer_help">Помощь</a>
+        <a href="https://app.daftarcha.tj"         class="text-sm text-slate-500 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
       </div>
     </div>
   </div>
@@ -779,7 +773,7 @@
 const T = {
   tj: {
     nav_login:'Даромадан',nav_features:'Имкониятҳо',nav_pricing:'Нархҳо',nav_about:'Дар бораи мо',
-    stats_title:'Ба мо эътимод мекунанд',stats_s1:'бизнес аллакай истифода мекунад',stats_s2:'қарз ба ҳисоб гирифта шуд',stats_s3:'забони интерфейс',
+    about_title:'Дар бораи мо',about_p1_title:'Дар бораи хизмат',about_p1_text:'Daftarcha — хизмати ҳисоби қарзҳо барои бизнес дар Тоҷикистон. Аз ҷониби дастаи Душанбе барои соҳибкорон сохта шудааст.',about_p2_title:'Забонҳо ва минтақа',about_p2_text:'Дастгирии 4 забон: тоҷикӣ, русӣ, ӯзбекӣ ва англисӣ. Бо асъори сомонӣ кор мекунем.',about_p3_title:'Тамос',
     hero_badge:'Daftarcha — ҳисоби қарзҳо барои бизнес',
     hero_title:'Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>',
     hero_sub:'Ҳисоби қарзҳо, насия ва хабарҳои SMS барои бизнеси шумо',
@@ -828,7 +822,7 @@ const T = {
   },
   ru: {
     nav_login:'Войти',nav_features:'Возможности',nav_pricing:'Тарифы',nav_about:'О нас',
-    stats_title:'Нам доверяют',stats_s1:'бизнесов уже используют',stats_s2:'долгов учтено',stats_s3:'языка интерфейса',
+    about_title:'О нас',about_p1_title:'О сервисе',about_p1_text:'Daftarcha — сервис учёта долгов для бизнеса в Таджикистане. Разработан командой из Душанбе для предпринимателей, которым нужен простой и надёжный инструмент учёта долгов и рассрочки.',about_p2_title:'Языки и регион',about_p2_text:'Поддержка 4 языков: таджикский, русский, узбекский и английский. Работаем с валютой сомони. Создан специально для предпринимателей Таджикистана.',about_p3_title:'Контакт',
     hero_badge:'Daftarcha — учёт долгов для бизнеса',
     hero_title:'Управляйте долгами<br><span class="gradient-text-anim">вашего бизнеса</span> легко',
     hero_sub:'Учёт долгов, рассрочка и SMS уведомления для вашего бизнеса в одном месте',
@@ -876,7 +870,7 @@ const T = {
   },
   uz: {
     nav_login:'Kirish',nav_features:"Imkoniyatlar",nav_pricing:'Narxlar',nav_about:'Biz haqimizda',
-    stats_title:'Bizga ishonishadi',stats_s1:"biznes allaqachon foydalanmoqda",stats_s2:"qarz hisobga olindi",stats_s3:"interfeys tili",
+    about_title:'Biz haqimizda',about_p1_title:'Xizmat haqida',about_p1_text:"Daftarcha — Tojikistondagi biznes uchun qarz hisobi xizmati. Dushanbe jamoasi tomonidan tadbirkorlar uchun yaratilgan.",about_p2_title:'Tillar va mintaqa',about_p2_text:"4 til qo'llab-quvvatlanadi: tojik, rus, o'zbek va ingliz. Somoni valyutasi bilan ishlaymiz.",about_p3_title:'Aloqa',
     hero_badge:'Daftarcha — biznes uchun qarz hisobi',
     hero_title:'Biznesingiz qarzlarini<br><span class="gradient-text-anim">osonlik bilan boshqaring</span>',
     hero_sub:"Qarz hisobi, nasiya va SMS bildirishnomalar — biznesingiz uchun bir joyda",
@@ -924,7 +918,7 @@ const T = {
   },
   en: {
     nav_login:'Sign in',nav_features:'Features',nav_pricing:'Pricing',nav_about:'About',
-    stats_title:'Trusted by businesses',stats_s1:'businesses already using',stats_s2:'debts tracked',stats_s3:'interface languages',
+    about_title:'About us',about_p1_title:'About the service',about_p1_text:'Daftarcha is a debt tracking service for businesses in Tajikistan. Built by a team from Dushanbe for entrepreneurs who need a simple and reliable tool.',about_p2_title:'Languages & region',about_p2_text:'Supports 4 languages: Tajik, Russian, Uzbek and English. Works with somoni currency. Built specifically for entrepreneurs in Tajikistan.',about_p3_title:'Contact',
     hero_badge:'Daftarcha — debt tracking for business',
     hero_title:'Manage your business<br><span class="gradient-text-anim">debts with ease</span>',
     hero_sub:'Debt tracking, installments and SMS notifications for your business — all in one place',
@@ -972,7 +966,7 @@ const T = {
   }
 };
 
-let lang = localStorage.getItem('daftarcha-landing-lang') || 'tj';
+let lang = localStorage.getItem('daftarcha-landing-lang') || 'ru';
 
 function switchLang(l) {
   lang = l;
@@ -990,15 +984,35 @@ function apply() {
 }
 
 function updateBtns() {
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    const active = btn.getAttribute('data-lang') === lang;
-    btn.classList.toggle('active', active);
+  var labels = { tj: 'TJ', ru: 'RU', uz: 'UZ', en: 'EN' };
+  var el = document.getElementById('lang-label');
+  if (el) el.textContent = labels[lang] || 'RU';
+  document.querySelectorAll('.lang-item').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
   });
+  document.querySelectorAll('.lang-btn-mobile').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+}
+
+function toggleLangMenu(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('lang-menu').classList.toggle('open');
+}
+
+function closeLangMenu() {
+  document.getElementById('lang-menu').classList.remove('open');
 }
 
 function toggleMenu() {
   document.getElementById('mobile-menu').classList.toggle('open');
 }
+
+// Close lang dropdown on outside click
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('lang-dropdown');
+  if (dd && !dd.contains(e.target)) closeLangMenu();
+});
 
 // Navbar scroll
 window.addEventListener('scroll', () => {
@@ -1015,33 +1029,6 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 apply();
 updateBtns();
 
-// Stats counter animation
-(function() {
-  var counters = document.querySelectorAll('.stat-counter');
-  var obsC = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (!e.isIntersecting) return;
-      obsC.unobserve(e.target);
-      var el = e.target;
-      var target = +el.dataset.target;
-      var suffix = el.dataset.suffix || '';
-      var duration = 1600;
-      var fps = 60;
-      var steps = duration / (1000 / fps);
-      var cur = 0;
-      var inc = target / steps;
-      function tick() {
-        cur = Math.min(cur + inc, target);
-        var display = target >= 1000 ? (Math.round(cur / 100) * 100).toLocaleString() : Math.round(cur).toLocaleString();
-        el.textContent = display + suffix;
-        if (cur < target) requestAnimationFrame(tick);
-        else el.textContent = target.toLocaleString() + suffix;
-      }
-      requestAnimationFrame(tick);
-    });
-  }, { threshold: 0.4 });
-  counters.forEach(function(c) { obsC.observe(c); });
-})();
 
 // Carousel
 (function(){

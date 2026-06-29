@@ -70,12 +70,12 @@ export default function LegalLayout({ doc, otherLink }: Props) {
 
         {/* Footer links */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <Link
-            to="/dashboard"
+          <a
+            href="https://www.daftarcha.tj"
             className="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
             ← На главную
-          </Link>
+          </a>
           <Link
             to={otherLink.to}
             className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
