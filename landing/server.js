@@ -10,6 +10,7 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.static(__dirname))
 
 const PORT = process.env.PORT || 3000
