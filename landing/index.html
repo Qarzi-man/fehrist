@@ -223,6 +223,9 @@
           <button onclick="switchLang('uz')" data-lang="uz" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">UZ</button>
           <button onclick="switchLang('en')" data-lang="en" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">EN</button>
         </div>
+        <a href="#features" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_features">Возможности</a>
+        <a href="#pricing" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_pricing">Тарифы</a>
+        <a href="#faq" class="text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_about">О нас</a>
         <a href="https://serene-friendship.up.railway.app" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors" data-i18n="nav_login">Войти</a>
         <a href="https://serene-friendship.up.railway.app" class="btn-gradient px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg shadow-indigo-500/25" data-i18n="hero_cta_primary">Начать бесплатно</a>
       </div>
@@ -242,6 +245,9 @@
         <button onclick="switchLang('uz')" data-lang="uz" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">UZ</button>
         <button onclick="switchLang('en')" data-lang="en" class="lang-btn rounded-lg px-3 py-1.5 text-xs font-bold transition-all">EN</button>
       </div>
+      <a href="#features" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_features">Возможности</a>
+      <a href="#pricing" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_pricing">Тарифы</a>
+      <a href="#faq" onclick="toggleMenu()" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_about">О нас</a>
       <a href="https://serene-friendship.up.railway.app" class="text-sm font-semibold text-slate-300 py-1" data-i18n="nav_login">Войти</a>
       <a href="https://serene-friendship.up.railway.app" class="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white text-center" data-i18n="hero_cta_primary">Начать бесплатно</a>
     </div>
@@ -378,6 +384,37 @@
       <button class="cs-dot" style="background:#6366F1;width:24px;" data-idx="0"></button>
       <button class="cs-dot" style="background:#334155;width:10px;" data-idx="1"></button>
       <button class="cs-dot" style="background:#334155;width:10px;" data-idx="2"></button>
+    </div>
+  </div>
+</section>
+
+<div class="px-4"><div class="section-divider"></div></div>
+
+<!-- ═══════════════════ STATS ═══════════════════ -->
+<section id="stats" class="py-16 md:py-20">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="text-center mb-12 reveal">
+      <h2 class="text-3xl md:text-4xl font-black text-white" data-i18n="stats_title">Нам доверяют</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div class="card rounded-2xl p-8 text-center reveal d1">
+        <div class="text-5xl md:text-6xl font-black mb-2">
+          <span class="stat-counter gradient-text-anim" data-target="500" data-suffix="+">0+</span>
+        </div>
+        <p class="text-slate-400 text-sm font-medium" data-i18n="stats_s1">бизнесов уже используют</p>
+      </div>
+      <div class="card rounded-2xl p-8 text-center reveal d2">
+        <div class="text-5xl md:text-6xl font-black mb-2">
+          <span class="stat-counter gradient-text-anim" data-target="10000" data-suffix="+">0+</span>
+        </div>
+        <p class="text-slate-400 text-sm font-medium" data-i18n="stats_s2">долгов учтено</p>
+      </div>
+      <div class="card rounded-2xl p-8 text-center reveal d3">
+        <div class="text-5xl md:text-6xl font-black mb-2">
+          <span class="stat-counter gradient-text-anim" data-target="4" data-suffix="">0</span>
+        </div>
+        <p class="text-slate-400 text-sm font-medium" data-i18n="stats_s3">языка интерфейса</p>
+      </div>
     </div>
   </div>
 </section>
@@ -741,7 +778,8 @@
 <script>
 const T = {
   tj: {
-    nav_login:'Даромадан',
+    nav_login:'Даромадан',nav_features:'Имкониятҳо',nav_pricing:'Нархҳо',nav_about:'Дар бораи мо',
+    stats_title:'Ба мо эътимод мекунанд',stats_s1:'бизнес аллакай истифода мекунад',stats_s2:'қарз ба ҳисоб гирифта шуд',stats_s3:'забони интерфейс',
     hero_badge:'Daftarcha — ҳисоби қарзҳо барои бизнес',
     hero_title:'Қарзҳои бизнеси худро<br><span class="gradient-text-anim">осон идора кунед</span>',
     hero_sub:'Ҳисоби қарзҳо, насия ва хабарҳои SMS барои бизнеси шумо',
@@ -789,7 +827,8 @@ const T = {
     carousel_s3_title:'Таҳлил',carousel_s3_desc:'Диаграммаҳо ва омор манзараи умумиро нишон медиҳанд',
   },
   ru: {
-    nav_login:'Войти',
+    nav_login:'Войти',nav_features:'Возможности',nav_pricing:'Тарифы',nav_about:'О нас',
+    stats_title:'Нам доверяют',stats_s1:'бизнесов уже используют',stats_s2:'долгов учтено',stats_s3:'языка интерфейса',
     hero_badge:'Daftarcha — учёт долгов для бизнеса',
     hero_title:'Управляйте долгами<br><span class="gradient-text-anim">вашего бизнеса</span> легко',
     hero_sub:'Учёт долгов, рассрочка и SMS уведомления для вашего бизнеса в одном месте',
@@ -836,7 +875,8 @@ const T = {
     carousel_s3_title:'Аналитика',carousel_s3_desc:'Графики и статистика помогают видеть картину целиком',
   },
   uz: {
-    nav_login:'Kirish',
+    nav_login:'Kirish',nav_features:"Imkoniyatlar",nav_pricing:'Narxlar',nav_about:'Biz haqimizda',
+    stats_title:'Bizga ishonishadi',stats_s1:"biznes allaqachon foydalanmoqda",stats_s2:"qarz hisobga olindi",stats_s3:"interfeys tili",
     hero_badge:'Daftarcha — biznes uchun qarz hisobi',
     hero_title:'Biznesingiz qarzlarini<br><span class="gradient-text-anim">osonlik bilan boshqaring</span>',
     hero_sub:"Qarz hisobi, nasiya va SMS bildirishnomalar — biznesingiz uchun bir joyda",
@@ -883,7 +923,8 @@ const T = {
     carousel_s3_title:'Tahlil',carousel_s3_desc:"Grafiklar va statistika umumiy manzarani ko'rishga yordam beradi",
   },
   en: {
-    nav_login:'Sign in',
+    nav_login:'Sign in',nav_features:'Features',nav_pricing:'Pricing',nav_about:'About',
+    stats_title:'Trusted by businesses',stats_s1:'businesses already using',stats_s2:'debts tracked',stats_s3:'interface languages',
     hero_badge:'Daftarcha — debt tracking for business',
     hero_title:'Manage your business<br><span class="gradient-text-anim">debts with ease</span>',
     hero_sub:'Debt tracking, installments and SMS notifications for your business — all in one place',
@@ -973,6 +1014,34 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 // Init
 apply();
 updateBtns();
+
+// Stats counter animation
+(function() {
+  var counters = document.querySelectorAll('.stat-counter');
+  var obsC = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (!e.isIntersecting) return;
+      obsC.unobserve(e.target);
+      var el = e.target;
+      var target = +el.dataset.target;
+      var suffix = el.dataset.suffix || '';
+      var duration = 1600;
+      var fps = 60;
+      var steps = duration / (1000 / fps);
+      var cur = 0;
+      var inc = target / steps;
+      function tick() {
+        cur = Math.min(cur + inc, target);
+        var display = target >= 1000 ? (Math.round(cur / 100) * 100).toLocaleString() : Math.round(cur).toLocaleString();
+        el.textContent = display + suffix;
+        if (cur < target) requestAnimationFrame(tick);
+        else el.textContent = target.toLocaleString() + suffix;
+      }
+      requestAnimationFrame(tick);
+    });
+  }, { threshold: 0.4 });
+  counters.forEach(function(c) { obsC.observe(c); });
+})();
 
 // Carousel
 (function(){
