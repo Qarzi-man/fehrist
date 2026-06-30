@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { useT } from '../../i18n'
 import { useIsOwner } from '../../lib/useIsOwner'
@@ -78,7 +78,7 @@ export default function Sidebar() {
     <>
       <aside className="hidden md:flex print:hidden flex-col fixed left-0 top-0 h-full w-56 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 shadow-[2px_0_16px_rgba(0,0,0,0.05)] z-30">
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100 dark:border-gray-700">
+        <Link to="/dashboard" className="flex items-center gap-3 px-5 py-5 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 shadow-md shadow-indigo-500/30">
             <svg width="18" height="18" viewBox="0 0 36 36" fill="none">
               <path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fillOpacity="0.95"/>
@@ -88,7 +88,7 @@ export default function Sidebar() {
           <div>
             <span className="text-[17px] font-extrabold tracking-tight text-gray-900 dark:text-white">{t.appName}</span>
           </div>
-        </div>
+        </Link>
 
         {/* Business switcher */}
         <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">

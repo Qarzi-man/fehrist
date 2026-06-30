@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { getAdminPayments } from '../api/admin'
 import AdminDashboard from '../components/admin/AdminDashboard'
 import AdminUsers from '../components/admin/AdminUsers'
 import AdminBusinesses from '../components/admin/AdminBusinesses'
@@ -43,9 +44,16 @@ const NAV: { key: Tab; label: string; Icon: () => JSX.Element }[] = [
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('dashboard')
+  const [pendingCount, setPendingCount] = useState(0)
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const current = NAV.find((n) => n.key === tab)!
+
+  useEffect(() => {
+    getAdminPayments({ status: 'pending', limit: 1 })
+      .then((r) => setPendingCount(r.total))
+      .catch(() => {})
+  }, [tab])
 
   return (
     <div className="flex h-screen bg-gray-950 overflow-hidden">
@@ -66,6 +74,7 @@ export default function AdminPage() {
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {NAV.map(({ key, label, Icon }) => {
             const active = tab === key
+            const badge = key === 'payments' && pendingCount > 0 ? pendingCount : null
             return (
               <button
                 key={key}
@@ -80,7 +89,12 @@ export default function AdminPage() {
                 <span className={active ? 'text-white/90' : 'text-gray-500'}>
                   <Icon />
                 </span>
-                {label}
+                <span className="flex-1">{label}</span>
+                {badge !== null && (
+                  <span className="min-w-[20px] h-5 px-1 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center leading-none">
+                    {badge > 99 ? '99+' : badge}
+                  </span>
+                )}
               </button>
             )
           })}

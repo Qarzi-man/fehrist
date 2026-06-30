@@ -1,5 +1,23 @@
+const https = require('https');
 const pool = require('../config/db');
 const { FREE_SMS_MONTHLY } = require('../services/limitsService');
+
+function sendTelegramNotification(text) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const body = JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' });
+  const req = https.request({
+    hostname: 'api.telegram.org',
+    path: `/bot${token}/sendMessage`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+  });
+  req.on('error', () => {});
+  req.write(body);
+  req.end();
+}
 
 async function getStatus(req, res, next) {
   try {
@@ -37,11 +55,30 @@ async function createRequest(req, res, next) {
     const { type, amount, sms_count, note } = req.body;
     if (!type || !amount) return res.status(400).json({ error: 'type and amount required' });
 
+    const [userRes, bizRes] = await Promise.all([
+      pool.query(`SELECT full_name, phone FROM users WHERE id = $1`, [req.user.userId]),
+      pool.query(`SELECT name FROM businesses WHERE id = $1`, [req.businessId]),
+    ]);
+    const user = userRes.rows[0] || {};
+    const biz  = bizRes.rows[0] || {};
+
     const { rows } = await pool.query(
       `INSERT INTO payment_requests (business_id, user_id, type, amount, sms_count, note)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [req.businessId, req.user.userId, type, amount, sms_count || null, note || null]
     );
+
+    const typeLabel = type === 'subscription' ? '📦 Подписка PRO' : `📨 SMS пакет (${sms_count} шт.)`;
+    const userName  = user.full_name || user.phone || `user#${req.user.userId}`;
+    sendTelegramNotification(
+      `🔔 <b>Новая заявка на оплату</b>\n` +
+      `${typeLabel}\n` +
+      `💰 Сумма: <b>${amount} сом</b>\n` +
+      `👤 Пользователь: ${userName}\n` +
+      `🏢 Бизнес: ${biz.name || req.businessId}\n` +
+      (note ? `📝 Примечание: ${note}` : '')
+    );
+
     res.status(201).json(rows[0]);
   } catch (err) {
     next(err);

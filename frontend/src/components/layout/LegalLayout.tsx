@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useLangStore, type Lang } from '../../store/langStore'
+import { useAuthStore } from '../../store/authStore'
 import type { LegalDoc } from '../../lib/legalContent'
 
 const LANGS: { code: Lang; label: string }[] = [
@@ -16,6 +17,7 @@ interface Props {
 
 export default function LegalLayout({ doc, otherLink }: Props) {
   const { lang, setLang } = useLangStore()
+  const token = useAuthStore((s) => s.token)
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -70,12 +72,21 @@ export default function LegalLayout({ doc, otherLink }: Props) {
 
         {/* Footer links */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <a
-            href="https://www.daftarcha.tj"
-            className="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-          >
-            ← На главную
-          </a>
+          {token ? (
+            <Link
+              to="/dashboard"
+              className="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+              ← На главную
+            </Link>
+          ) : (
+            <a
+              href="https://www.daftarcha.tj"
+              className="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            >
+              ← На главную
+            </a>
+          )}
           <Link
             to={otherLink.to}
             className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
