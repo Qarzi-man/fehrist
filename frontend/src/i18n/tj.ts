@@ -32,6 +32,7 @@ export const tj: Translations = {
   errInvalidCredentials: 'Рақам ё рамз нодуруст аст',
   errPhoneExists: 'Ин рақам аллакай сабт шудааст',
   errInvalidOtp: 'Рамз нодуруст ё кӯҳна аст',
+  errTooManyRequests: 'Кӯшишҳои зиёд. Каме баъдтар кӯшиш кунед.',
   errNetwork: 'Хатои шабака. Дубора кӯшиш кунед',
   errPasswordShort: 'Рамз ҳадди аққал 6 аломат дорад',
   dashboard: 'Асосӣ',

@@ -32,6 +32,7 @@ export const uz: Translations = {
   errInvalidCredentials: "Noto'g'ri raqam yoki parol",
   errPhoneExists: "Bu raqam allaqachon ro'yxatdan o'tgan",
   errInvalidOtp: "Noto'g'ri yoki eskirgan kod",
+  errTooManyRequests: "Juda ko'p urinish. Keyinroq urinib ko'ring.",
   errNetwork: "Tarmoq xatosi. Qaytadan urinib ko'ring",
   errPasswordShort: "Parol kamida 6 ta belgidan iborat bo'lishi kerak",
   dashboard: 'Bosh sahifa',

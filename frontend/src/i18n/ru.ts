@@ -32,6 +32,7 @@ export const ru = {
   errInvalidCredentials: 'Неверный номер или пароль',
   errPhoneExists: 'Этот номер уже зарегистрирован',
   errInvalidOtp: 'Неверный или устаревший код',
+  errTooManyRequests: 'Слишком много попыток. Попробуйте позже.',
   errNetwork: 'Ошибка сети. Попробуйте снова',
   errPasswordShort: 'Пароль минимум 6 символов',
   // Navigation

@@ -32,6 +32,7 @@ export const en: Translations = {
   errInvalidCredentials: 'Invalid phone or password',
   errPhoneExists: 'This phone is already registered',
   errInvalidOtp: 'Invalid or expired code',
+  errTooManyRequests: 'Too many attempts. Please try again later.',
   errNetwork: 'Network error. Please try again',
   errPasswordShort: 'Password must be at least 6 characters',
   dashboard: 'Dashboard',

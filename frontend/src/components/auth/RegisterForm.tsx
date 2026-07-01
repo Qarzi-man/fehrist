@@ -58,8 +58,13 @@ export default function RegisterForm({ onSwitch, initialPhone }: { onSwitch: () 
     try {
       await api.post('/auth/send-otp', { phone: phone.trim() })
       return true
-    } catch {
-      setError(t.errNetwork)
+    } catch (err) {
+      const msg = getApiError(err, '')
+      if (msg === 'too_many_requests') {
+        setError(t.errTooManyRequests)
+      } else {
+        setError(t.errNetwork)
+      }
       return false
     } finally {
       setLoading(false)
