@@ -29,8 +29,6 @@ export default function AuthPage() {
         <div className="mb-8 text-center">
           <a
             href="https://www.daftarcha.tj"
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-block group"
           >
             <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm shadow-lg transition-transform group-hover:scale-105">
