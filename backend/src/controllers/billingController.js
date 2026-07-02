@@ -22,12 +22,17 @@ function sendTelegramNotification(text) {
 async function getStatus(req, res, next) {
   try {
     const businessId = req.businessId;
-    const [bizRes, balRes] = await Promise.all([
+    const userId = req.user.userId;
+
+    const [bizRes, balRes, clientsRes, membersRes, businessesRes] = await Promise.all([
       pool.query(
         `SELECT subscription_status, subscription_expires_at FROM businesses WHERE id = $1`,
         [businessId]
       ),
       pool.query(`SELECT * FROM sms_balance WHERE business_id = $1`, [businessId]),
+      pool.query(`SELECT COUNT(*) FROM clients WHERE business_id = $1 AND deleted_at IS NULL`, [businessId]),
+      pool.query(`SELECT COUNT(*) FROM business_members WHERE business_id = $1`, [businessId]),
+      pool.query(`SELECT COUNT(*) FROM businesses WHERE owner_id = $1`, [userId]),
     ]);
 
     const biz = bizRes.rows[0] || {};
@@ -44,6 +49,9 @@ async function getStatus(req, res, next) {
       total_sent:              parseInt(bal.total_sent) || 0,
       free_sms_limit:          FREE_SMS_MONTHLY,
       free_sms_remaining:      Math.max(0, FREE_SMS_MONTHLY - monthlySent),
+      clients_count:           parseInt(clientsRes.rows[0].count) || 0,
+      employees_count:         parseInt(membersRes.rows[0].count) || 0,
+      businesses_count:        parseInt(businessesRes.rows[0].count) || 0,
     });
   } catch (err) {
     next(err);
