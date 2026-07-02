@@ -27,13 +27,20 @@ export default function AuthPage() {
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm shadow-lg">
-            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fillOpacity="0.9"/>
-              <path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">{t.appName}</h1>
+          <a
+            href="https://www.daftarcha.tj"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block group"
+          >
+            <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm shadow-lg transition-transform group-hover:scale-105">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 4C6 2.9 6.9 2 8 2H28C29.1 2 30 2.9 30 4V32L18 27L6 32V4Z" fill="white" fillOpacity="0.9"/>
+                <path d="M12 10H24M12 15H24M12 20H20" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <h1 className="text-3xl font-bold text-white tracking-tight group-hover:text-indigo-200 transition-colors">{t.appName}</h1>
+          </a>
           <p className="mt-1 text-sm text-white/70">{t.appTagline}</p>
         </div>
 
