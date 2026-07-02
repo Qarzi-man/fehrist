@@ -35,9 +35,10 @@ async function listPending(req, res, next) {
 
 async function invite(req, res, next) {
   try {
-    const { phone } = req.body;
+    const { phone, role } = req.body;
     if (!phone) return res.status(400).json({ error: 'phone required' });
-    const trimmed = phone.trim();
+    const trimmed  = phone.trim();
+    const safeRole = role === 'admin' ? 'admin' : 'employee';
 
     // Check member limit
     const countRes = await pool.query(
@@ -65,10 +66,10 @@ async function invite(req, res, next) {
 
       const { rows } = await pool.query(`
         INSERT INTO business_members (business_id, user_id, phone, role, invited_by, status)
-        VALUES ($1, $2, $3, 'employee', $4, 'pending')
-        ON CONFLICT (business_id, user_id) DO UPDATE SET status = 'pending', invited_by = $4
+        VALUES ($1, $2, $3, $5, $4, 'pending')
+        ON CONFLICT (business_id, user_id) DO UPDATE SET status = 'pending', role = $5, invited_by = $4
         RETURNING *
-      `, [req.businessId, target.id, trimmed, req.user.userId]);
+      `, [req.businessId, target.id, trimmed, req.user.userId, safeRole]);
       row = { ...rows[0], full_name: target.full_name };
 
       createNotification({
@@ -104,9 +105,9 @@ async function invite(req, res, next) {
       } else {
         const { rows } = await pool.query(`
           INSERT INTO business_members (business_id, user_id, phone, role, invited_by, status)
-          VALUES ($1, NULL, $2, 'employee', $3, 'pending')
+          VALUES ($1, NULL, $2, $4, $3, 'pending')
           RETURNING *
-        `, [req.businessId, trimmed, req.user.userId]);
+        `, [req.businessId, trimmed, req.user.userId, safeRole]);
         row = rows[0];
       }
 
