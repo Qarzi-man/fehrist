@@ -4,7 +4,8 @@ const path = require('path');
 const app = require('./src/app');
 const pool = require('./src/config/db');
 const { startSubscriptionReminder } = require('./src/services/subscriptionReminder');
-const { startBackupService } = require('./src/services/backupService');
+const { startBackupService }  = require('./src/services/backupService');
+const { startHealthMonitor }  = require('./src/services/healthMonitor');
 
 const PORT = process.env.PORT || 3000;
 
@@ -16,6 +17,7 @@ async function start() {
     console.log(`Daftarcha backend running on port ${PORT}`);
     startSubscriptionReminder();
     startBackupService();
+    startHealthMonitor();
   });
 }
 
