@@ -178,6 +178,10 @@ CREATE TABLE IF NOT EXISTS payment_requests (
   approved_at TIMESTAMPTZ
 );
 
+-- Cancellation audit for payment_requests
+ALTER TABLE payment_requests ADD COLUMN IF NOT EXISTS cancelled_at  TIMESTAMPTZ;
+ALTER TABLE payment_requests ADD COLUMN IF NOT EXISTS cancelled_by  INTEGER REFERENCES users(id);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_debts_user_id         ON debts(user_id);
 CREATE INDEX IF NOT EXISTS idx_debts_client_id       ON debts(client_id);

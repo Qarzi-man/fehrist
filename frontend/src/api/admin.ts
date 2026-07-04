@@ -49,10 +49,12 @@ export interface AdminPayment {
   type: string
   amount: number
   sms_count: number | null
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled'
   note: string | null
   created_at: string
   approved_at: string | null
+  cancelled_at: string | null
+  cancelled_by: number | null
 }
 
 export interface AdminSmsLog {
@@ -116,6 +118,9 @@ export const approveAdminPayment = (id: number) =>
 
 export const rejectAdminPayment = (id: number, reason: string) =>
   api.patch(`${B}/payments/${id}/reject`, { reason }).then((r) => r.data)
+
+export const cancelAdminPayment = (id: number) =>
+  api.patch(`${B}/payments/${id}/cancel`).then((r) => r.data)
 
 export const getAdminSmsLogs = (p: { dateFrom?: string; dateTo?: string; page?: number; limit?: number }) =>
   api.get(`${B}/sms`, { params: p }).then((r) => r.data as { data: AdminSmsLog[]; total: number; totalPages: number; page: number })

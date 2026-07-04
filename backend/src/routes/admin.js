@@ -15,6 +15,7 @@ router.patch('/businesses/:id/plan',         a.updatePlan);
 router.get('/payments',               a.getPayments);
 router.patch('/payments/:id/approve', a.approvePayment);
 router.patch('/payments/:id/reject',  a.rejectPayment);
+router.patch('/payments/:id/cancel',  a.cancelPayment);
 router.get('/sms',                    a.getSmsLogs);
 router.get('/revenue',                a.getRevenue);
 

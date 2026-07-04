@@ -179,7 +179,7 @@ async function getPayments(req, res, next) {
     const limit  = Math.min(100, parseInt(req.query.limit) || 20);
     const offset = (page - 1) * limit;
 
-    const VALID = ['pending', 'approved', 'rejected'];
+    const VALID = ['pending', 'approved', 'rejected', 'cancelled'];
     const statusFilter = VALID.includes(req.query.status) ? req.query.status : null;
 
     const params = [];
@@ -269,6 +269,68 @@ async function rejectPayment(req, res, next) {
   } catch (err) { next(err); }
 }
 
+async function cancelPayment(req, res, next) {
+  const client = await pool.connect();
+  try {
+    const { id } = req.params;
+    const adminId = req.user.userId;
+
+    const { rows } = await client.query(
+      `SELECT * FROM payment_requests WHERE id = $1`, [id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    const pr = rows[0];
+    if (pr.status !== 'approved') {
+      return res.status(400).json({ error: 'Only approved requests can be cancelled' });
+    }
+
+    await client.query('BEGIN');
+
+    // Rollback the effect of the approval
+    if (pr.type === 'sms_package' && pr.sms_count) {
+      await client.query(
+        `UPDATE sms_balance
+         SET purchased_sms = GREATEST(0, purchased_sms - $1)
+         WHERE business_id = $2`,
+        [pr.sms_count, pr.business_id]
+      );
+    } else if (pr.type === 'subscription') {
+      await client.query(
+        `UPDATE businesses
+         SET subscription_status = 'free', subscription_expires_at = NULL
+         WHERE id = $1`,
+        [pr.business_id]
+      );
+    }
+
+    await client.query(
+      `UPDATE payment_requests
+       SET status = 'cancelled', cancelled_at = NOW(), cancelled_by = $1
+       WHERE id = $2`,
+      [adminId, id]
+    );
+
+    await client.query('COMMIT');
+
+    createNotification({
+      userId: pr.user_id,
+      businessId: pr.business_id,
+      type: 'payment_received',
+      title: pr.type === 'sms_package'
+        ? `SMS пакет (${pr.sms_count} шт.) отменён`
+        : 'Подписка PRO отменена',
+      body: `Заявка #${pr.id} была отменена администратором`,
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    next(err);
+  } finally {
+    client.release();
+  }
+}
+
 async function getSmsLogs(req, res, next) {
   try {
     const page   = Math.max(1, parseInt(req.query.page) || 1);
@@ -326,4 +388,4 @@ async function getRevenue(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { getStats, getUsers, blockUser, getBusinesses, updatePlan, getPayments, approvePayment, rejectPayment, getSmsLogs, getRevenue, getExpiringSubscriptions };
+module.exports = { getStats, getUsers, blockUser, getBusinesses, updatePlan, getPayments, approvePayment, rejectPayment, cancelPayment, getSmsLogs, getRevenue, getExpiringSubscriptions };

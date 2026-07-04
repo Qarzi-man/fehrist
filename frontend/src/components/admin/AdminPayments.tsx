@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { getAdminPayments, approveAdminPayment, rejectAdminPayment, type AdminPayment } from '../../api/admin'
+import { getAdminPayments, approveAdminPayment, rejectAdminPayment, cancelAdminPayment, type AdminPayment } from '../../api/admin'
 
-type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected'
+type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected' | 'cancelled'
 
 function StatusBadge({ status }: { status: string }) {
-  if (status === 'pending')  return <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-400 ring-1 ring-amber-500/20">Ожидает</span>
-  if (status === 'approved') return <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400 ring-1 ring-emerald-500/20">Одобрено</span>
+  if (status === 'pending')   return <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-amber-400 ring-1 ring-amber-500/20">Ожидает</span>
+  if (status === 'approved')  return <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400 ring-1 ring-emerald-500/20">Одобрено</span>
+  if (status === 'cancelled') return <span className="inline-flex items-center rounded-full bg-gray-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-gray-400 ring-1 ring-gray-500/20">Отменено</span>
   return <span className="inline-flex items-center rounded-full bg-red-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-red-400 ring-1 ring-red-500/20">Отклонено</span>
 }
 
@@ -29,6 +30,7 @@ export default function AdminPayments() {
   const [actId, setActId]     = useState<number | null>(null)
   const [rejectModal, setRejectModal] = useState<{ id: number } | null>(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [cancelModal, setCancelModal] = useState<AdminPayment | null>(null)
 
   function load(s = status, p = page) {
     setLoading(true)
@@ -61,11 +63,23 @@ export default function AdminPayments() {
     } finally { setActId(null) }
   }
 
+  async function handleCancel() {
+    if (!cancelModal) return
+    setActId(cancelModal.id)
+    try {
+      await cancelAdminPayment(cancelModal.id)
+      setCancelModal(null); load()
+    } catch (err) {
+      console.error('[AdminPayments] cancel failed:', err)
+    } finally { setActId(null) }
+  }
+
   const tabs: { key: StatusFilter; label: string }[] = [
-    { key: 'all',      label: 'Все' },
-    { key: 'pending',  label: 'Ожидают' },
-    { key: 'approved', label: 'Одобрены' },
-    { key: 'rejected', label: 'Отклонены' },
+    { key: 'all',       label: 'Все' },
+    { key: 'pending',   label: 'Ожидают' },
+    { key: 'approved',  label: 'Одобрены' },
+    { key: 'rejected',  label: 'Отклонены' },
+    { key: 'cancelled', label: 'Отменены' },
   ]
 
   return (
@@ -142,7 +156,21 @@ export default function AdminPayments() {
                           </button>
                         </div>
                       )}
-                      {p.status !== 'pending' && p.note && (
+                      {p.status === 'approved' && (
+                        <button
+                          onClick={() => setCancelModal(p)}
+                          disabled={actId === p.id}
+                          className="rounded-lg bg-gray-700 hover:bg-gray-600 px-2.5 py-1 text-[11px] font-semibold text-gray-300 transition disabled:opacity-40"
+                        >
+                          Отменить
+                        </button>
+                      )}
+                      {p.status === 'cancelled' && p.cancelled_at && (
+                        <span className="text-xs text-gray-600 italic">
+                          {new Date(p.cancelled_at).toLocaleString('ru', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      )}
+                      {(p.status === 'rejected') && p.note && (
                         <span className="text-xs text-gray-600 italic">{p.note.slice(0, 30)}</span>
                       )}
                     </td>
@@ -164,6 +192,26 @@ export default function AdminPayments() {
               className={`w-8 h-8 rounded-lg text-xs font-semibold transition ${p === page ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 border border-gray-700'}`}
             >{p}</button>
           ))}
+        </div>
+      )}
+
+      {cancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+          <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm border border-gray-700">
+            <p className="text-sm font-bold text-white mb-1">Отменить одобренную заявку?</p>
+            <p className="text-xs text-gray-400 mb-4">
+              {cancelModal.type === 'sms_package'
+                ? `Будут вычтены ${cancelModal.sms_count} SMS из баланса бизнеса «${cancelModal.business_name}».`
+                : `Подписка PRO бизнеса «${cancelModal.business_name}» будет сброшена на бесплатный тариф.`}
+              {' '}Сумма {cancelModal.amount} сом. будет исключена из доходов.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setCancelModal(null)} className="flex-1 rounded-xl border border-gray-700 py-2.5 text-sm text-gray-400 hover:bg-gray-700 transition">Назад</button>
+              <button onClick={handleCancel} disabled={!!actId} className="flex-1 rounded-xl bg-gray-600 hover:bg-gray-500 py-2.5 text-sm font-semibold text-white transition disabled:opacity-40">
+                {actId ? '...' : 'Отменить заявку'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
