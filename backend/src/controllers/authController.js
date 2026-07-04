@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const pool = require('../config/db');
 const { sendOtp } = require('../services/smsService');
 
@@ -48,9 +49,9 @@ async function sendOtpHandler(req, res, next) {
 async function register(req, res, next) {
   const client = await pool.connect();
   try {
-    const { phone, password, full_name, business_name, email, otp } = req.body;
-    if (!phone || !password || !otp) {
-      return res.status(400).json({ error: 'phone, password and otp required' });
+    const { phone, full_name, business_name, email, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ error: 'phone and otp required' });
     }
 
     // Verify OTP
@@ -71,7 +72,7 @@ async function register(req, res, next) {
 
     await client.query('BEGIN');
 
-    const hash = await bcrypt.hash(password, 10);
+    const hash = await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 10);
     const userResult = await client.query(
       `INSERT INTO users (phone, password, full_name, email)
        VALUES ($1, $2, $3, $4) RETURNING id, phone, full_name, email`,

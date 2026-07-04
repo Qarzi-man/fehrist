@@ -46,7 +46,6 @@ export default function RegisterForm({ onSwitch, initialPhone }: { onSwitch: () 
   const [fullName, setFullName] = useState('')
   const [businessName, setBusinessName] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -83,7 +82,6 @@ export default function RegisterForm({ onSwitch, initialPhone }: { onSwitch: () 
     if (otp.length < 6) return setError(t.errOtpRequired)
     if (!fullName.trim()) return setError(t.errNameRequired)
     if (!businessName.trim()) return setError(t.errBusinessNameRequired)
-    if (password.length < 6) return setError(t.errPasswordShort)
 
     setLoading(true)
     try {
@@ -93,7 +91,6 @@ export default function RegisterForm({ onSwitch, initialPhone }: { onSwitch: () 
         full_name: fullName.trim(),
         business_name: businessName.trim(),
         email: email.trim() || undefined,
-        password,
       })
       setAuth(data.token, data.user)
       navigate('/dashboard')
@@ -176,16 +173,6 @@ export default function RegisterForm({ onSwitch, initialPhone }: { onSwitch: () 
         onChange={(e) => setEmail(e.target.value)}
         placeholder={t.emailPlaceholder}
         autoComplete="email"
-      />
-
-      <Input
-        label={t.password}
-        type="password"
-        showToggle
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder={t.passwordPlaceholder}
-        autoComplete="new-password"
       />
 
       {/* Terms checkbox */}
