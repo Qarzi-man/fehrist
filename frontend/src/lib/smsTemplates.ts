@@ -21,10 +21,10 @@ export const SMS_TEMPLATES: SmsTemplate[] = [
       en: 'Debt reminder',
     },
     text: {
-      ru: 'Уважаемый [имя], ваш долг составляет [сумма] [валюта]. Просим оплатить до [дата]. — Daftarcha',
-      tj: 'Муҳтарам [имя], қарзи шумо [сумма] [валюта] мебошад. Лутфан то [дата] пардохт намоед. — Daftarcha',
-      uz: "Hurmatli [имя], qarzingiz [сумма] [валюта]. Iltimos [дата] gacha to'lang. — Daftarcha",
-      en: 'Dear [имя], your debt is [сумма] [валюта]. Please pay by [дата]. — Daftarcha',
+      ru: 'Уважаемый [имя], ваш долг составляет [сумма] [валюта]. Просим оплатить до [дата]. — [бизнес]',
+      tj: 'Муҳтарам [имя], қарзи шумо [сумма] [валюта] мебошад. Лутфан то [дата] пардохт намоед. — [бизнес]',
+      uz: "Hurmatli [имя], qarzingiz [сумма] [валюта]. Iltimos [дата] gacha to'lang. — [бизнес]",
+      en: 'Dear [имя], your debt is [сумма] [валюта]. Please pay by [дата]. — [бизнес]',
     },
   },
   {
@@ -37,10 +37,10 @@ export const SMS_TEMPLATES: SmsTemplate[] = [
       en: 'Payment confirmed',
     },
     text: {
-      ru: 'Уважаемый [имя], ваша оплата [сумма] [валюта] принята. Спасибо! — Daftarcha',
-      tj: 'Муҳтарам [имя], пардохти шумо [сумма] [валюта] қабул шуд. Ташаккур! — Daftarcha',
-      uz: "Hurmatli [имя], [сумма] [валюта] to'lovingiz qabul qilindi. Rahmat! — Daftarcha",
-      en: 'Dear [имя], your payment of [сумма] [валюта] has been received. Thank you! — Daftarcha',
+      ru: 'Уважаемый [имя], ваша оплата [сумма] [валюта] принята. Спасибо! — [бизнес]',
+      tj: 'Муҳтарам [имя], пардохти шумо [сумма] [валюта] қабул шуд. Ташаккур! — [бизнес]',
+      uz: "Hurmatli [имя], [сумма] [валюта] to'lovingiz qabul qilindi. Rahmat! — [бизнес]",
+      en: 'Dear [имя], your payment of [сумма] [валюта] has been received. Thank you! — [бизнес]',
     },
   },
   {
@@ -53,10 +53,10 @@ export const SMS_TEMPLATES: SmsTemplate[] = [
       en: 'Overdue notice',
     },
     text: {
-      ru: 'Уважаемый [имя], срок оплаты [дата] прошёл. Остаток: [сумма] [валюта]. Пожалуйста свяжитесь с нами. — Daftarcha',
-      tj: 'Муҳтарам [имя], мӯҳлати пардохт [дата] гузашт. Боқимонда: [сумма] [валюта]. Лутфан бо мо тамос гиред. — Daftarcha',
-      uz: "Hurmatli [имя], [дата] to'lov muddati o'tdi. Qoldiq: [сумма] [валюта]. Iltimos biz bilan bog'laning. — Daftarcha",
-      en: 'Dear [имя], your payment deadline [дата] has passed. Remaining: [сумма] [валюта]. Please contact us. — Daftarcha',
+      ru: 'Уважаемый [имя], срок оплаты [дата] прошёл. Остаток: [сумма] [валюта]. Пожалуйста свяжитесь с нами. — [бизнес]',
+      tj: 'Муҳтарам [имя], мӯҳлати пардохт [дата] гузашт. Боқимонда: [сумма] [валюта]. Лутфан бо мо тамос гиред. — [бизнес]',
+      uz: "Hurmatli [имя], [дата] to'lov muddati o'tdi. Qoldiq: [сумма] [валюта]. Iltimos biz bilan bog'laning. — [бизнес]",
+      en: 'Dear [имя], your payment deadline [дата] has passed. Remaining: [сумма] [валюта]. Please contact us. — [бизнес]',
     },
   },
   {
@@ -69,10 +69,10 @@ export const SMS_TEMPLATES: SmsTemplate[] = [
       en: 'Installment reminder',
     },
     text: {
-      ru: 'Уважаемый [имя], следующий платёж по рассрочке: [сумма] [валюта] — [дата]. — Daftarcha',
-      tj: 'Муҳтарам [имя], пардохти навбатии насия: [сумма] [валюта] — [дата]. — Daftarcha',
-      uz: "Hurmatli [имя], navbatdagi nasiya to'lovi: [сумма] [валюта] — [дата]. — Daftarcha",
-      en: 'Dear [имя], your next installment payment: [сумма] [валюта] due [дата]. — Daftarcha',
+      ru: 'Уважаемый [имя], следующий платёж по рассрочке: [сумма] [валюта] — [дата]. — [бизнес]',
+      tj: 'Муҳтарам [имя], пардохти навбатии насия: [сумма] [валюта] — [дата]. — [бизнес]',
+      uz: "Hurmatli [имя], navbatdagi nasiya to'lovi: [сумма] [валюта] — [дата]. — [бизнес]",
+      en: 'Dear [имя], your next installment payment: [сумма] [валюта] due [дата]. — [бизнес]',
     },
   },
 ]
@@ -86,6 +86,7 @@ export function fillTemplate(
   lang: Lang,
   debt: Debt,
   schedule: ScheduleItem[] = [],
+  businessName: string = 'Daftarcha',
 ): string {
   const tpl = SMS_TEMPLATES.find((t) => t.key === templateKey)
   if (!tpl) return ''
@@ -124,4 +125,5 @@ export function fillTemplate(
     .replace(/\[сумма\]/g, amount)
     .replace(/\[валюта\]/g, currency)
     .replace(/\[дата\]/g, date)
+    .replace(/\[бизнес\]/g, businessName)
 }

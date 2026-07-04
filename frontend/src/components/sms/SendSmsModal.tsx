@@ -4,6 +4,7 @@ import { type Debt, type ScheduleItem } from '../../api/debts'
 import { sendSmsToClient } from '../../api/sms'
 import { SMS_TEMPLATES, fillTemplate } from '../../lib/smsTemplates'
 import { getApiError, getLimitError, type LimitError } from '../../lib/utils'
+import { useBusinessStore } from '../../store/businessStore'
 import Button from '../ui/Button'
 import LimitModal from '../ui/LimitModal'
 
@@ -24,6 +25,7 @@ interface Props {
 
 export default function SendSmsModal({ debt, schedule = [], onClose }: Props) {
   const t = useT()
+  const businessName = useBusinessStore((s) => s.activeBusiness?.name ?? 'Daftarcha')
   const [lang, setLang] = useState<Lang>('ru')
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
   const [phone, setPhone] = useState(debt.client_phone || '')
@@ -35,7 +37,7 @@ export default function SendSmsModal({ debt, schedule = [], onClose }: Props) {
 
   useEffect(() => {
     if (!selectedTemplate) return
-    setMessage(fillTemplate(selectedTemplate, lang, debt, schedule))
+    setMessage(fillTemplate(selectedTemplate, lang, debt, schedule, businessName))
   }, [selectedTemplate, lang])
 
   async function handleSend() {
