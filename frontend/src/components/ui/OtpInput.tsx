@@ -54,6 +54,8 @@ export default function OtpInput({ value, onChange, error }: Props) {
             ref={(el) => { refs.current[i] = el }}
             type="text"
             inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="one-time-code"
             maxLength={1}
             value={digits[i] ?? ''}
             onChange={(e) => update(i, e.target.value.slice(-1))}
