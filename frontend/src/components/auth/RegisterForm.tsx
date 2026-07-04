@@ -35,14 +35,14 @@ function StepIndicator({ step }: { step: Step }) {
   )
 }
 
-export default function RegisterForm({ onSwitch, initialPhone }: { onSwitch: () => void; initialPhone?: string }) {
+export default function RegisterForm({ onSwitch, initialPhone, initialOtp }: { onSwitch: () => void; initialPhone?: string; initialOtp?: string }) {
   const t = useT()
   const navigate = useNavigate()
   const setAuth = useAuthStore((s) => s.setAuth)
 
-  const [step, setStep] = useState<Step>(1)
+  const [step, setStep] = useState<Step>(initialOtp ? 2 : 1)
   const [phone, setPhone] = useState(initialPhone || '+992')
-  const [otp, setOtp] = useState('')
+  const [otp, setOtp] = useState(initialOtp || '')
   const [fullName, setFullName] = useState('')
   const [businessName, setBusinessName] = useState('')
   const [email, setEmail] = useState('')

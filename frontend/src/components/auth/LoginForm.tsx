@@ -10,7 +10,7 @@ import OtpInput from '../ui/OtpInput'
 
 type Step = 'phone' | 'otp'
 
-export default function LoginForm({ onSwitch }: { onSwitch: (phone?: string) => void }) {
+export default function LoginForm({ onSwitch }: { onSwitch: (phone?: string, otp?: string) => void }) {
   const t = useT()
   const navigate = useNavigate()
   const setAuth = useAuthStore((s) => s.setAuth)
@@ -58,7 +58,7 @@ export default function LoginForm({ onSwitch }: { onSwitch: (phone?: string) => 
     } catch (err) {
       const msg = getApiError(err, '')
       if (msg === 'user_not_found') {
-        onSwitch(phone.trim())
+        onSwitch(phone.trim(), otp)
       } else if (msg === 'Invalid or expired OTP') {
         setError(t.errInvalidOtp)
       } else if (msg === 'too_many_requests') {
