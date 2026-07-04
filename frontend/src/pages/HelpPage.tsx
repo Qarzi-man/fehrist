@@ -1,6 +1,7 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import AppLayout from '../components/layout/AppLayout'
+import { useAuthStore } from '../store/authStore'
 
 const faqs = [
   {
@@ -39,6 +40,7 @@ const faqs = [
 
 export default function HelpPage() {
   const t = useT()
+  const token = useAuthStore((s) => s.token)
 
   return (
     <AppLayout>
@@ -91,12 +93,21 @@ export default function HelpPage() {
 
         {/* Legal links */}
         <div className="flex items-center justify-between gap-4">
-          <a
-            href="https://www.daftarcha.tj"
-            className="text-sm text-gray-400 hover:text-indigo-500 transition-colors"
-          >
-            ← На главную
-          </a>
+          {token ? (
+            <Link
+              to="/dashboard"
+              className="text-sm text-gray-400 hover:text-indigo-500 transition-colors"
+            >
+              ← На главную
+            </Link>
+          ) : (
+            <a
+              href="https://www.daftarcha.tj"
+              className="text-sm text-gray-400 hover:text-indigo-500 transition-colors"
+            >
+              ← На главную
+            </a>
+          )}
           <div className="flex gap-4 text-xs text-gray-400">
             <NavLink to="/oferta"  className="hover:text-indigo-500 transition">Оферта</NavLink>
             <NavLink to="/privacy" className="hover:text-indigo-500 transition">Конфиденциальность</NavLink>
