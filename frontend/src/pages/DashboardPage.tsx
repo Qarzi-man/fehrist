@@ -31,8 +31,8 @@ function statusBadge(status: RecentDebt['status'], t: ReturnType<typeof useT>) {
 
 function typeBadge(type: RecentDebt['type'], t: ReturnType<typeof useT>) {
   return type === 'receivable'
-    ? <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">{t.receivable}</span>
-    : <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">{t.payable}</span>
+    ? <span className="hidden sm:inline-flex text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">{t.receivable}</span>
+    : <span className="hidden sm:inline-flex text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">{t.payable}</span>
 }
 
 const SKELETON_WIDTHS = ['w-36', 'w-28', 'w-44', 'w-32'] as const
@@ -177,13 +177,13 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Amount + badges */}
-                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <div className="flex flex-col items-end gap-1.5 shrink-0 max-w-[45%]">
                         <span
-                          className={`text-sm font-bold ${d.type === 'receivable' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}
+                          className={`text-sm font-bold text-right ${d.type === 'receivable' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}
                         >
                           {d.type === 'receivable' ? '+' : '−'}{formatMoney(d.amount, d.currency)}
                         </span>
-                        <div className="flex gap-1">
+                        <div className="flex flex-wrap gap-1 justify-end">
                           {typeBadge(d.type, t)}
                           {statusBadge(d.status, t)}
                         </div>

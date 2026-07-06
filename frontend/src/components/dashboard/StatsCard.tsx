@@ -44,23 +44,23 @@ export default function StatsCard({ label, color, amounts, count }: Props) {
 
   function renderAmount() {
     if (count !== undefined) {
-      return <span className="text-3xl md:text-5xl font-bold text-white leading-none">{count}</span>
+      return <span className="text-2xl md:text-5xl font-bold text-white leading-none">{count}</span>
     }
     const entries = Object.entries(amounts ?? {})
     if (!entries.length) {
       return (
         <div className="flex items-end gap-1">
-          <span className="text-2xl md:text-4xl font-bold text-white leading-none">0</span>
-          <span className="text-sm md:text-base font-semibold text-white/70 mb-0.5 md:mb-1">TJS</span>
+          <span className="text-xl md:text-4xl font-bold text-white leading-none">0</span>
+          <span className="text-xs sm:text-base font-semibold text-white/70 mb-0.5 md:mb-1">TJS</span>
         </div>
       )
     }
     if (entries.length === 1) {
       const [currency, value] = entries[0]
       return (
-        <div className="flex items-end gap-1.5">
-          <span className="text-2xl md:text-4xl font-bold text-white leading-none">{fmt(value)}</span>
-          <span className="text-sm md:text-base font-semibold text-white/70 mb-0.5 md:mb-1">{currency}</span>
+        <div className="flex items-end gap-1 flex-wrap">
+          <span className="text-xl md:text-4xl font-bold text-white leading-none">{fmt(value)}</span>
+          <span className="text-xs sm:text-base font-semibold text-white/70 mb-0.5 md:mb-1">{currency}</span>
         </div>
       )
     }
@@ -68,8 +68,8 @@ export default function StatsCard({ label, color, amounts, count }: Props) {
       <div className="flex flex-col gap-1">
         {entries.map(([currency, value]) => (
           <div key={currency} className="flex items-end gap-1">
-            <span className="text-xl md:text-2xl font-bold text-white leading-none">{fmt(value)}</span>
-            <span className="text-xs md:text-sm font-semibold text-white/70 mb-0.5">{currency}</span>
+            <span className="text-base md:text-2xl font-bold text-white leading-none">{fmt(value)}</span>
+            <span className="text-xs font-semibold text-white/70 mb-0.5">{currency}</span>
           </div>
         ))}
       </div>
@@ -77,7 +77,7 @@ export default function StatsCard({ label, color, amounts, count }: Props) {
   }
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-4 md:p-6 flex flex-col gap-2 md:gap-4 shadow-lg`}>
+    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-4 md:p-6 flex flex-col gap-1.5 md:gap-4 shadow-lg`}>
       {/* Decorative circles */}
       <div className="absolute -top-5 -right-5 w-24 h-24 rounded-full bg-white/10 pointer-events-none" />
       <div className="absolute -bottom-8 -right-2 w-32 h-32 rounded-full bg-white/5 pointer-events-none" />
@@ -85,7 +85,7 @@ export default function StatsCard({ label, color, amounts, count }: Props) {
       {/* Label + icon */}
       <div className="flex items-start justify-between gap-2">
         <span className="text-xs md:text-sm font-semibold text-white/85 leading-tight">{label}</span>
-        <div className="shrink-0 text-white/50 mt-0.5">
+        <div className="hidden sm:block shrink-0 text-white/50 mt-0.5">
           <Icon />
         </div>
       </div>

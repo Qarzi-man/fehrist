@@ -164,12 +164,12 @@ export default function AnalyticsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white print:text-black">{t.analytics}</h1>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 print:hidden">
+            <div className="flex flex-wrap gap-1 bg-gray-100 dark:bg-gray-700 rounded-xl p-1 print:hidden">
               {periods.map((p) => (
                 <button
                   key={p.value}
                   onClick={() => setPeriod(p.value)}
-                  className={['rounded-lg px-3 py-1.5 text-sm font-semibold transition-all',
+                  className={['rounded-lg px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-semibold transition-all',
                     period === p.value
                       ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'].join(' ')}
@@ -308,7 +308,7 @@ export default function AnalyticsPage() {
                 </div>
                 <ul className="divide-y divide-gray-50 dark:divide-gray-700">
                   {data.top_clients.map((client, idx) => (
-                    <li key={client.client_id} className="flex items-center gap-4 px-4 md:px-6 py-3 md:py-4">
+                    <li key={client.client_id} className="flex items-center gap-3 px-4 md:px-6 py-3 md:py-4">
                       <span className="text-sm font-bold text-gray-300 dark:text-gray-600 w-5 shrink-0">
                         {idx + 1}
                       </span>
@@ -318,17 +318,21 @@ export default function AnalyticsPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{client.full_name}</p>
                       </div>
-                      <div className="flex flex-col items-end gap-1 shrink-0">
+                      <div className="flex flex-col items-end gap-1 shrink-0 max-w-[45%]">
                         {client.debts.map((debt, i) => (
-                          <div key={i} className="flex items-center gap-1.5">
-                            <span className={`text-[10px] font-semibold rounded-full px-1.5 py-0.5 ${
+                          <div key={i} className="flex items-center gap-1 flex-wrap justify-end">
+                            <span className={`hidden sm:inline-flex text-[10px] font-semibold rounded-full px-1.5 py-0.5 ${
                               debt.type === 'receivable'
                                 ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
                                 : 'bg-rose-50 dark:bg-rose-900/20 text-rose-500 dark:text-rose-400'
                             }`}>
                               {debt.type === 'receivable' ? t.iAmOwed : t.iOwe}
                             </span>
-                            <span className="text-sm font-bold text-gray-900 dark:text-white">
+                            <span className={`text-xs sm:text-sm font-bold ${
+                              debt.type === 'receivable'
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : 'text-rose-500 dark:text-rose-400'
+                            }`}>
                               {fmt(debt.amount)} {debt.currency}
                             </span>
                           </div>

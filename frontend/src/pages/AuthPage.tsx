@@ -44,7 +44,7 @@ export default function AuthPage() {
         </div>
 
         {/* Form card */}
-        <div className="rounded-3xl bg-white px-8 py-8 shadow-2xl">
+        <div className="rounded-3xl bg-white px-5 sm:px-8 py-6 sm:py-8 shadow-2xl">
           {/* Tabs */}
           <div className="mb-6 flex rounded-xl bg-gray-100 p-1">
             <button

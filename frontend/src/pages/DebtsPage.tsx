@@ -45,12 +45,12 @@ function DebtRow({ debt, onClick }: { debt: Debt; onClick: () => void }) {
         <p className="text-xs md:text-sm text-gray-400 dark:text-gray-500 mt-0.5">{formatDate(debt.due_date ?? debt.created_at)}</p>
       </div>
 
-      <div className="flex flex-col items-end gap-1.5 shrink-0">
-        <span className={`text-sm md:text-base font-bold ${isReceivable ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+      <div className="flex flex-col items-end gap-1.5 shrink-0 max-w-[45%]">
+        <span className={`text-sm md:text-base font-bold ${isReceivable ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'} text-right`}>
           {isReceivable ? '+' : '−'}{formatMoney(debt.amount, debt.currency)}
         </span>
-        <div className="flex gap-1">
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isReceivable ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'}`}>
+        <div className="flex flex-wrap gap-1 justify-end">
+          <span className={`hidden sm:inline-flex text-xs font-semibold px-2 py-0.5 rounded-full ${isReceivable ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'}`}>
             {isReceivable ? t.receivable : t.payable}
           </span>
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusCls}`}>{statusLabel}</span>
@@ -264,7 +264,7 @@ export default function DebtsPage() {
 
             {/* Filter panel */}
             {showFilters && (
-              <div className="absolute right-0 top-full mt-2 z-50 w-72 rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-4 flex flex-col gap-3">
+              <div className="absolute right-0 top-full mt-2 z-50 w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-4 flex flex-col gap-3">
                 {/* Currency */}
                 <div>
                   <label className={labelCls}>{t.currency}</label>
