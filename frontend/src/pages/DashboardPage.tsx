@@ -75,7 +75,8 @@ function SkeletonDashboard() {
 export default function DashboardPage() {
   const t = useT()
   const user = useAuthStore((s) => s.user)
-  const activeBusinessId = useBusinessStore((s) => s.activeBusiness?.id)
+  const activeBusiness = useBusinessStore((s) => s.activeBusiness)
+  const activeBusinessId = activeBusiness?.id
 
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -104,11 +105,20 @@ export default function DashboardPage() {
       <div className="max-w-6xl mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 md:mb-8">
-          <div>
-            <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
-              {getGreeting(t)}{displayName ? `, ${displayName}` : ''}!
-            </h1>
-            <p className="text-sm md:text-base text-gray-400 dark:text-gray-500 mt-0.5">{todayStr}</p>
+          <div className="flex items-center gap-3">
+            {activeBusiness?.logo && (
+              <img
+                src={activeBusiness.logo}
+                alt={activeBusiness.name}
+                className="h-10 w-10 md:h-12 md:w-12 rounded-xl object-cover shrink-0 shadow-sm border border-gray-100 dark:border-gray-700"
+              />
+            )}
+            <div>
+              <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {getGreeting(t)}{displayName ? `, ${displayName}` : ''}!
+              </h1>
+              <p className="text-sm md:text-base text-gray-400 dark:text-gray-500 mt-0.5">{todayStr}</p>
+            </div>
           </div>
           <Button onClick={() => setShowAdd(true)} className="text-sm md:text-base px-4 md:px-5 py-2 md:py-2.5">
             {t.addDebt}

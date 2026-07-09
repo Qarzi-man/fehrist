@@ -146,7 +146,11 @@ export default function BusinessSwitcher({ isMobile }: { isMobile?: boolean }) {
             : 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50',
         ].join(' ')}
       >
-        <BuildingIcon />
+        {activeBusiness?.logo ? (
+          <img src={activeBusiness.logo} alt="" className="h-5 w-5 rounded object-cover shrink-0" />
+        ) : (
+          <BuildingIcon />
+        )}
         <span className="flex-1 truncate min-w-0">{activeBusiness?.name ?? t.loading}</span>
         <ChevronIcon />
       </button>
